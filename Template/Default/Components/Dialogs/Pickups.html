@@ -1,0 +1,31 @@
+﻿<div class="modal-header">
+    <h4 class="modal-title">Pending Pickups</h4>
+</div>
+<div class="modal-body">
+    <div class="form-group">
+        <div class="table-responsive">
+            <table class="table table-condensed table-hover table-striped">
+                <thead>
+                    <tr>
+                        <th width ="135px;">Pickup Date</th>
+                        <th class="hidden-xs">Comments</th>
+                        <th class="hidden-xs">Instructions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="pickup in filteredPickups | orderBy: 'PickupDate'">
+                        <td width="135px;">{{pickup.PickupDate | date:'shortDate'}}</td>
+                        <td class="hidden-xs">{{pickup.Comments}}</td>
+                        <td class="hidden-xs">{{pickup.InstructionsRequests}}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="form-group text-center">
+            <pagination boundary-links="true" max-size="3" items-per-page="itemsPerPage" total-items="Pickups.PendingPickups.length" ng-model="currentPage" ng-change="pageChanged()" num-pages="numPages" previous-text="&lsaquo;" next-text="&rsaquo;" first-text="&laquo;" last-text="&raquo;"></pagination>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <label class="btn btn-success" ng-click="done()">Close</label>
+    </div>
+</div>

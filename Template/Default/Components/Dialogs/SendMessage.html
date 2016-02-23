@@ -1,0 +1,42 @@
+﻿<div class="modal-header">
+    <h4 class="modal-title">Send Message</h4>
+</div>
+<div class="modal-body">
+    <div ng-if="data.Settings.General['Enable Captcha'] == 1 && !data.CaptchaValid && !data.LoggedIn" vc-recaptcha key="'6LcFpwUTAAAAADf8OJeuriHgIZiI6Av9hcC3wqok'" theme="light" size="normal" on-create="setWidgetId(widgetid)"></div>
+
+    <div ng-if="data.InvoiceId" class="form-group">
+        Invoice Number: {{data.InvoiceKey}}
+    </div>
+
+    <form name="messageManagerForm" novalidate>
+        <div class="form-group" ng-if="!data.LoggedIn" ng-class="{'has-error':messageManagerForm.messageManagerName.$invalid && messageManagerForm.messageManagerName.$dirty, 'has-success':messageManagerForm.messageManagerName.$valid && messageManagerForm.messageManagerName.$dirty}">
+            <label for="messageManagerName" class="control-label">Name</label>
+            <input type="text" class="form-control" name="messageManagerName" ng-model="data.name" placeholder="Enter name (Required)" title="Please enter your name." required />
+            <span class="glyphicon glyphicon-remove form-control-feedback" aria-hidden="true" ng-if="messageManagerForm.messageManagerName.$invalid && messageManagerForm.messageManagerName.$dirty"></span>
+            <span class="glyphicon glyphicon-ok form-control-feedback" aria-hidden="true" ng-if="messageManagerForm.messageManagerName.$valid && messageManagerForm.messageManagerName.$dirty"></span>
+        </div>
+        <div class="form-group" ng-if="!data.LoggedIn" ng-class="{'has-error':messageManagerForm.messageManagerEmail.$invalid && messageManagerForm.messageManagerEmail.$dirty, 'has-success':messageManagerForm.messageManagerEmail.$valid && messageManagerForm.messageManagerEmail.$dirty}">
+            <label for="messageManagerEmail" class="control-label">Email Address</label>
+            <input type="email" class="form-control" name="messageManagerEmail" ng-model="data.emailAddress" placeholder="Enter email address (Required)" title="Please enter your email." required />
+            <span class="glyphicon glyphicon-remove form-control-feedback" aria-hidden="true" ng-if="messageManagerForm.messageManagerEmail.$invalid && messageManagerForm.messageManagerEmail.$dirty"></span>
+            <span class="glyphicon glyphicon-ok form-control-feedback" aria-hidden="true" ng-if="messageManagerForm.messageManagerEmail.$valid && messageManagerForm.messageManagerEmail.$dirty"></span>
+        </div>
+        <div class="form-group" ng-class="{'has-error':messageManagerForm.messageManagerSubject.$invalid && messageManagerForm.messageManagerSubject.$dirty, 'has-success':messageManagerForm.messageManagerSubject.$valid && messageManagerForm.messageManagerSubject.$dirty}">
+            <label for="messageManagerSubject" class="control-label">Subject</label>
+            <input type="text" class="form-control" name="messageManagerSubject" ng-model="data.subject" placeholder="Enter subject (Required)" title="Please enter a subject." required />
+            <span class="glyphicon glyphicon-remove form-control-feedback" aria-hidden="true" ng-if="messageManagerForm.messageManagerSubject.$invalid && messageManagerForm.messageManagerSubject.$dirty"></span>
+            <span class="glyphicon glyphicon-ok form-control-feedback" aria-hidden="true" ng-if="messageManagerForm.messageManagerSubject.$valid && messageManagerForm.messageManagerSubject.$dirty"></span>
+        </div>
+        <div class="form-group" ng-class="{'has-error':messageManagerForm.messageManagerBody.$invalid && messageManagerForm.messageManagerBody.$dirty, 'has-success':messageManagerForm.messageManagerBody.$valid && messageManagerForm.messageManagerBody.$dirty}">
+            <label for="messageManagerBody" class="control-label">Message</label>
+            <textarea name="messageManagerBody" class="form-control" ng-model="data.messageBody" placeholder="Enter message (Required)" title="Please enter a message. (Required)" maxlength="255" rows="6" required></textarea>
+            <span class="glyphicon glyphicon-remove form-control-feedback" aria-hidden="true" ng-if="messageManagerForm.messageManagerBody.$invalid && messageManagerForm.messageManagerBody.$dirty"></span>
+            <span class="glyphicon glyphicon-ok form-control-feedback" aria-hidden="true" ng-if="messageManagerForm.messageManagerBody.$valid && messageManagerForm.messageManagerBody.$dirty"></span>
+        </div>
+
+        <div class="modal-footer">           
+            <button class="btn btn-primary" ng-click="done()" ng-disabled="!messageManagerForm.$valid">Send</button>
+            <button class="btn btn-warning" ng-click="cancel()">Cancel</button>
+        </div>
+    </form>
+</div>

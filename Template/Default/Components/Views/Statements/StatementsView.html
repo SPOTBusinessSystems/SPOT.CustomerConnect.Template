@@ -1,0 +1,41 @@
+﻿<div ng-controller="StatementsController" id="statementsForm" class="fullPage">
+    <div class="text-center">
+        <h2>View Statements</h2>
+        <br />
+    </div>
+    <div class="table-responsive">
+        <table class="table table-condensed table-hover table-striped">
+            <thead>
+                <tr>
+                    <th>Statement Date</th>
+                    <th class="hidden-xs hidden-sm">Closing Date</th>
+                    <th>Due Date</th>
+                    <th class="hidden-xs">Previous Balance</th>
+                    <th class="hidden-xs">Total Charges</th>
+                    <th class="hidden-xs">Total Payments</th>
+                    <th>Balance</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-if="Statements.length == 0"><td colspan="4">No statements found</td></tr>
+                <tr ng-repeat="statement in Statements">
+                    <td><a href="" ng-click="ShowStatement(statement.StatementID)">{{statement.StatementDate | date:'shortDate'}}</a></td>
+                    <td class="hidden-xs hidden-sm">{{statement.ClosingDate | date:'shortDate'}}</td>
+                    <td>{{statement.DueDate | date:'shortDate'}}</td>
+                    <td class="hidden-xs">{{statement.BalancePrevious | currency}}</td>
+                    <td class="hidden-xs">{{statement.TotalCharges | currency}}</td>
+                    <td class="hidden-xs">{{statement.TotalPayments | currency}}</td>
+                    <td>{{statement.Balance | currency}}</td>
+                </tr>
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td colspan="5" class="text-center"></td>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+    <div class="form-group text-center">
+        <pagination boundary-links="true" max-size="3" items-per-page="itemsPerPage" total-items="Statements.length" ng-model="currentPage" ng-change="pageChanged()" num-pages="numPages" previous-text="&lsaquo;" next-text="&rsaquo;" first-text="&laquo;" last-text="&raquo;"></pagination>
+    </div>
+</div>

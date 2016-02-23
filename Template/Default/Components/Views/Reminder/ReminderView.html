@@ -1,0 +1,20 @@
+﻿<div ng-controller="ReminderController" id="reminder" class="smallPage">
+    <div class="page-header">
+        <h3>Change password</h3>
+    </div>
+    <form name="form" novalidate>
+        <div class="form-group">
+            <passwordindicator />
+            <div class="input-group has-feedback" ng-class="{'has-error':form.zip.$invalid && form.zip.$dirty, 'has-success':form.zip.$valid && form.zip.$dirty}">
+                <span class=" input-group-addon">
+                    <i class="glyphicon glyphicon-pencil"></i>
+                </span>
+                <input name="zip" ng-model="Request.ZipCode" class="form-control" placeholder="Confirm Postal Code (#####)" minlength="5" maxlength="5" required />
+                <span class="glyphicon glyphicon-remove form-control-feedback" aria-hidden="true" ng-if="form.zip.$invalid && form.zip.$dirty"></span>
+                <span class="glyphicon glyphicon-ok form-control-feedback" aria-hidden="true" ng-if="form.zip.$valid && form.zip.$dirty"></span>
+            </div>
+        </div>
+
+        <input type="submit" class="btn btn-primary" value="Change Password" ng-click="ChangePassword();" ng-disabled="!form.$valid || data.PasswordConfirm != data.Password" />
+    </form>
+</div>

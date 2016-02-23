@@ -1,0 +1,153 @@
+﻿<div id="signUpForm" class="smallPage container-fluid" ng-controller="SignupController">
+    <wizard name="SignupWizard" on-finish="finishedWizard()">
+        <wz-step title="Basic">
+            <!-- Customer Type -->
+            <form name="form" novalidate>
+                <div class="form-group">
+                    <div class="input-group has-feedback" ng-class="{'has-error':!validEmail(), 'has-success':validEmail()}">
+                        <span class="input-group-addon"><i class="glyphicon glyphicon-envelope"></i></span>
+                        <input type="email" id="emailAddress" name="email" ng-model="Customer.Email" class="form-control" placeholder="Email Address (Required)" required />
+                        <span class="glyphicon glyphicon-remove form-control-feedback" aria-hidden="true" ng-if="!validEmail() && (form.email.$dirty || form.email.value.length > 0)"></span>
+                        <span class="glyphicon glyphicon-ok form-control-feedback" aria-hidden="true" ng-if="validEmail() && (form.email.$dirty || form.email.value.length > 0)"></span>
+                    </div>
+
+                    <passwordindicator />
+
+                    <div class="input-group has-feedback" ng-class="{'has-error':form.firstname.$invalid && form.firstname.$dirty, 'has-success':form.firstname.$valid && form.firstname.$dirty}">
+                        <span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span>
+                        <input id="firstName" name="firstname" ng-model="Customer.FirstName" class="form-control" placeholder="First Name (Required)" required />
+                        <span class="glyphicon glyphicon-remove form-control-feedback" aria-hidden="true" ng-if="form.firstname.$invalid && form.firstname.$dirty"></span>
+                        <span class="glyphicon glyphicon-ok form-control-feedback" aria-hidden="true" ng-if="form.firstname.$valid && form.firstname.$dirty"></span>
+                    </div>
+                    <div class="input-group has-feedback" ng-class="{'has-error':form.lastname.$invalid && form.lastname.$dirty, 'has-success':form.lastname.$valid && form.lastname.$dirty}">
+                        <span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span>
+                        <input id="lastName" name="lastname" ng-model="Customer.LastName" class="form-control" placeholder="Last Name (Required)" required />
+                        <span class="glyphicon glyphicon-remove form-control-feedback" aria-hidden="true" ng-if="form.lastname.$invalid && form.lastname.$dirty"></span>
+                        <span class="glyphicon glyphicon-ok form-control-feedback" aria-hidden="true" ng-if="form.lastname.$valid && form.lastname.$dirty"></span>
+                    </div>
+
+                    <div class="form-group" style="display:table-row;" ng-class="{'has-error':form.phonenumber.$invalid && form.phonenumber.$dirty && form.phonetype.value == 'Choose Type', 'has-success':form.phonenumber.$valid && form.phonenumber.$dirty && form.phonetype.value != 'Choose Type'}">
+                        <span class="input-group-addon" style="display:table-cell"><label class="glyphicon glyphicon-phone"></label></span>
+                        <input id="phoneNumber" name="phonenumber" ng-model="Customer.PhoneNumber" class="form-control" placeholder="{{ Settings.General['Data Formats']['Phone Mask'] }}" tooltip="{{ Settings.General['Data Formats']['Phone Mask'] }}" tooltip-trigger="focus" required type="tel" pattern="[0-9]*" />
+                        <select id="phonetype" ng-model="Customer.PhoneType" class="form-control" required>
+                            <option>Home</option>
+                            <option value="Cell/Mobile">Mobile</option>
+                            <option>Work</option>
+                            <option>Other</option>
+                            <option>Principal</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group" ng-show="Settings.General['Customer Referral']['Enable Customer Referral'] == 1">
+                        <br />
+                        <label class="control-label">Referring Customer ID</label>
+                        <input class="form-control" type="text" id="referringCustomer" name="referringCustomer" ng-model="Customer.ReferringCustomerKey" placeholder="Referring Customer ID" />
+                    </div>
+                </div>
+
+                <div class="form-group center">
+                    <input type="submit" class="btn btn-success" wz-next ng-disabled="!form.$valid || data.PasswordConfirm != data.Password" ng-click="storePass(data.Password)" value="Continue" />
+                </div>
+            </form>
+        </wz-step>
+        <wz-step title="Type">
+            <!-- Route or Counter -->
+            <form novalidate>
+                <div class="form-group text-center">
+                    <label class="control-label">Would you like to sign up for delivery?</label><br />
+                    <input type="button" class="btn btn-info" wz-next value="No" ng-click="Customer.Type = 'RETAIL'" />
+                    <input type="submit" class="btn btn-success" wz-next value="Yes" ng-click="Customer.Type = 'DELIVERY'" />
+                </div>
+
+                <div class="form-group">
+                    <input type="button" class="btn btn-danger" wz-previous value="Go Back" />
+                </div>
+            </form>
+        </wz-step>
+        <wz-step title="Details">
+            <!-- Address -->
+            <form name="addressForm" novalidate>
+                <div class="form-group">
+                    <div class="input-group">
+                        <span class="input-group-addon"><i class="glyphicon glyphicon-pencil"></i></span>
+                        <input type="text" id="address1" ng-model="Customer.Address1" class="form-control" placeholder="Address 1" aria-describedby="add1" ng-required="Customer.Type == 'DELIVERY'" />
+                    </div>
+
+                    <div class="input-group">
+                        <span class="input-group-addon"><i class="glyphicon glyphicon-pencil"></i></span>
+                        <input id="address2" ng-model="Customer.Address2" class="form-control" placeholder="Address 2" />
+                    </div>
+
+                    <div class="input-group">
+                        <span class="input-group-addon"><i class="glyphicon glyphicon-pencil"></i></span>
+                        <input id="city" ng-model="Customer.City" class="form-control" placeholder="City" ng-required="Customer.Type == 'DELIVERY'" />
+                        <span class="glyphicon form-control-feedback" aria-hidden="true"></span>
+                    </div>
+
+                    <states ng-model="Customer.State" ng-required="Customer.Type == 'DELIVERY'" />
+
+                    <div class="input-group">
+                        <span class="input-group-addon"><i class="glyphicon glyphicon-pencil"></i></span>
+                        <input id="zip" ng-model="Customer.Zip" class="form-control" placeholder="Postal Code" ng-required="Customer.Type == 'DELIVERY'" />
+                        <span class="glyphicon form-control-feedback" aria-hidden="true"></span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <input type="button" class="btn btn-danger" wz-previous value="Go Back" />
+                    <input type="submit" class="btn btn-success" ng-disabled="Customer.Type == 'DELIVERY' && !addressForm.$dirty && addressValid()" wz-next value="Continue" />
+                </div>
+            </form>
+        </wz-step>
+        <wz-step title="Confirm">
+            <div class="form-group">
+                <!-- Basic -->
+                <div ng-if="Customer.Email">
+                    <label class="control-label">{{ Customer.Email }}</label><br />
+                </div>
+
+                <div ng-if="Customer.FirstName">
+                    <label class="control-label">{{ Customer.FirstName }}</label><br />
+                </div>
+
+                <div ng-if="Customer.LastName">
+                    <label class="control-label">{{ Customer.LastName }}</label><br />
+                </div>
+
+                <div ng-if="Customer.PhoneNumber">
+                    <label class="control-label">{{ Customer.PhoneNumber }}</label><br />
+                </div>
+
+                <!-- Address -->
+                <div ng-if="Customer.Address1">
+                    <label class="control-label">{{ Customer.Address1 }}</label><br />
+                </div>
+
+                <div ng-if="Customer.Address2">
+                    <label class="control-label">{{ Customer.Address2 }}</label><br />
+                </div>
+
+                <div ng-if="Customer.City">
+                    <label class="control-label">{{ Customer.City }}</label><br />
+                </div>
+
+                <div ng-if="Customer.State">
+                    <label class="control-label">{{ Customer.State }}</label><br />
+                </div>
+
+                <div ng-if="Customer.Zip">
+                    <label class="control-label">{{ Customer.Zip }}</label><br />
+                </div>
+            </div>
+
+            <form novalidate>
+                <div ng-if="Customer.Settings.General['Enable Captcha'] == 1 && !Customer.CaptchaValid" vc-recaptcha key="'6LcFpwUTAAAAADf8OJeuriHgIZiI6Av9hcC3wqok'" on-create="setWidgetId(widgetId)"></div>
+            </form>
+
+            <div class="form-group">
+                <input type="button" class="btn btn-danger" wz-previous value="Go Back" />
+                <input type="submit" class="btn btn-success" wz-finish value="Save" />
+            </div>
+        </wz-step>
+    </wizard>
+</div>

@@ -1,0 +1,90 @@
+﻿<div ng-controller="PickupController" class="smallPage">
+    <div class="text-center">
+        <h2>Schedule Your Pickup</h2>
+        <br />
+    </div>
+    <div class="form-group text-center">
+        <h4>Available pickup days:</h4>
+        <div ng-if="Customer.RouteDays.charAt(0) == 'M'">
+            <label class="control-label">&nbsp;&nbsp;&nbsp;Monday</label>
+            <br />
+        </div>
+        <div ng-if="Customer.RouteDays.charAt(1) == 'T'">
+            <label class="control-label">&nbsp;&nbsp;&nbsp;Tuesday</label>
+            <br />
+        </div>
+        <div ng-if="Customer.RouteDays.charAt(2) == 'W'">
+            <label class="control-label">&nbsp;&nbsp;&nbsp;Wednesday</label>
+            <br />
+        </div>
+        <div ng-if="Customer.RouteDays.charAt(3) == 'T'">
+            <label class="control-label">&nbsp;&nbsp;&nbsp;Thursday</label>
+            <br />
+        </div>
+        <div ng-if="Customer.RouteDays.charAt(4) == 'F'">
+            <label class="control-label">&nbsp;&nbsp;&nbsp;Friday</label>
+            <br />
+        </div>
+        <div ng-if="Customer.RouteDays.charAt(5) == 'S'">
+            <label class="control-label">&nbsp;&nbsp;&nbsp;Saturday</label>
+            <br />
+        </div>
+        <div ng-if="Customer.RouteDays.charAt(6) == 'S'">
+            <label class="control-label">&nbsp;&nbsp;&nbsp;Sunday</label>
+            <br />
+        </div>
+    </div>
+
+    <div class="form-group">
+        <form name="pickupForm" novalidate>
+            <label class="control-label">Pickup Date</label><br />
+            <div class="input-group" ng-class="{'has-error':pickupForm.pickupDate.$invalid && pickupForm.pickupDate.$dirty, 'has-success':pickupForm.pickupDate.$valid && pickupForm.pickupDate.$dirty}">
+                <span class="input-group-btn">
+                    <button type="button" class="btn btn-info" ng-click="open($event)"><i class="glyphicon glyphicon-calendar"></i></button>
+                </span>
+                <input name="pickupDate" type="text" class="form-control" datepicker-popup="{{dateFormat}}" ng-model="Pickup.Date" is-open="openedPickup" close-text="Close" placeholder="Choose a Pickup Date (Required)"
+                       ng-click="open($event, true)" min-date="minDate" max-date="maxDate" datepicker-options="dateOptions" date-disabled="disabled(date, mode)" ng-required="true" required />
+                <span class="glyphicon glyphicon-remove form-control-feedback" aria-hidden="true" ng-if="pickupForm.pickupDate.$invalid && pickupForm.pickupDate.$dirty"></span>
+                <span class="glyphicon glyphicon-ok form-control-feedback" aria-hidden="true" ng-if="pickupForm.pickupDate.$valid && pickupForm.pickupDate.$dirty"></span>
+            </div>
+
+            <div class="input-group">
+                <timepicker ng-model="Pickup.Date" hour-step="1" minute-step="30" show-meridian="true" readonly-input="true" ng-change="timeChange()" ng-if="Settings.Pickup['Allow Time Selection'] == '1'"></timepicker>
+            </div>
+
+            <div ng-if="Settings.Pickup['Allow Delivery Date Selection'] == '1'">
+                <label class="control-label">Delivery Date</label><br />
+                <div class="input-group" ng-class="{'has-error':pickupForm.deliveryDate.$invalid && pickupForm.deliveryDate.$dirty, 'has-success':pickupForm.deliveryDate.$valid && pickupForm.deliveryDate.$dirty}">
+                    <span class="input-group-btn">
+                        <button type="button" class="btn btn-info" ng-click="open($event)"><i class="glyphicon glyphicon-calendar"></i></button>
+                    </span>
+                    <input name="deliveryDate" type="text" class="form-control" datepicker-popup="{{dateFormat}}" ng-model="Pickup.DeliveryDate" is-open="openedDelivery" close-text="Close" placeholder="Choose a Delivery Date (Required)"
+                           ng-click="open($event, false)" min-date="minDate" max-date="maxDate" datepicker-options="dateOptions" date-disabled="disabled(date, mode)" ng-required="true" required />
+                    <span class="glyphicon glyphicon-remove form-control-feedback" aria-hidden="true" ng-if="pickupForm.deliveryDate.$invalid && pickupForm.deliveryDate.$dirty"></span>
+                    <span class="glyphicon glyphicon-ok form-control-feedback" aria-hidden="true" ng-if="pickupForm.deliveryDate.$valid && pickupForm.deliveryDate.$dirty"></span>
+                </div>
+            </div>
+
+            <div class="input-group">
+                <timepicker ng-model="Pickup.DeliveryDate" hour-step="1" minute-step="30" show-meridian="true" readonly-input="true" ng-change="timeChange()" ng-if="Settings.Pickup['Allow Time Selection'] == '1' && Settings.Pickup['Allow Delivery Date Selection'] == '1'"></timepicker>
+            </div>
+
+            <div class="form-group">
+                <label for="comments" class="control-label">Comments</label>
+                <textarea name="comments" class="form-control" ng-model="Pickup.Comments" title="Please enter a message." maxlength="250" rows="6"></textarea>
+                <span>{{Pickup.Comments.length}} / 250</span>
+            </div>
+
+            <div class="form-group">
+                <label for="instructions" class="control-label">Cleaning Instructions/Requests</label>
+                <textarea name="instructions" class="form-control" ng-model="Pickup.Instructions" title="Please enter a message." maxlength="250" rows="6"></textarea>
+                <span>{{Pickup.Instructions.length}} / 250</span>
+            </div>
+
+            <div class="form-group">
+                <label class="btn btn-info" ng-click="pendingPickups()">Show Pending Pickups</label>
+                <label class="btn btn-success" ng-click="schedulePickup()" ng-disabled="!pickupForm.$valid">Schedule Your Pickup</label>
+            </div>
+        </form>
+    </div>
+</div>

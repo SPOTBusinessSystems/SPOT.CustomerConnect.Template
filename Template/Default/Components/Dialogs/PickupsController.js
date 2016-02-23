@@ -1,0 +1,52 @@
+﻿(function () {
+    'use strict';
+
+    angular
+    .module('app')
+    .controller('PickupsController', PickupsController);
+
+    PickupsController.$inject = ['$scope', '$modalInstance', 'blockUI', 'data', 'dialogs'];
+
+    function PickupsController($scope, $modalInstance, blockUI, data, dialogs) {
+        /* jshint validthis:true */
+        var vm = this;
+        vm.title = 'PickupsController';
+
+        activate();
+
+        function activate() {
+            $scope.Pickups = { PendingPickups: data };
+
+            $scope.filteredPickups = [];
+            $scope.itemsPerPage = 5;
+            $scope.currentPage = 1;
+
+            $scope.numPages = function () {
+                return Math.ceil($scope.Pickups.PendingPickups.length / $scope.numPerPage);
+            };
+
+            $scope.figureOutPickupsToDisplay = function () {
+                var begin = (($scope.currentPage - 1) * $scope.itemsPerPage);
+                var end = begin + $scope.itemsPerPage;
+
+                $scope.filteredPickups = [];
+
+                if ($scope.Pickups.PendingPickups != null) {
+                    if ($scope.Pickups.PendingPickups.length > 0) {
+                        $scope.filteredPickups = $scope.Pickups.PendingPickups.slice(begin, end);
+                    }
+                }
+            };
+
+            $scope.pageChanged = function () {
+                $scope.figureOutPickupsToDisplay();
+            };
+
+            $scope.done = function () {
+                $modalInstance.close($scope.data);
+            }; // end done
+
+            $scope.figureOutPickupsToDisplay();
+        }
+    }
+})();

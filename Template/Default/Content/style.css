@@ -1,0 +1,19 @@
+﻿.smallPage {
+    max-width: 450px;
+    margin: 0 auto;
+}
+
+.fullPage {
+    margin: 0 auto;
+}
+
+.sidebyside {
+    width: 50%;
+    display: table-cell;
+}
+
+.center {
+    float: none;
+    margin-left: auto;
+    margin-right: auto;
+}

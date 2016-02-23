@@ -1,0 +1,91 @@
+﻿<div ng-controller="OrdersController" id="ordersForm" class="container fullPage">
+    <div class="text-center">
+        <h2>View Orders</h2>
+        <br />
+    </div>
+    <div class="form-group" style="max-width: 300px; margin: 0 auto;">
+        <select class="form-control" ng-model="Filters.Status" ng-change="LoadOrders()">
+            <option value="128" selected>Current</option>
+            <option value="130">Picked Up</option>
+        </select>
+    </div>
+
+    <div class="form-group" ng-show="Filters.Status == 130" style="max-width: 300px; margin: 10px auto;">
+        <button class="btn btn-info form-control control-label" ng-click="isCollapsed = !isCollapsed">
+            <label ng-if="isCollapsed">Select Dates</label>
+            <label ng-if="!isCollapsed">Hide Dates</label>
+        </button>
+        <div class="form-group" collapse="isCollapsed">
+            <label class="control-label">Start Date</label>
+
+            <div class="input-group">
+                <span class="input-group-btn">
+                    <button type="button" class="btn btn-info" ng-click="open($event, true)"><i class="glyphicon glyphicon-calendar"></i></button>
+                </span>
+                <input type="text" class="form-control" datepicker-popup="{{dateFormat}}" ng-model="Filters.StartDate" is-open="openedStart" close-text="Close" placeholder="Start Date" ng-click="open($event, true)" ng-change="LoadOrders()" readonly required />
+            </div>
+
+            <label class="control-label">End Date</label>
+            <div class="input-group">
+                <span class="input-group-btn">
+                    <button type="button" class="btn btn-info" ng-click="open($event, false)"><i class="glyphicon glyphicon-calendar"></i></button>
+                </span>
+                <input type="text" class="form-control" datepicker-popup="{{dateFormat}}" ng-model="Filters.EndDate" is-open="openedEnd" close-text="Close" placeholder="End Date" ng-click="open($event, false)" ng-change="LoadOrders()" readonly required />
+            </div>
+        </div>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-condensed table-hover table-striped">
+            <thead>
+                <tr>
+                    <th ng-if="Filters.Status == 128">Dropoff Date</th>
+                    <th ng-if="Filters.Status == 129">Ready Date</th>
+                    <th ng-if="Filters.Status == 130">Sold Date</th>
+                    <th>Invoice</th>
+                    <th class="hidden-xs">Department</th>
+                    <th>Balance</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-if="filteredOrders.length == 0"><td colspan="4">No orders found</td></tr>
+                <tr ng-repeat="order in filteredOrders">
+                    <td ng-if="Filters.Status == 128">{{order.DropoffDateTime | date:'short'}}</td>
+                    <td ng-if="Filters.Status == 129">{{order.ReadyDateTime | date:'short'}}</td>
+                    <td ng-if="Filters.Status == 130">{{order.SoldDateTime | date:'short'}}</td>
+                    <td><a href="" ng-click="ShowOrder(order.InvoiceID, Orders)">{{order.InvoiceKey}}</a></td>
+                    <td class="hidden-xs">{{order.DepartmentGroupName}}</td>
+                    <td>{{order.Balance | currency}}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="form-group text-center">
+        <pagination boundary-links="true" max-size="3" items-per-page="itemsPerPage" total-items="Orders.length" ng-model="currentPage" ng-change="pageChanged()" num-pages="NumPages" previous-text="&lsaquo;" next-text="&rsaquo;" first-text="&laquo;" last-text="&raquo;"></pagination>
+    </div>
+
+    <div class="table-responsive" ng-if="Filters.Status == 128">
+        <table class="table table-condensed table-hover table-striped">
+            <thead>
+                <tr>
+                    <th>Ready Date</th>
+                    <th>Invoice</th>
+                    <th class="hidden-xs">Department</th>
+                    <th>Balance</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-if="filteredReadyOrders.length == 0"><td colspan="4">No orders found</td></tr>
+                <tr ng-repeat="readyOrder in filteredReadyOrders">
+                    <td>{{readyOrder.ReadyDateTime | date:'short'}}</td>
+                    <td><a href="" ng-click="ShowOrder(readyOrder.InvoiceID, ReadyOrders)">{{readyOrder.InvoiceKey}}</a></td>
+                    <td class="hidden-xs">{{readyOrder.DepartmentGroupName}}</td>
+                    <td>{{readyOrder.Balance | currency}}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="form-group text-center" ng-if="Filters.Status == 128">
+        <pagination boundary-links="true" max-size="3" items-per-page="itemsPerPage" total-items="ReadyOrders.length" ng-model="readyCurrentPage" ng-change="readyPageChanged()" num-pages="readyNumPages" previous-text="&lsaquo;" next-text="&rsaquo;" first-text="&laquo;" last-text="&raquo;"></pagination>
+    </div>
+</div>

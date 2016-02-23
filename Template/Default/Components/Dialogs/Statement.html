@@ -1,0 +1,52 @@
+﻿<div class="modal-header">
+    <h4 class="modal-title">{{Statement.StatementDate | date:'shortDate'}}<span class="pull-right glyphicon glyphicon-remove" ng-click="close()"></span></h4>
+</div>
+<div class="modal-body">
+    <div class="form-group">
+        <div class="form-group">
+            <span class="input-group">Due Date: {{Statement.DueDate | date:'shortDate'}}</span>
+            <span class="input-group">Closing Date: {{Statement.ClosingDate | date:'shortDate'}}</span>
+        </div>
+        <div class="form-group">
+            <span class="input-group">Previous Balance: {{Statement.BalancePrevious | currency}}</span>
+            <span class="input-group">Total Charges: {{Statement.TotalCharges | currency}}</span>
+            <span class="input-group">Total Payments: {{Statement.TotalPayments | currency}}</span>
+            <span class="input-group">Statement Balance: {{Statement.Balance | currency}}</span>
+        </div>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-condensed table-hover table-striped">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th class="hidden-xs">Item</th>
+                    <th>Description</th>
+                    <th>Amount</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="item in filteredItems">
+                    <td>{{item.ActivityDateTime | date:'shortDate'}}</td>
+                    <td class="hidden-xs"><a href="" ng-click="ShowOrder(item.InvoiceID, Orders)">{{item.InvoiceKey}}</a></td>
+                    <td ng-if="item.InvoiceKey != ''"><a href="" ng-click="ShowOrder(item.InvoiceID, Orders)">{{item.Description}}</a></td>
+                    <td ng-if="item.InvoiceKey == ''">{{item.Description}}</td>
+                    <td>{{item.Amount | currency}}</td>
+                </tr>
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td colspan="5" class="text-center"></td>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+    <div class="form-group text-center">
+        <pagination boundary-links="true" max-size="3" items-per-page="itemsPerPage" total-items="Statement.StatementItems.length" ng-model="currentPage" ng-change="pageChanged()" num-pages="numPages" previous-text="&lsaquo;" next-text="&rsaquo;" first-text="&laquo;" last-text="&raquo;"></pagination>
+    </div>
+
+    <div class="modal-footer">
+        <button class="btn btn-warning" ng-controller="SendMessageController" ng-click="open()">Send Message</button>
+        <button class="btn btn-primary" ng-click="close()">Close</button>
+    </div>
+</div>

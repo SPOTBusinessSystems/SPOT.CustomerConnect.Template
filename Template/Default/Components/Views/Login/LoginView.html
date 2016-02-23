@@ -1,0 +1,47 @@
+﻿<div ng-controller="LoginController" class="smallPage">
+    <div class="text-center">
+        <h2>Login</h2>
+        <br />
+    </div>
+    <form name="loginForm" ng-submit="loginUser();" novalidate>
+        <div class="form-group">
+            <div class="input-group has-feedback" ng-class="{'has-error':loginForm.loginEmail.$dirty && !validEmail(), 'has-success':loginForm.loginEmail.$dirty && validEmail()}">
+                <span class="input-group-addon"><i class="glyphicon glyphicon-envelope"></i></span>
+                <input type="email" class="form-control" ng-model="emailAddress" name="loginEmail" placeholder="Email Address" title="Please enter your email address." required />
+                <span class="glyphicon glyphicon-remove form-control-feedback" aria-hidden="true" ng-if="loginForm.loginEmail.$dirty && !validEmail()"></span>
+                <span class="glyphicon glyphicon-ok form-control-feedback" aria-hidden="true" ng-if="loginForm.loginEmail.$dirty && validEmail()"></span>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="input-group has-feedback" ng-class="{'has-error':loginForm.loginPassword.$invalid && loginForm.loginPassword.$dirty, 'has-success':loginForm.loginPassword.$valid && loginForm.loginPassword.$dirty}">
+                <span class="input-group-addon"><i class="glyphicon glyphicon-lock"></i></span>
+                <input type="password" class="form-control" ng-model="password" name="loginPassword" placeholder="Password" title="Password must contain 6 to 30 characters with at least 1 capital letter and 1 number." required ng-minlength="4" ng-maxlength="30" />
+                <span class="glyphicon glyphicon-remove form-control-feedback" aria-hidden="true" ng-if="loginForm.loginPassword.$invalid && loginForm.loginPassword.$dirty"></span>
+                <span class="glyphicon glyphicon-ok form-control-feedback" aria-hidden="true" ng-if="loginForm.loginPassword.$valid && loginForm.loginPassword.$dirty"></span>
+            </div>
+        </div>
+        <div class="form-group text-center">
+            <div class="checkbox">
+                <label>
+                    <input type="checkbox" ng-model="rememberEmail" />&nbsp;&nbsp;Remember my email address.
+                </label>
+            </div>
+        </div>
+
+        <!-- Justified for large screens -->
+        <div class="btn-group btn-group-justified hidden-xs">
+            <label class="btn btn-success" ng-click="loginUser();" ng-disabled="!loginForm.loginEmail.$valid || !loginForm.loginPassword.$valid">Login</label>
+            <label class="btn btn-danger" ng-click="forgotPassword();" ng-disabled="!loginForm.loginEmail.$dirty || !validEmail()">Forgot Password</label>
+            <label class="btn btn-primary" ng-click="createAccount();">Create Account</label>
+        </div>
+
+        <!-- Stacked for small screens -->
+        <div class="btn-group btn-group-vertical visible-xs">
+            <label class="btn btn-success" ng-click="loginUser();" ng-disabled="!loginForm.loginEmail.$valid || !loginForm.loginPassword.$valid">Login</label>
+            <label class="btn btn-danger" ng-click="forgotPassword();" ng-disabled="!loginForm.loginEmail.$dirty || !validEmail()">Forgot Password</label>
+            <label class="btn btn-primary" ng-click="createAccount();">Create Account</label>
+        </div>
+
+        <input type="submit" style="display: none;" />
+    </form>
+</div>

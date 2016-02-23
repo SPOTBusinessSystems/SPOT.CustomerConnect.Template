@@ -1,0 +1,66 @@
+﻿<div ng-controller="PaymentsController" id="makePaymentForm" class="container fullPage">
+    <div class="text-center">
+        <h2>Make Payment</h2>
+        <br />
+    </div>
+    <div class="table-responsive">
+        <table class="table table-condensed table-hover table-striped">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Item</th>
+                    <th class="hidden-xs">Description</th>
+                    <th>Amount</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-if="filteredPayments.length == 0"><td colspan="4">No payments found</td></tr>
+                <tr ng-repeat="payment in filteredPayments | orderBy: '-PaymentDateTime'">
+                    <td>{{payment.PaymentDateTime | date:'short'}}</td>
+                    <td>{{payment.TenderTypeToken | uppercase}}</td>
+                    <td class="hidden-xs">{{payment.Description}}</td>
+                    <td>{{payment.Amount | currency}}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="form-group text-center">
+        <pagination boundary-links="true" max-size="3" items-per-page="itemsPerPage" total-items="AR.Payments.length" ng-model="currentPage" ng-change="pageChanged()" num-pages="numPages" previous-text="&lsaquo;" next-text="&rsaquo;" first-text="&laquo;" last-text="&raquo;"></pagination>
+    </div>
+
+    <div style="max-width: 300px; margin: 0 auto;">
+        <form name="paymentForm" novalidate>
+            <h3>Current Balance:&nbsp;&nbsp;{{AR.Balance | currency}}</h3>
+            <div class="form-group">
+                <label for="makePaymentAmount" class="control-label">Payment Amount</label>
+                <input name="makePaymentAmount" ng-model="AR.Payment.Amount" class="form-control" type="currency" placeholder="Enter a payment amount (Required)" currencyformatter required />
+                <span class="glyphicon glyphicon-remove form-control-feedback" aria-hidden="true" ng-if="paymentForm.name.$invalid && paymentForm.name.$dirty"></span>
+                <span class="glyphicon glyphicon-ok form-control-feedback" aria-hidden="true" ng-if="paymentForm.name.$valid && paymentForm.name.$dirty"></span>
+            </div>
+            <div class="form-group">
+                <label for="makePaymentCCOFSel" class="control-label">Card On File</label>
+                <select id="makePaymentCCOFSel" class="form-control" ng-model="AR.Payment.CardInformation" ng-options="cc.CardInfo for cc in Customer.CreditCards track by cc.CardId">
+                    <option value="" selected>Other Card</option>
+                </select>
+                <div ng-hide="AR.Payment.CardInformation.CardId">
+                    <div class="form-group">
+                        <div class="form-group">
+                            <div class="input-group has-feedback" ng-class="{'has-error':!CCValid && paymentForm.makePaymentNewCard.$dirty, 'has-success':CCValid && paymentForm.makePaymentNewCard.$dirty}">
+                                <label for="makePaymentNewCard" class="control-label">Other Card Number</label>
+                                <input name="makePaymentNewCard" class="form-control" ng-model="AR.Payment.CardInformation.CardInfo" ng-change="ValidateCard()" placeholder="Enter credit card number (Required)" ng-minlength="8" />
+                                <span class="glyphicon glyphicon-remove form-control-feedback" aria-hidden="true" ng-if="!CCValid && paymentForm.makePaymentNewCard.$dirty"></span>
+                                <span class="glyphicon glyphicon-ok form-control-feedback" aria-hidden="true" ng-if="CCValid && paymentForm.makePaymentNewCard.$dirty"></span>
+                            </div>
+                            <ccexp ng-model="AR.Payment.CardInformation.CardExpiration" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group text-center">
+                <input type="submit" class="btn btn-success" value="Submit" ng-click="submitPayment(false);" ng-disabled="!paymentForm.$dirty && AR.Payment.Amount > 0" />
+                <input type="button" class="btn btn-warning" value="Submit & Save Card" ng-click="submitPayment(true);" ng-disabled="!paymentForm.$dirty && AR.Payment.Amount > 0" />
+            </div>
+        </form>
+    </div>
+</div>

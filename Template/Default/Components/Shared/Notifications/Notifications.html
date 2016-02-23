@@ -1,0 +1,5 @@
+﻿<div ng-repeat="notification in notifications track by notification.name">
+    <label class="form-label">{{ notification.description }}</label>
+    <select ng-model="notification.selectedMethod" ng-options="method.description for method in notification.methods track by method.name" class="form-control">
+    </select>
+</div>

@@ -1,0 +1,41 @@
+﻿<div ng-controller="SuspendController" class="smallPage">
+    <div class="text-center">
+        <h2>Suspend Service</h2>
+        <br />
+    </div>
+    <div class="form-group text-center">
+        <form name="cancellationForm" novalidate>
+            <div class="input-group" ng-class="{'has-error':cancellationForm.fromDate.$invalid && cancellationForm.fromDate.$dirty, 'has-success':cancellationForm.fromDate.$valid && cancellationForm.fromDate.$dirty}">
+                <span class="input-group-btn">
+                    <button type="button" class="btn btn-info" ng-click="open($event)"><i class="glyphicon glyphicon-calendar"></i></button>
+                </span>
+                <input name="fromDate" type="text" class="form-control" datepicker-popup="{{dateFormat}}" ng-model="Cancellation.FromDate" is-open="openedStart" close-text="Close" placeholder="Choose a beginning date (Required)"
+                       ng-click="open($event, true)" min-date="minDate" max-date="maxDate" datepicker-options="dateOptions" ng-required="true" required />
+                <span class="glyphicon glyphicon-remove form-control-feedback" aria-hidden="true" ng-if="cancellationForm.fromDate.$invalid && cancellationForm.fromDate.$dirty"></span>
+                <span class="glyphicon glyphicon-ok form-control-feedback" aria-hidden="true" ng-if="cancellationForm.fromDate.$valid && cancellationForm.fromDate.$dirty"></span>
+            </div>
+
+            <div class="input-group" ng-class="{'has-error':cancellationForm.toDate.$invalid && cancellationForm.toDate.$dirty, 'has-success':cancellationForm.toDate.$valid && cancellationForm.toDate.$dirty}">
+                <span class="input-group-btn">
+                    <button type="button" class="btn btn-info" ng-click="open($event)"><i class="glyphicon glyphicon-calendar"></i></button>
+                </span>
+                <input name="toDate" type="text" class="form-control" datepicker-popup="{{dateFormat}}" ng-model="Cancellation.ToDate" is-open="openedEnd" close-text="Close" placeholder="Choose an ending date (Required)"
+                       ng-click="open($event, false)" min-date="minDate" max-date="maxDate" datepicker-options="dateOptions" ng-required="true" required />
+                <span class="glyphicon glyphicon-remove form-control-feedback" aria-hidden="true" ng-if="cancellationForm.toDate.$invalid && cancellationForm.toDate.$dirty"></span>
+                <span class="glyphicon glyphicon-ok form-control-feedback" aria-hidden="true" ng-if="cancellationForm.toDate.$valid && cancellationForm.toDate.$dirty"></span>
+            </div>
+            <br />
+
+            <div class="form-group">
+                <label for="comments" class="control-label">Comments</label>
+                <textarea name="comments" class="form-control" ng-model="Cancellation.Comments" title="Please enter a message." maxlength="250" rows="6"></textarea>
+                <span>{{Cancellation.Comments.length}} / 250</span>
+            </div>
+
+            <div class="form-group">
+                <label class="btn btn-info" ng-click="pendingSuspensions()">Show Pending Suspensions</label>
+                <label class="btn btn-success" ng-click="scheduleCancellation()" ng-disabled="!cancellationForm.$valid">Suspend Service</label>
+            </div>
+        </form>
+    </div>
+</div>

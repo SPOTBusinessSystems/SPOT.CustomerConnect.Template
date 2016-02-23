@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="app">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>CustomerConnect</title>
+
+    <!-- Dependencies -->
+    <link id="themeCss" rel="stylesheet" href="@TENANT/Template/Default/Content/bootstrap/bootstrap.min.css?v=3.3.2" />
+    <link rel="stylesheet" href="@TENANT/Template/Default/Content/css/styles-bundle.min.css?v=1.0.0" />
+
+    <script src="@TENANT/Template/Default/Scripts/extras-bundle.min.js?v=1.0.0"></script>
+    <script src="@TENANT/Template/Default/Scripts/bootstrap-bundle.min.js?v=1.0.0"></script>
+    <script src="@TENANT/Template/Default/Scripts/angular-bundle.min.js?v=1.0.0"></script>
+
+    <!-- SPOT API -->
+    <script src="@TENANT/Template/Default/Scripts/customerconnect.min.js?v=1.0.0"></script>
+
+    <!-- Core -->
+    <script src="@TENANT/Template/Default/Components/app.js"></script>
+    <script src="@TENANT/Template/Default/Components/service.js"></script>
+
+    <!-- Directives -->
+    <script src="@TENANT/Template/Default/Components/Shared/PasswordIndicator/PasswordIndicatorDirective.js"></script>
+    <script src="@TENANT/Template/Default/Components/Shared/CCExp/CCExp.js"></script>
+    <script src="@TENANT/Template/Default/Components/Shared/Notifications/Notifications.js"></script>
+    <script src="@TENANT/Template/Default/Components/Shared/Preferences/Preferences.js"></script>
+    <script src="@TENANT/Template/Default/Components/Shared/States/States.js"></script>
+
+    <!-- View Controllers - Anonymous -->
+    <script src="@TENANT/Template/Default/Components/maincontroller.js"></script>
+    <script src="@TENANT/Template/Default/Components/Views/Login/LoginController.js"></script>
+    <script src="@TENANT/Template/Default/Components/Views/Reminder/ReminderController.js"></script>
+    <script src="@TENANT/Template/Default/Components/Views/Signup/SignupController.js"></script>
+
+    <!-- View Controllers - Authorized-->
+    <script src="@TENANT/Template/Default/Components/Views/Account/AccountController.js"></script>
+    <script src="@TENANT/Template/Default/Components/Views/GiftCards/GiftCardsController.js"></script>
+    <script src="@TENANT/Template/Default/Components/Views/Kiosk/KioskController.js"></script>
+    <script src="@TENANT/Template/Default/Components/Views/Orders/OrdersController.js"></script>
+    <script src="@TENANT/Template/Default/Components/Views/Payments/PaymentsController.js"></script>
+    <script src="@TENANT/Template/Default/Components/Views/Pickup/PickupController.js"></script>
+    <script src="@TENANT/Template/Default/Components/Views/Statements/StatementsController.js"></script>
+    <script src="@TENANT/Template/Default/Components/Views/Suspend/SuspendController.js"></script>
+
+    <!-- Dialog Controllers -->
+    <script src="@TENANT/Template/Default/Components/Dialogs/DialogController.js"></script>
+    <script src="@TENANT/Template/Default/Components/Dialogs/OrderController.js"></script>
+    <script src="@TENANT/Template/Default/Components/Dialogs/PickupsController.js"></script>
+    <script src="@TENANT/Template/Default/Components/Dialogs/SendMessageController.js"></script>
+    <script src="@TENANT/Template/Default/Components/Dialogs/StatementController.js"></script>
+    <script src="@TENANT/Template/Default/Components/Dialogs/SuspensionsController.js"></script>
+
+    <!-- Captcha -->
+    <script src='//www.google.com/recaptcha/api.js?onload=vcRecaptchaApiLoaded&render=explicit' async defer></script>
+</head>
+<body ng-controller="maincontroller" ng-cloak ng-show="Loaded">
+    <!-- Navigation -->
+    <nav class="navbar navbar-default" ng-if="!LoggedIn">
+        <div class=" container-fluid">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" ng-click="isCollapsed = !isCollapsed">
+                    <span class=" sr-only">
+                        Toggle navigation
+                    </span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <img class="navbar-brand brandImgIcon" ng-src="{{Settings.General['Logo Icon']}}" />
+                <a class="navbar-brand brandText" href="#">{{Settings.General['Brand Name']}}</a>
+            </div>
+            <div class="collapse navbar-collapse" collapse="isCollapsed">
+                <ul class="nav navbar-nav">
+                    <li role="presentation" ui-sref-active="active"><a href="" ui-sref="login" ng-click="isCollapsed = true">Login</a></li>
+                    <li role="presentation" ui-sref-active="active"><a href="" ui-sref="signup" ng-click="isCollapsed = true">{{Settings.Signup['Menu Synonym']}}</a></li>
+                    <li role="presentation" ng-click="isCollapsed = true"><a href="" ng-controller="SendMessageController" ng-click="open();">Contact</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <nav class="navbar navbar-default" ng-if="LoggedIn">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" ng-click="isCollapsed = !isCollapsed">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <img class="navbar-brand brandImgIcon" ng-src="{{Settings.General['Logo Icon']}}" />
+                <a class="navbar-brand brandText" href="#">{{Settings.General['Brand Name']}}</a>
+            </div>
+            <div class="collapse navbar-collapse" collapse="isCollapsed">
+                <ul class="nav navbar-nav">
+                    <li role="presentation" ui-sref-active="active"><a href="" ui-sref="account" ng-click="isCollapsed = true">Account</a></li>
+                    <li role="presentation" ui-sref-active="active" ng-show="Settings.General['Gift Cards Menu Enabled'] == 1"><a href="" ui-sref="giftcards" ng-click="isCollapsed = true">Gift Cards</a></li>
+                    <li role="presentation" ui-sref-active="active" ng-show="Settings.General['Kiosk Menu Enabled'] == 1"><a href="" ui-sref="kiosk" ng-click="isCollapsed = true">Kiosk</a></li>
+                    <li role="presentation" ui-sref-active="active"><a href="" ui-sref="orders" ng-click="isCollapsed = true">Orders</a></li>
+                    <li role="presentation" ui-sref-active="active" ng-show="(Customer.RouteName || Settings.Pickup['Allow Non-Route Pickup'] == 1) && Settings.General['Route Scheduling'] == 1 && Settings.Pickup['Menu Synonym']"><a href="" ui-sref="pickup" ng-click="isCollapsed = true">{{Settings.Pickup['Menu Synonym']}}</a></li>
+                    <li role="presentation" ui-sref-active="active" ng-show="Customer.RouteName && Settings.General['Route Scheduling'] == 1 && Settings.Cancellation['Menu Synonym']"><a href="" ui-sref="suspend" ng-click="isCollapsed = true">{{Settings.Cancellation['Menu Synonym']}}</a></li>
+                    <li role="presentation" ui-sref-active="active" ng-show="Customer.IsAR == true"><a href="" ui-sref="statements" ng-click="isCollapsed = true">Statements</a></li>
+                    <li role="presentation" ui-sref-active="active" ng-show="Customer.IsAR == true"><a href="" ui-sref="payment" ng-click="isCollapsed = true">Make Payment</a></li>
+                    <li role="presentation" ng-click="isCollapsed = true"><a href="" ng-controller="SendMessageController" ng-click="open();">Contact</a></li>
+                    <li role="presentation" ng-click="isCollapsed = true"><a href="" ui-sref="login" ng-click="LogOut(); isCollapsed = true">Logout</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main -->
+    <div class="container">
+        <div ui-view=""></div>
+    </div>
+</body>
+</html>
