@@ -54,6 +54,7 @@
                     type: "POST",
                     async: true,
                     dataType: "json",
+                    contentType: "application/json",
                     success: function (data) {
                         if (requestType == 'Login' && !data.Failed) {
                             CustomerConnect.Config.SessionId = data.ReturnObject.SessionID;

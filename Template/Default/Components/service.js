@@ -281,6 +281,7 @@
                 url: apiConfig.getURL(),
                 data: '{"RequestType":"' + requestType + '","AccountKey":"' + accountKey + '","SessionID":"' + apiConfig.getSessionId() + '","Body":"' + CustomerConnect.Util.base64._encode(JSON.stringify(body)) + '","UserAgent":"' + navigator.userAgent.toString() + '"}',
                 async: true,
+                contentType: "application/json",
                 dataType: "json",
                 headers: {'Content-Type': null}
             }));
