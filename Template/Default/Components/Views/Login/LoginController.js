@@ -97,7 +97,7 @@
 
                 var ip = "1.1.1.1";
 
-                dataService.user.passwordReminder().then(function (data) {
+                dataService.user.passwordReminder({ emailAddress: $scope.emailAddress, ipAddress: ip }).then(function (data) {
                     if (!data.Failed) {
                         var templateData = { IPAddress: ip, RememberKey: data.ReturnObject.RememberKey, FinishUrl: window.location.origin + window.location.pathname + '#/reminder/' + data.ReturnObject.RememberKey };
                         $scope.sendPasswordEmail(templateData);

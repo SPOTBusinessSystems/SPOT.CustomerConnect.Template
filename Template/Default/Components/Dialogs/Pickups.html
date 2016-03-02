@@ -8,6 +8,7 @@
                 <thead>
                     <tr>
                         <th width ="135px;">Pickup Date</th>
+                        <th width="135px;" ng-if="Settings.Pickup['Allow Delivery Date Selection'] == '1'">Delivery Date</th>
                         <th class="hidden-xs">Comments</th>
                         <th class="hidden-xs">Instructions</th>
                     </tr>
@@ -15,6 +16,7 @@
                 <tbody>
                     <tr ng-repeat="pickup in filteredPickups | orderBy: 'PickupDate'">
                         <td width="135px;">{{pickup.PickupDate | date:'shortDate'}}</td>
+                        <td width="135px;" ng-if="Settings.Pickup['Allow Delivery Date Selection'] == '1'">{{pickup.DeliveryDate | date:'shortDate'}}</td>
                         <td class="hidden-xs">{{pickup.Comments}}</td>
                         <td class="hidden-xs">{{pickup.InstructionsRequests}}</td>
                     </tr>
