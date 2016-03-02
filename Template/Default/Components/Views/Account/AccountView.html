@@ -54,7 +54,7 @@
             <h3>Phones</h3>
             <div class="form-group" ng-repeat="phone in Customer.Phones" style="display:table-row;">
                 <span class="input-group-addon" style="display:table-cell"><label class="glyphicon glyphicon-phone"></label></span>
-                <input id="phoneNumber" name="phonenumber" ng-model="phone.Number" class="form-control" placeholder="{{ Settings.General['Data Formats']['Phone Mask'] }}" tooltip="{{ Settings.General['Data Formats']['Phone Mask'] }}" tooltip-trigger="focus" required type="tel" pattern="[0-9]*" />
+                <input id="phoneNumber" name="phonenumber" ng-model="phone.Number" class="form-control" placeholder="{{ Settings.General['Data Formats']['Phone Mask'] }}" tooltip="{{ Settings.General['Data Formats']['Phone Mask'] }}" tooltip-trigger="focus" required type="tel" />
                 <select ng-model="phone.PhoneType" class="form-control">
                     <option>Home</option>
                     <option value="Cell/Mobile">Mobile</option>

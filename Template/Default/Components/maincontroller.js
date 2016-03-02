@@ -149,7 +149,7 @@
                             $rootScope.LoggedIn = true;
                             $state.go('account');
                         } else {
-                            dialogs.error('Load Failed', 'Unable to retrieve customer data. Please login again.');
+                            //dialogs.error('Load Failed', 'Unable to retrieve customer data. Please login again.');
                             localStorageService.remove(CustomerConnect.Config.Tenant + '_token');
                             window.location.reload();
                         }

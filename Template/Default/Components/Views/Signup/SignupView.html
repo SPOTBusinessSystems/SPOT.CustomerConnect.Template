@@ -28,7 +28,7 @@
 
                     <div class="form-group" style="display:table-row;" ng-class="{'has-error':form.phonenumber.$invalid && form.phonenumber.$dirty && form.phonetype.value == 'Choose Type', 'has-success':form.phonenumber.$valid && form.phonenumber.$dirty && form.phonetype.value != 'Choose Type'}">
                         <span class="input-group-addon" style="display:table-cell"><label class="glyphicon glyphicon-phone"></label></span>
-                        <input id="phoneNumber" name="phonenumber" ng-model="Customer.PhoneNumber" class="form-control" placeholder="{{ Settings.General['Data Formats']['Phone Mask'] }}" tooltip="{{ Settings.General['Data Formats']['Phone Mask'] }}" tooltip-trigger="focus" required type="tel" pattern="[0-9]*" />
+                        <input id="phoneNumber" name="phonenumber" ng-model="Customer.PhoneNumber" class="form-control" placeholder="{{ Settings.General['Data Formats']['Phone Mask'] }}" tooltip="{{ Settings.General['Data Formats']['Phone Mask'] }}" tooltip-trigger="focus" required type="tel" />
                         <select id="phonetype" ng-model="Customer.PhoneType" class="form-control" required>
                             <option>Home</option>
                             <option value="Cell/Mobile">Mobile</option>
