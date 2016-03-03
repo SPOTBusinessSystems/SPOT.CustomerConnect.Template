@@ -39,7 +39,10 @@
 
         function controller($scope) {
             $scope.selectedState = {};
-            $scope.states = configService.getProfile().States;
+
+            if (configService.getProfile() != null) {
+                $scope.states = configService.getProfile().States;
+            }
         }
     }
 })();

@@ -50,51 +50,53 @@
         }
         
         // Views
-        $stateProvider.
-        state('login', {
+        $stateProvider.state('login', {
             url: '/login',
             templateUrl: settingsServiceProvider.getPath() + 'Components/Views/Login/LoginView.html'
-        }).
-        state('signup', {
+        })
+        .state('signup', {
             url: '/signup/{key}',
             templateUrl: settingsServiceProvider.getPath() + 'Components/Views/Signup/SignupView.html'
-
-        }).
-        state('payment', {
+        })
+        .state('payment', {
             url: '/payment',
             templateUrl: settingsServiceProvider.getPath() + 'Components/Views/Payments/PaymentsView.html'
-        }).
-        state('account', {
+        })
+        .state('account', {
             url: '/account',
             templateUrl: settingsServiceProvider.getPath() + 'Components/Views/Account/AccountView.html'
-        }).
-        state('giftcards', {
+        })
+        .state('giftcards', {
             url: '/giftcards',
             templateUrl: settingsServiceProvider.getPath() + 'Components/Views/GiftCards/GiftCardsView.html'
-        }).
-        state('orders', {
+        })
+        .state('orders', {
             url: '/orders',
             templateUrl: settingsServiceProvider.getPath() + 'Components/Views/Orders/OrdersView.html'
-        }).
-        state('pickup', {
+        })
+        .state('pickup', {
             url: '/pickup',
             templateUrl: settingsServiceProvider.getPath() + 'Components/Views/Pickup/PickupView.html'
-        }).
-        state('suspend', {
+        })
+        .state('suspend', {
             url: '/suspend',
             templateUrl: settingsServiceProvider.getPath() + 'Components/Views/Suspend/Suspend.html'
-        }).
-        state('kiosk', {
+        })
+        .state('kiosk', {
             url: '/kiosk',
             templateUrl: settingsServiceProvider.getPath() + 'Components/Views/Kiosk/KioskView.html'
-        }).
-        state('statements', {
+        })
+        .state('statements', {
             url: '/statements',
             templateUrl: settingsServiceProvider.getPath() + 'Components/Views/Statements/StatementsView.html'
-        }).
-        state('reminder', {
+        })
+        .state('reminder', {
             url: '/reminder/{key}',
             templateUrl: settingsServiceProvider.getPath() + 'Components/Views/Reminder/ReminderView.html'
+        })
+        .state('pickupemail', {
+            url: '/pickupemail?Status&PickupDate&TransactionID',
+            templateUrl: settingsServiceProvider.getPath() + 'Components/Views/PickupEmail/PickupEmail.html'
         });
 
         $urlRouterProvider.otherwise('/login');
@@ -111,9 +113,10 @@
         apiConfig.setURL(CustomerConnect.Config.URL);
         apiConfig.setAccountKey(CustomerConnect.Config.AccountKey);
         apiConfig.setSessionId(CustomerConnect.Config.SessionId);
+        apiConfig.setPublishableId(CustomerConnect.Config.PublishableId);
 
         // enumerate routes that don't need authentication
-        var routesThatDontRequireAuth = ['/login', '/signup/{key}', '/reminder/{key}'];
+        var routesThatDontRequireAuth = ['/login', '/signup/{key}', '/reminder/{key}', '/pickupemail?Status&PickupDate&TransactionID'];
 
         // check if current location matches route
         var routeClean = function (route) {

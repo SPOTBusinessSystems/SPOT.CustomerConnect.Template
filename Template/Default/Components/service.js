@@ -38,6 +38,18 @@
         this.getAccountKey = function () {
             return this.accountKey;
         }
+
+        this.setPublishableId = function (publishableId) {
+            this.publishableId = publishableId;
+        }
+
+        this.getPublishableId = function () {
+            return this.publishableId;
+        }
+
+        this.getFileResourceUrl = function (fileName) {
+            return this.getURL().replace('/q', '/g') + '?Id=' + this.getPublishableId() + '&Action=GetFileResource&Name=' + fileName
+        }
     }
 
     function configService(dataService) {
@@ -259,6 +271,9 @@
 
         // Util
         var util = {
+            getFileResource: function (fileName) {
+                return (getFileResource(fileName).then(handleSuccess, handleError));
+            }
         }
 
         // Dependency
@@ -274,17 +289,23 @@
         });
 
         function createRequest(requestType, body) {
-            var accountKey = apiConfig.getAccountKey();
-
             return ($http({
                 method: 'post',
                 url: apiConfig.getURL(),
-                data: '{"RequestType":"' + requestType + '","AccountKey":"' + accountKey + '","SessionID":"' + apiConfig.getSessionId() + '","Body":"' + CustomerConnect.Util.base64._encode(JSON.stringify(body)) + '","UserAgent":"' + navigator.userAgent.toString() + '"}',
+                data: '{"RequestType":"' + requestType + '","AccountKey":"' + apiConfig.getAccountKey() + '","SessionID":"' + apiConfig.getSessionId() + '","Body":"' + CustomerConnect.Util.base64._encode(JSON.stringify(body)) + '","UserAgent":"' + navigator.userAgent.toString() + '"}',
                 async: true,
                 contentType: "application/json",
                 dataType: "json",
                 headers: {'Content-Type': null}
             }));
+        }
+
+        function getFileResource(fileName) {
+            return ($http({
+                method: 'get',
+                url: apiConfig.getFileResourceUrl(fileName),
+                async: true
+            }))
         }
 
         // I transform the error response, unwrapping the application dta from
