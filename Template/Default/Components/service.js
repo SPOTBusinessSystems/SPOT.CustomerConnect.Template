@@ -265,7 +265,7 @@
             },
 
             sendMessage: function (subject, body, invoiceid) {
-                return (createRequest('MessageToManagerUser', { subject: subject, message: message, invoiceid: invoiceid }).then(handleSuccess, handleError));
+                return (createRequest('MessageToManagerNoUser', { subject: subject, message: body, invoiceid: invoiceid }).then(handleSuccess, handleError));
             }
         }
 

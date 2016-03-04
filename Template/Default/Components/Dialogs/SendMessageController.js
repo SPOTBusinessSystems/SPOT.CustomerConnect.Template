@@ -61,7 +61,12 @@
                         dialogs.notify('Message Sent', 'Your message has been sent successfully.');
                     } else {
                         dialogs.error('Sending Error', 'Your message was not able to be sent. Please try again.');
-                        $scope.open(invoiceId, invoiceKey);
+
+                        console.log(data);
+
+                        if (invoiceId !== undefined) {
+                            $scope.open(invoiceId, invoiceKey);
+                        }
                     }
                 });
             };
