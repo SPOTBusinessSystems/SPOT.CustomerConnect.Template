@@ -5,9 +5,9 @@
     .module('app')
     .controller('PickupsController', PickupsController);
 
-    PickupsController.$inject = ['$scope', '$modalInstance', 'blockUI', 'data', 'dialogs'];
+    PickupsController.$inject = ['$scope', '$uibModalInstance', 'blockUI', 'data', 'dialogs'];
 
-    function PickupsController($scope, $modalInstance, blockUI, data, dialogs) {
+    function PickupsController($scope, $uibModalInstance, blockUI, data, dialogs) {
         /* jshint validthis:true */
         var vm = this;
         vm.title = 'PickupsController';
@@ -43,7 +43,7 @@
             };
 
             $scope.done = function () {
-                $modalInstance.close($scope.data);
+                $uibModalInstance.close($scope.data);
             }; // end done
 
             $scope.figureOutPickupsToDisplay();

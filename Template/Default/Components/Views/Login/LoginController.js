@@ -35,7 +35,17 @@
                         $rootScope.Customer = data.ReturnObject;
                         userService.setCustomer(data.ReturnObject);
                         $rootScope.LoggedIn = true;
-                        $state.go('account');
+
+                        dataService.user.getMessages().then(function (data) {
+                            if (!data.Failed) {
+                                userService.setMessages(data.ReturnObject);
+                                $scope.unreadMessages = userService.unreadMessageCount();
+                            } else {
+                                dialogs.error('Messages Error', 'Unable to load messages.')
+                            }
+
+                            $state.go('account');
+                        });
                     } else {
                         dialogs.error('Load Failed', data.Message);
                     }

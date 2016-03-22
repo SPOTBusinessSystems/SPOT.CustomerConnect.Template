@@ -62,6 +62,20 @@ $provide.value("$locale", {
       "11\uc6d4",
       "12\uc6d4"
     ],
+    "STANDALONEMONTH": [
+      "1\uc6d4",
+      "2\uc6d4",
+      "3\uc6d4",
+      "4\uc6d4",
+      "5\uc6d4",
+      "6\uc6d4",
+      "7\uc6d4",
+      "8\uc6d4",
+      "9\uc6d4",
+      "10\uc6d4",
+      "11\uc6d4",
+      "12\uc6d4"
+    ],
     "WEEKENDRANGE": [
       5,
       6
@@ -97,7 +111,7 @@ $provide.value("$locale", {
         "maxFrac": 2,
         "minFrac": 2,
         "minInt": 1,
-        "negPre": "\u00a4-",
+        "negPre": "-\u00a4",
         "negSuf": "",
         "posPre": "\u00a4",
         "posSuf": ""
@@ -105,6 +119,7 @@ $provide.value("$locale", {
     ]
   },
   "id": "ko-kp",
+  "localeID": "ko_KP",
   "pluralCat": function(n, opt_precision) {  return PLURAL_CATEGORY.OTHER;}
 });
 }]);

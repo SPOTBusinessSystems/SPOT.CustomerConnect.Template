@@ -5,9 +5,9 @@
     .module('app')
     .controller('StatementController', StatementController);
 
-    StatementController.$inject = ['$rootScope','$scope','$modalInstance','blockUI','data','dialogs','settingsService','dataService'];
+    StatementController.$inject = ['$rootScope','$scope','$uibModalInstance','blockUI','data','dialogs','settingsService','dataService', 'configService', '$q'];
 
-    function StatementController($rootScope, $scope, $modalInstance, blockUI, data, dialogs, settingsService, dataService) {
+    function StatementController($rootScope, $scope, $uibModalInstance, blockUI, data, dialogs, settingsService, dataService, configService, $q) {
         /* jshint validthis:true */
         var vm = this;
         vm.title = 'StatementController';
@@ -65,7 +65,18 @@
             };
 
             $scope.close = function () {
-                $modalInstance.close();
+                $uibModalInstance.close();
+            };
+
+            $scope.print = function () {
+                var printContents = document.getElementsByClassName('modal-body')[0].innerHTML;
+
+                if (printContents != null) {
+                    var popupWin = window.open('', '_blank', '');
+                    popupWin.document.open()
+                    popupWin.document.write('<html><head><link rel="stylesheet" type="text/css" media="print" href="' + configService.getCSSPath() + '" /></head><body onload="window.print(); window.close();">' + printContents + '</html>');
+                    popupWin.document.close();
+                }
             };
 
             $scope.LoadStatement();

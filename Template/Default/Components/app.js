@@ -2,6 +2,8 @@
     'use strict';
     var ccApp = angular.module('app', [
                 'ui.router',
+                'ngTouch',
+                'ngAnimate',
                 'ui.bootstrap',
                 'dialogs.main',
                 'mgo-angular-wizard',

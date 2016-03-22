@@ -3,11 +3,11 @@
         <h2>Gift Cards</h2>
         <br />
     </div>
-    <accordion close-others="true">
-        <accordion-group ng-repeat="giftcard in GiftCards">
-            <accordion-heading>
+    <uib-accordion close-others="true">
+        <uib-accordion-group ng-repeat="giftcard in GiftCards">
+            <uib-accordion-heading>
                 <h4 class="text-center">Card:&nbsp;{{giftcard.AccountInfo}}&nbsp;&nbsp;&nbsp;Balance:&nbsp;{{giftcard.Balance | currency}}<i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': status.open, 'glyphicon-chevron-right': !status.open}"></i></h4>
-            </accordion-heading>
+            </uib-accordion-heading>
             <div class="text-center">
                 <label class="control-label">Number:&nbsp</label>{{giftcard.AccountInfo}}<br />
                 <label class="control-label">Balance: &nbsp</label>{{giftcard.Balance | currency}}<br />
@@ -15,8 +15,8 @@
 
                 <img ng-src="{{giftcard.GiftCardBarcode}}" />
             </div>
-        </accordion-group>
-    </accordion>
+        </uib-accordion-group>
+    </uib-accordion>
 
     <div class="form-group">
         <label class="form-control btn btn-success" ng-click="AddCard();">Add purchased Gift Card</label>

@@ -60,6 +60,14 @@
         this.getProfile = function () {
             return this.profile;
         }
+
+        this.setCSSPath = function (path) {
+            this.CSSPath = path;
+        }
+
+        this.getCSSPath = function (path) {
+            return this.CSSPath;
+        }
     }
     
     function userService() {
@@ -93,6 +101,26 @@
 
         this.getCustomer = function () {
             return this.customer;
+        }
+
+        this.setMessages = function (messages) {
+            this.messages = messages;
+        }
+
+        this.getMessages = function () {
+            return this.messages;
+        }
+
+        this.unreadMessageCount = function () {
+            var count = null;
+
+            for (var x = 0; x < this.messages.length; x++) {
+                if (this.messages[x].ReadDateTime == null) {
+                    count += 1;
+                }
+            }
+
+            return count;
         }
     }
 
@@ -266,7 +294,20 @@
 
             sendMessage: function (subject, body, invoiceid) {
                 return (createRequest('MessageToManagerNoUser', { subject: subject, message: body, invoiceid: invoiceid }).then(handleSuccess, handleError));
+            },
+
+            getMessages: function () {
+                return (createRequest('GetMessages', null).then(handleSuccess, handleError));
+            },
+
+            readMessage: function (messageId) {
+                return (createRequest('ReadMessage', { messageId: messageId }).then(handleSuccess, handleError));
+            },
+
+            deleteMessage: function (messageId) {
+                return (createRequest('DeleteMessage', { messageId: messageId }).then(handleSuccess, handleError));
             }
+
         }
 
         // Util
@@ -330,4 +371,4 @@
             return (response.data);
         }
     }
-})(); 
+})();

@@ -17,3 +17,7 @@
     margin-left: auto;
     margin-right: auto;
 }
+
+.boldText {
+    font-weight: bold !important;
+}

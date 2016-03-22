@@ -5,9 +5,9 @@
     .module('app')
     .controller('OrderController', OrderController);
 
-    OrderController.$inject = ['$rootScope', '$scope', '$modalInstance', 'blockUI', 'data', 'dataService'];
+    OrderController.$inject = ['$rootScope', '$scope', '$uibModalInstance', 'blockUI', 'data', 'dataService','configService'];
 
-    function OrderController($rootScope, $scope, $modalInstance, blockUI, data, dataService) {
+    function OrderController($rootScope, $scope, $uibModalInstance, blockUI, data, dataService, configService) {
         /* jshint validthis:true */
         var vm = this;
         vm.title = 'OrderController';
@@ -37,7 +37,7 @@
             };
 
             $scope.close = function () {
-                $modalInstance.close();
+                $uibModalInstance.close();
             };
 
             $scope.numPages = function () {
@@ -51,6 +51,16 @@
             $scope.pageChanged = function () {
                 $scope.InvoiceID = $scope.Orders[$scope.currentPage - 1].InvoiceID;
                 $scope.LoadOrder();
+            };
+
+            $scope.print = function () {
+                var printContents = document.getElementsByClassName('modal-body')[0].innerHTML;
+                if (printContents != null) {
+                    var popupWin = window.open('', '_blank', '');
+                    popupWin.document.open()
+                    popupWin.document.write('<html><head><link rel="stylesheet" type="text/css" media="print" href="' + configService.getCSSPath() + '" /></head><body onload="window.print(); window.close();">' + printContents + '</html>');
+                    popupWin.document.close();
+                }
             };
 
             $scope.LoadOrder();

@@ -62,6 +62,20 @@ $provide.value("$locale", {
       "Tach",
       "Rhag"
     ],
+    "STANDALONEMONTH": [
+      "Ionawr",
+      "Chwefror",
+      "Mawrth",
+      "Ebrill",
+      "Mai",
+      "Mehefin",
+      "Gorffennaf",
+      "Awst",
+      "Medi",
+      "Hydref",
+      "Tachwedd",
+      "Rhagfyr"
+    ],
     "WEEKENDRANGE": [
       5,
       6
@@ -97,7 +111,7 @@ $provide.value("$locale", {
         "maxFrac": 2,
         "minFrac": 2,
         "minInt": 1,
-        "negPre": "\u00a4-",
+        "negPre": "-\u00a4",
         "negSuf": "",
         "posPre": "\u00a4",
         "posSuf": ""
@@ -105,6 +119,7 @@ $provide.value("$locale", {
     ]
   },
   "id": "cy",
+  "localeID": "cy",
   "pluralCat": function(n, opt_precision) {  if (n == 0) {    return PLURAL_CATEGORY.ZERO;  }  if (n == 1) {    return PLURAL_CATEGORY.ONE;  }  if (n == 2) {    return PLURAL_CATEGORY.TWO;  }  if (n == 3) {    return PLURAL_CATEGORY.FEW;  }  if (n == 6) {    return PLURAL_CATEGORY.MANY;  }  return PLURAL_CATEGORY.OTHER;}
 });
 }]);

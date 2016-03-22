@@ -46,7 +46,18 @@
     </div>
 
     <div class="modal-footer">
-        <button class="btn btn-warning" ng-controller="SendMessageController" ng-click="open()">Send Message</button>
-        <button class="btn btn-primary" ng-click="close()">Close</button>
+        <!-- Justified for large screens -->
+        <div class="btn-group btn-group-justified hidden-xs">
+            <label class="btn btn-warning" ng-controller="SendMessageController" ng-click="open()"><span class="glyphicon glyphicon-question-sign"></span>  Have a question?</label>
+            <label class="btn btn-info" ng-click="print('printBody')"><span class="glyphicon glyphicon-print"></span>  Print</label>
+            <label class="btn btn-primary" ng-click="close()">Close</label>
+        </div>
+
+        <!-- Stacked for small screens -->
+        <div class="btn-group btn-group-vertical visible-xs">
+            <label class="btn btn-warning" ng-controller="SendMessageController" ng-click="open()"><span class="glyphicon glyphicon-question-sign"></span>  Have a question?</label>
+            <label class="btn btn-info" ng-click="print('printBody')"><span class="glyphicon glyphicon-print"></span>  Print</label>
+            <label class="btn btn-primary" ng-click="close()">Close</label>
+        </div>
     </div>
 </div>

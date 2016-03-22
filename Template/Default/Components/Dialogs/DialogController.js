@@ -5,9 +5,9 @@
     .module('app')
     .controller('DialogController', DialogController);
 
-    DialogController.$inject = ['$scope', '$modalInstance','data'];
+    DialogController.$inject = ['$scope', '$uibModalInstance','data', 'configService'];
 
-    function DialogController($scope, $modalInstance, data) {
+    function DialogController($scope, $uibModalInstance, data, configService) {
         /* jshint validthis:true */
         var vm = this;
         vm.title = 'DialogController';
@@ -25,11 +25,11 @@
             }; // end open
 
             $scope.done = function () {
-                $modalInstance.close($scope.data);
+                $uibModalInstance.close($scope.data);
             }; // end done
 
             $scope.cancel = function () {
-                $modalInstance.close();
+                $uibModalInstance.close();
             };
 
             $scope.print = function () {
@@ -37,7 +37,7 @@
                 if (printContents != null) {
                     var popupWin = window.open('', '_blank', '');
                     popupWin.document.open()
-                    popupWin.document.write('<html><head><link rel="stylesheet" type="text/css" href="style.css" /></head><body onload="window.print(); window.close();">' + printContents + '</html>');
+                    popupWin.document.write('<html><head><link rel="stylesheet" type="text/css" media="print" href="' + configService.getCSSPath() + '" /></head><body onload="window.print(); window.close();">' + printContents + '</html>');
                     popupWin.document.close();
                 }
             };

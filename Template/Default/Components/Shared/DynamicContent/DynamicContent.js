@@ -3,7 +3,7 @@
 
     angular
     .module('app')
-    .directive('dynamicecontent', dynamicContent);
+    .directive('dynamiccontent', dynamicContent);
 
     dynamicContent.$inject = ['$compile'];
 
@@ -11,6 +11,7 @@
         function link(scope, element, attrs) {
             scope.$watch('content', function (newVal) {
                 if (newVal !== undefined) {
+                    console.log('test content');
                     element.html(scope.content.template).show();
                     scope.Tokens = scope.content.tokens;
                     $compile(element.contents())(scope);

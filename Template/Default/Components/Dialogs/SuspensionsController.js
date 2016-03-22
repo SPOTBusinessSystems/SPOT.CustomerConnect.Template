@@ -5,9 +5,9 @@
     .module('app')
     .controller('SuspensionsController', SuspensionsController);
 
-    SuspensionsController.$inject = ['$scope', '$modalInstance', 'blockUI', 'data', 'dialogs'];
+    SuspensionsController.$inject = ['$scope', '$uibModalInstance', 'blockUI', 'data', 'dialogs'];
 
-    function SuspensionsController($scope, $modalInstance, blockUI, data, dialogs) {
+    function SuspensionsController($scope, $uibModalInstance, blockUI, data, dialogs) {
         /* jshint validthis:true */
         var vm = this;
         vm.title = 'SuspensionsController';
@@ -42,7 +42,7 @@
             };
 
             $scope.done = function () {
-                $modalInstance.close($scope.data);
+                $uibModalInstance.close($scope.data);
             }; // end done
 
             $scope.figureOutCancellationsToDisplay();

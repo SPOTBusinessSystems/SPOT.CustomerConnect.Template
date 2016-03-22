@@ -54,6 +54,8 @@
     <script src="@TENANT/Template/Default/Components/Dialogs/SendMessageController.js"></script>
     <script src="@TENANT/Template/Default/Components/Dialogs/StatementController.js"></script>
     <script src="@TENANT/Template/Default/Components/Dialogs/SuspensionsController.js"></script>
+    <script src="@TENANT/Template/Default/Components/Dialogs/Messages/MessagesController.js"></script>
+    <script src="@TENANT/Template/Default/Components/Dialogs/Message/MessageController.js"></script>
 
     <!-- Captcha -->
     <script src='//www.google.com/recaptcha/api.js?onload=vcRecaptchaApiLoaded&render=explicit' async defer></script>
@@ -72,9 +74,9 @@
                     <span class="icon-bar"></span>
                 </button>
                 <img class="navbar-brand brandImgIcon" ng-src="{{Settings.General['Logo Icon']}}" />
-                <a class="navbar-brand brandText" href="#">{{Settings.General['Brand Name']}}</a>
+                <a class="navbar-brand brandText" href="" ui-sref="login">{{Settings.General['Brand Name']}}</a>
             </div>
-            <div class="collapse navbar-collapse" collapse="isCollapsed">
+            <div class="collapse navbar-collapse" uib-collapse="isCollapsed">
                 <ul class="nav navbar-nav">
                     <li role="presentation" ui-sref-active="active"><a href="" ui-sref="login" ng-click="isCollapsed = true">Login</a></li>
                     <li role="presentation" ui-sref-active="active"><a href="" ui-sref="signup" ng-click="isCollapsed = true">{{Settings.Signup['Menu Synonym']}}</a></li>
@@ -94,9 +96,9 @@
                     <span class="icon-bar"></span>
                 </button>
                 <img class="navbar-brand brandImgIcon" ng-src="{{Settings.General['Logo Icon']}}" />
-                <a class="navbar-brand brandText" href="#">{{Settings.General['Brand Name']}}</a>
+                <a class="navbar-brand brandText" href="" ui-sref="account">{{Settings.General['Brand Name']}}</a>
             </div>
-            <div class="collapse navbar-collapse" collapse="isCollapsed">
+            <div class="collapse navbar-collapse" uib-collapse="isCollapsed">
                 <ul class="nav navbar-nav">
                     <li role="presentation" ui-sref-active="active"><a href="" ui-sref="account" ng-click="isCollapsed = true">Account</a></li>
                     <li role="presentation" ui-sref-active="active" ng-show="Settings.General['Gift Cards Menu Enabled'] == 1"><a href="" ui-sref="giftcards" ng-click="isCollapsed = true">Gift Cards</a></li>
@@ -106,7 +108,8 @@
                     <li role="presentation" ui-sref-active="active" ng-show="Customer.RouteName && Settings.General['Route Scheduling'] == 1 && Settings.Cancellation['Menu Synonym']"><a href="" ui-sref="suspend" ng-click="isCollapsed = true">{{Settings.Cancellation['Menu Synonym']}}</a></li>
                     <li role="presentation" ui-sref-active="active" ng-show="Customer.IsAR == true"><a href="" ui-sref="statements" ng-click="isCollapsed = true">Statements</a></li>
                     <li role="presentation" ui-sref-active="active" ng-show="Customer.IsAR == true"><a href="" ui-sref="payment" ng-click="isCollapsed = true">Make Payment</a></li>
-                    <li role="presentation" ng-click="isCollapsed = true"><a href="" ng-controller="SendMessageController" ng-click="open();">Contact</a></li>
+                    <li role="presentation" ui-sref-active="active"><a href="" ng-click="openMessages();"><span class="glyphicon glyphicon-envelope"></span>  Messages  <span class="badge">{{unreadMessages}}</span></a></li>
+                    <li role="presentation" ng-click="isCollapsed = true" ng-show="Settings.General['Enable Two-Way Messaging'] == 1"><a href="" ng-controller="SendMessageController" ng-click="open();"><span class="glyphicon glyphicon-question-sign"></span>  Have a question?</a></li>
                     <li role="presentation" ng-click="isCollapsed = true"><a href="" ui-sref="login" ng-click="LogOut(); isCollapsed = true">Logout</a></li>
                 </ul>
             </div>
@@ -116,6 +119,11 @@
     <!-- Main -->
     <div class="container">
         <div ui-view=""></div>
+    </div>
+
+    <!-- Message Alert -->
+    <div style="bottom: 0; right: 0; position: fixed;">
+        <uib-alert ng-repeat="alert in alerts" type="{{alert.type}}" dismiss-on-timeout="10000" close="closeAlert($index)">{{alert.msg}}</uib-alert>
     </div>
 </body>
 </html>

@@ -27,12 +27,10 @@
             $scope.figureOutStatementsToDisplay = function () {
                 var begin = (($scope.currentPage - 1) * $scope.itemsPerPage);
                 var end = begin + $scope.itemsPerPage;
-                $scope.$apply(function () {
-                    $scope.filteredStatements = [];
-                    if ($scope.Statements) {
-                        $scope.filteredStatements = $scope.Statements.slice(begin, end);
-                    }
-                });
+                $scope.filteredStatements = [];
+                if ($scope.Statements) {
+                    $scope.filteredStatements = $scope.Statements.slice(begin, end);
+                }
             };
 
             $scope.pageChanged = function () {
@@ -54,7 +52,6 @@
 
             $scope.ShowStatement = function (key) {
                 $scope.key = key;
-
                 var dlg = dialogs.create(settingsService.path + 'Components/Dialogs/Statement.html', 'StatementController', $scope.key, 'lg');
             };
 

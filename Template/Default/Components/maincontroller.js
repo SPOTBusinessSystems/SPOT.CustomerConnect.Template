@@ -5,9 +5,9 @@
         .module('app')
         .controller('maincontroller', maincontroller);
 
-    maincontroller.$inject = ['$location', '$scope', 'localStorageService', '$state', 'dialogs', '$rootScope', 'settingsService', 'userService', 'dataService', 'configService', 'apiConfig', 'tmhDynamicLocale'];
+    maincontroller.$inject = ['$location', '$scope', 'localStorageService', '$state', 'dialogs', '$rootScope', 'settingsService', 'userService', 'dataService', 'configService', 'apiConfig', 'tmhDynamicLocale', '$interval'];
 
-    function maincontroller($location, $scope, localStorageService, $state, dialogs, $rootScope, settingsService, userService, dataService, configService, apiConfig, tmhDynamicLocale) {
+    function maincontroller($location, $scope, localStorageService, $state, dialogs, $rootScope, settingsService, userService, dataService, configService, apiConfig, tmhDynamicLocale, $interval) {
         /* jshint validthis:true */
         var vm = this;
         vm.title = 'maincontroller';
@@ -57,7 +57,8 @@
                         if ($scope.Settings.General.Theme !== 'Custom') {
                             for (var x = 0; x < $scope.Themes.length; x++) {
                                 if ($scope.Themes[x].Name === $scope.Settings.General.Theme) {
-                                    $("#themeCss").attr("href", settingsService.path + 'Content/bootstrap/' + $scope.Themes[x].File);
+                                    configService.setCSSPath(settingsService.path + 'Content/bootstrap/' + $scope.Themes[x].File);
+                                    $("#themeCss").attr("href", configService.getCSSPath());
                                     return;
                                 }
                             }
@@ -137,6 +138,13 @@
                 }
             };
 
+            $scope.openMessages = function () {
+                var dlg = dialogs.create(settingsService.path + 'Components/Dialogs/Messages/Messages.html', 'MessagesController', $scope.data);
+                dlg.result.then(function (data) {
+                    $scope.unreadMessages = userService.unreadMessageCount();
+                });
+            };
+
             $scope.LoadUser = function () {
                 if (localStorageService.get(CustomerConnect.Config.Tenant + '_token') != null) {
                     CustomerConnect.Config.SessionId = localStorageService.get(CustomerConnect.Config.Tenant + '_token');
@@ -147,7 +155,19 @@
                             userService.setCustomer(data.ReturnObject);
                             $scope.Customer = data.ReturnObject;
                             $rootScope.LoggedIn = true;
-                            $state.go('account');
+
+                            dataService.user.getMessages().then(function (data) {
+                                if (!data.Failed) {
+                                    $scope.Messages = data.ReturnObject.length;
+                                    userService.setMessages(data.ReturnObject);
+                                    $scope.unreadMessages = userService.unreadMessageCount();
+                                } else {
+                                    dialogs.error('Messages Error', 'Unable to load messages.')
+                                }
+
+                                $state.go('account');
+                            });
+                            
                         } else {
                             //dialogs.error('Load Failed', 'Unable to retrieve customer data. Please login again.');
                             localStorageService.remove(CustomerConnect.Config.Tenant + '_token');
@@ -155,6 +175,36 @@
                         }
                     });
                 }
+            };
+
+            // Keep session alive. Periodically retrieve messages.
+            $interval(function () {
+                if (userService.getCustomer() != null) {
+                    dataService.user.getMessages().then(function (data) {
+                        if (!data.Failed) {
+                            var oldMessages = userService.getMessages();
+
+                            if (oldMessages.length < data.ReturnObject.length) {
+                                // New message
+                                $scope.alerts.push({ type: 'success', msg: 'You have received a new message' });
+                            }
+
+                            $scope.Messages = data.ReturnObject.length;
+                            userService.setMessages(data.ReturnObject);
+                            $scope.unreadMessages = userService.unreadMessageCount();
+                        }
+                    });
+                } else {
+                    dataService.store.getStoreList().then(function (data) {
+
+                    });
+                }
+            }, 300 * 1000);
+
+            $scope.alerts = [];
+
+            $scope.closeAlert = function (index) {
+                $scope.alerts.splice(index, 1);
             };
 
             // Use these if session token has already been established by server side component.
