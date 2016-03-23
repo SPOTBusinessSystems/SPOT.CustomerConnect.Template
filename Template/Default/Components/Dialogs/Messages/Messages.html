@@ -1,0 +1,34 @@
+﻿<div class="modal-header">
+    <h4 class="modal-title"><span class="glyphicon glyphicon-envelope"></span>  Messages <span class="badge">{{unreadMessages}}</span></h4>
+</div>
+
+<div class="modal-body">
+    <div class="table-responsive">
+        <table class="table table-condensed table-hover table-striped">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th></th>
+                    <th>Subject</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-if="filteredMessages.length == 0"><td colspan="4">No messages found.</td></tr>
+                <tr ng-repeat="message in filteredMessages" ng-class="{'boldText': filteredMessages[$index].ReadDateTime == null}" ng-dblclick="selectedMessage = $index; open($index);">
+                    <td style="width: 130px;">{{message.CreatedDateTime | date:'short'}}</td>
+                    <td style="width: 70px;"><a href="" ng-click="open($index);">Open</a></td>
+                    <td>{{message.Subject}}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="form-group text-center">
+        <pagination boundary-links="true" max-size="3" items-per-page="itemsPerPage" total-items="Messages.length" ng-model="currentPage" ng-change="pageChanged()" num-pages="NumPages" previous-text="&lsaquo;" next-text="&rsaquo;" first-text="&laquo;" last-text="&raquo;"></pagination>
+    </div>
+</div>
+
+<div class="modal-footer">
+    <button class="btn btn-warning" ng-controller="SendMessageController" ng-click="open()"><span class="glyphicon glyphicon-question-sign"></span>  Have a question?</button>
+    <button class="btn btn-info" ng-click="refresh()">Refresh</button>
+    <button class="btn btn-primary" ng-click="close()">Close</button>
+</div>

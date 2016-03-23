@@ -47,7 +47,7 @@
             <br />
             <label class="control-label">Available Cash Credit:&nbsp;&nbsp;</label>{{ Customer.CashCreditBalance | currency}}
             <br />
-            <label class="control-label">Locker PIN:&nbsp;&nbsp;</label>{{ Customer.LockerPIN }}
+            <label class="control-label" ng-show="Customer.LockerPIN">Locker PIN:&nbsp;&nbsp;</label>{{ Customer.LockerPIN }}
         </div>
 
         <div style="max-width: 350px;">
