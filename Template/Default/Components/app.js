@@ -38,6 +38,7 @@
         $httpProvider, dialogsProvider, localStorageServiceProvider, tmhDynamicLocaleProvider,
         settingsServiceProvider) {
 
+        $urlMatcherFactoryProvider.caseInsensitive(true); // Allow any case.
         $urlMatcherFactoryProvider.strictMode(false); // Allows trailing slash.
         
         if (CustomerConnect.Config.Layout == null)
