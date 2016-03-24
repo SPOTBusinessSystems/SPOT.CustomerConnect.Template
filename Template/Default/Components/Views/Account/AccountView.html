@@ -43,11 +43,18 @@
         </div>
 
         <div class="form-group">
-            <label class="control-label">Rewards Points:&nbsp;&nbsp;</label>{{ Customer.FBPoints }}
-            <br />
-            <label class="control-label">Available Cash Credit:&nbsp;&nbsp;</label>{{ Customer.CashCreditBalance | currency}}
-            <br />
-            <label class="control-label" ng-show="Customer.LockerPIN">Locker PIN:&nbsp;&nbsp;</label>{{ Customer.LockerPIN }}
+            <div ng-show="Settings['Account Update']['Show Rewards Points'] == 1">
+                <label class="control-label">Rewards Points:&nbsp;&nbsp;</label>{{ Customer.FBPoints }}
+                <br />
+            </div>
+            <div ng-show="Settings['Account Update']['Show Cash Credit'] == 1">
+                <label class="control-label">Available Cash Credit:&nbsp;&nbsp;</label>{{ Customer.CashCreditBalance | currency}}
+                <br />
+            </div>
+            <div ng-show="Customer.LockerPIN">
+                <label class="control-label">Locker PIN:&nbsp;&nbsp;</label>{{ Customer.LockerPIN }}
+                <br />
+            </div>
         </div>
 
         <div style="max-width: 350px;">
