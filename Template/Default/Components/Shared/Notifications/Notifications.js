@@ -79,6 +79,10 @@
                     var y = findInArray($scope.notifications, notifications[x].TypeID);
                     var z = notifications[x];
 
+                    if (z.MethodDescription == '') {
+                        z.MethodDescription = z.MethodName;
+                    }
+
                     if (y == -1) {
                         $scope.notifications.push({
                             typeId: z.TypeID,
@@ -121,6 +125,7 @@
                     }
                 }
 
+                console.log(model);
             }
         }
     }
