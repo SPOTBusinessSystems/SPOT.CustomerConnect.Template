@@ -97,9 +97,9 @@
             url: '/reminder/{key}',
             templateUrl: settingsServiceProvider.getPath() + 'Components/Views/Reminder/ReminderView.html'
         })
-        .state('pickupemail', {
-            url: '/pickupemail?Status&PickupDate&TransactionID',
-            templateUrl: settingsServiceProvider.getPath() + 'Components/Views/PickupEmail/PickupEmail.html'
+        .state('confirmation', {
+            url: '/confirmation?Status&Type&PickupDate&TransactionID',
+            templateUrl: settingsServiceProvider.getPath() + 'Components/Views/Confirmation/ConfirmationView.html'
         });
 
         $urlRouterProvider.otherwise('/login');
@@ -119,7 +119,7 @@
         apiConfig.setPublishableId(CustomerConnect.Config.PublishableId);
 
         // enumerate routes that don't need authentication
-        var routesThatDontRequireAuth = ['/login', '/signup/{key}', '/reminder/{key}', '/pickupemail?Status&PickupDate&TransactionID'];
+        var routesThatDontRequireAuth = ['/login', '/signup/{key}', '/reminder/{key}', '/confirmation?Status&Type&PickupDate&TransactionID'];
 
         // check if current location matches route
         var routeClean = function (route) {
