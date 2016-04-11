@@ -28,18 +28,16 @@
             </div>
         </div>
 
-        <!-- Justified for large screens -->
-        <div class="btn-group btn-group-justified hidden-xs">
-            <label class="btn btn-success" ng-click="loginUser();" ng-disabled="!loginForm.loginEmail.$valid || !loginForm.loginPassword.$valid">Login</label>
-            <label class="btn btn-danger" ng-click="forgotPassword();" ng-disabled="!loginForm.loginEmail.$dirty || !validEmail()">Forgot Password</label>
-            <label class="btn btn-primary" ng-click="createAccount();">Create Account</label>
-        </div>
-
-        <!-- Stacked for small screens -->
-        <div class="btn-group btn-group-vertical visible-xs">
-            <label class="btn btn-success" ng-click="loginUser();" ng-disabled="!loginForm.loginEmail.$valid || !loginForm.loginPassword.$valid">Login</label>
-            <label class="btn btn-danger" ng-click="forgotPassword();" ng-disabled="!loginForm.loginEmail.$dirty || !validEmail()">Forgot Password</label>
-            <label class="btn btn-primary" ng-click="createAccount();">Create Account</label>
+        <div class="row">
+            <div class="col-sm-4" style="padding: 3px;">
+                <label class="btn btn-success btn-block col-sm-4" ng-click="loginUser();" ng-disabled="!loginForm.loginEmail.$valid || !loginForm.loginPassword.$valid">Login</label>
+            </div>
+            <div class="col-sm-4" style="padding: 3px;">
+                <label class="btn btn-danger btn-block" ng-click="forgotPassword();" ng-disabled="!loginForm.loginEmail.$dirty || !validEmail()">Forgot Password</label>
+            </div>
+            <div class="col-sm-4" style="padding: 3px;">
+                <label class="btn btn-primary btn-block" ng-click="createAccount();">Create Account</label>
+            </div>
         </div>
 
         <input type="submit" style="display: none;" />

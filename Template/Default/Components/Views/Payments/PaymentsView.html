@@ -57,9 +57,13 @@
                 </div>
             </div>
 
-            <div class="form-group text-center">
-                <input type="submit" class="btn btn-success" value="Submit" ng-click="submitPayment(false);" ng-disabled="!paymentForm.$dirty && AR.Payment.Amount > 0" />
-                <input type="button" class="btn btn-warning" value="Submit & Save Card" ng-click="submitPayment(true);" ng-disabled="!paymentForm.$dirty && AR.Payment.Amount > 0" />
+            <div class="row">
+                <div class="col-sm-6" style="padding: 3px;">
+                    <input type="submit" class="btn btn-success btn-block" value="Submit" ng-click="submitPayment(false);" ng-disabled="!paymentForm.$dirty && AR.Payment.Amount > 0" />
+                </div>
+                <div class="col-sm-6" style="padding: 3px;">
+                    <input type="button" class="btn btn-warning btn-block" value="Submit & Save Card" ng-click="submitPayment(true);" ng-disabled="!paymentForm.$dirty && AR.Payment.Amount > 0" />
+                </div>
             </div>
         </form>
     </div>

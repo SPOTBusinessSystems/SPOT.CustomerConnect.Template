@@ -3,6 +3,11 @@
     margin: 0 auto;
 }
 
+.medPage {
+    max-width: 650px;
+    margin: 0 auto;
+}
+
 .fullPage {
     margin: 0 auto;
 }

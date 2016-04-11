@@ -34,9 +34,15 @@
             <span class="glyphicon glyphicon-ok form-control-feedback" aria-hidden="true" ng-if="messageManagerForm.messageManagerBody.$valid && messageManagerForm.messageManagerBody.$dirty"></span>
         </div>
 
-        <div class="modal-footer">           
-            <button class="btn btn-primary" ng-click="done()" ng-disabled="!messageManagerForm.$valid">Send</button>
-            <button class="btn btn-warning" ng-click="cancel()">Cancel</button>
+        <div class="modal-footer">
+            <div class="row">
+                <div class="col-sm-6" style="padding: 3px;">
+                    <button class="btn btn-primary btn-block" ng-click="done()" ng-disabled="!messageManagerForm.$valid">Send</button>
+                </div>
+                <div class="col-sm-6" style="padding: 3px;">
+                    <button class="btn btn-warning btn-block" ng-click="cancel()">Cancel</button>
+                </div>
+            </div>
         </div>
     </form>
 </div>

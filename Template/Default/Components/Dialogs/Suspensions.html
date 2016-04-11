@@ -22,11 +22,14 @@
             </table>
         </div>
         <div class="form-group text-center">
-            <pagination boundary-links="true" max-size="3" items-per-page="itemsPerPage" total-items="Cancellations.PendingCancellations.length" ng-model="currentPage" ng-change="pageChanged()" num-pages="numPages" previous-text="&lsaquo;" next-text="&rsaquo;" first-text="&laquo;" last-text="&raquo;"></pagination>
+            <uib-pagination boundary-links="true" max-size="3" items-per-page="itemsPerPage" total-items="Cancellations.PendingCancellations.length" ng-model="currentPage" ng-change="pageChanged()" num-pages="numPages" previous-text="&lsaquo;" next-text="&rsaquo;" first-text="&laquo;" last-text="&raquo;"></uib-pagination>
         </div>
     </div>
-
     <div class="modal-footer">
-        <label class="btn btn-success" ng-click="done()">Close</label>
+        <div class="row">
+            <div class="col-sm-12" style="padding: 3px;">
+                <label class="btn btn-success btn-block" ng-click="done()">Close</label>
+            </div>
+        </div>
     </div>
 </div>

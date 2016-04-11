@@ -5,9 +5,9 @@
     .module('app')
     .controller('OrdersController', OrdersController);
 
-    OrdersController.$inject = ['$scope', 'dialogs', 'blockUI', '$filter', '$uibModal', 'settingsService'];
+    OrdersController.$inject = ['$scope', 'dialogs', 'blockUI', '$filter', '$uibModal', 'settingsService', 'dataService', 'userService', 'configService'];
 
-    function OrdersController($scope, dialogs, blockUI, $filter, $uibModal, settingsService) {
+    function OrdersController($scope, dialogs, blockUI, $filter, $uibModal, settingsService, dataService, userService, configService) {
         /* jshint validthis:true */
         var vm = this;
         vm.title = 'OrdersController';
@@ -19,8 +19,10 @@
             $scope.Orders = null;
             $scope.ReadyOrders = null;
             $scope.SingleOrder = null;
-            $scope.Filters = { Status: '128', StartDate: moment().subtract(90, 'days').calendar(), EndDate: moment().format('L') };
-            $scope.Customer = CustomerConnect.Config.Customer;
+            $scope.Filters = { Status: '128', StartDate: moment().subtract(90, 'days').format(), EndDate: moment().format() };
+            $scope.dateText = "Hide Dates";
+            $scope.Customer = userService.getCustomer();
+            $scope.Settings = configService.getProfile();
 
             $scope.filteredOrders = [];
             $scope.itemsPerPage = 10;
@@ -63,57 +65,55 @@
                 $scope.figureOutReadyOrdersToDisplay();
             };
 
+            $scope.hideShowDates = function () {
+                $scope.isCollapsed = !$scope.isCollapsed;
+
+                if (!$scope.isCollapsed) {
+                    $scope.dateText = "Select Dates";
+                } else {
+                    $scope.dateText = "Hide Dates";
+                }
+            };
+
             // Load orders, at init and on status and date changes.
             $scope.LoadOrders = function () {
                 if ($scope.Filters.StartDate == null || $scope.Filters.EndDate == null) {
                     return;
                 }
 
-                CustomerConnect.Invoice.GetInvoiceList($scope.Filters.Status, moment($scope.Filters.StartDate).startOf('day').format('MM/DD/YYYY HH:mm:ss'), moment($scope.Filters.EndDate).endOf('day').format('MM/DD/YYYY HH:mm:ss'))
-                    .done(function (data) {
-                        $scope.$apply(function () {
+                dataService.invoice.getInvoiceList($scope.Filters.Status, moment($scope.Filters.StartDate).startOf('day').format('MM/DD/YYYY HH:mm:ss'), moment($scope.Filters.EndDate).endOf('day').format('MM/DD/YYYY HH:mm:ss'))
+                    .then(function (data) {
+                        if (!data.Failed) {
                             var orderBy = $filter('orderBy');
                             $scope.Orders = orderBy(data.ReturnObject, 'DropoffDateTime', true);
                             $scope.figureOutOrdersToDisplay();
-                        });
-                    }).fail(function (data) {
-                        dialogs.error('Load failed.', data.Message);
-                        $scope.filteredOrders = [];
+                        } else {
+                            dialogs.error('Load failed.', data.Message);
+                            $scope.filteredOrders = [];
+                        }
                     });
 
                 if ($scope.Filters.Status == '128') {
-                    CustomerConnect.Invoice.GetInvoiceList('129', moment($scope.Filters.StartDate).startOf('day').format('MM/DD/YYYY HH:mm:ss'), moment($scope.Filters.EndDate).endOf('day').format('MM/DD/YYYY HH:mm:ss'))
-                        .done(function (data) {
-                            $scope.$apply(function () {
+                    dataService.invoice.getInvoiceList('129', moment($scope.Filters.StartDate).startOf('day').format('MM/DD/YYYY HH:mm:ss'), moment($scope.Filters.EndDate).endOf('day').format('MM/DD/YYYY HH:mm:ss'))
+                        .then(function (data) {
+                            if (!data.Failed) {
                                 var orderBy = $filter('orderBy');
                                 $scope.ReadyOrders = orderBy(data.ReturnObject, 'DropoffDateTime', true);
                                 $scope.figureOutReadyOrdersToDisplay();
-                            });
-                        }).fail(function (data) {
-                            dialogs.error('Load failed.', data.Message);
-                            $scope.filteredReadyOrders = [];
+                            } else {
+                                dialogs.error('Load failed.', data.Message);
+                                $scope.filteredReadyOrders = [];
+                            }
                         });
-                }
-            };
-
-            // Date Picker Functions:
-            $scope.open = function ($event, start) {
-                $event.preventDefault();
-                $event.stopPropagation();
-
-                if (start) {
-                    $scope.openedStart = true;
-                } else {
-                    $scope.openedEnd = true;
                 }
             };
 
             $scope.dateOptions = {
-                formatYear: 'yyyy',
+                formatYear: 'yy',
                 startingDay: 1
             };
 
-            $scope.dateFormat = 'MM/dd/yyyy';
+            $scope.dateFormat = $scope.Settings.General["Data Formats"]["Date Format"].toLowerCase().split("m").join("M");
 
             // Show Order
             $scope.ShowOrder = function (key, orders) {

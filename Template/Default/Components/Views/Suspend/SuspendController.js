@@ -18,31 +18,14 @@
             $scope.Customer = userService.getCustomer();
             $scope.Cancellation = { Comments: '' };
 
-            // Date Control
-            $scope.open = function ($event, start) {
-                $scope.openedStart = false;
-                $scope.openedEnd = false;
-
-                $event.preventDefault();
-                $event.stopPropagation();
-
-                if (start) {
-                    $scope.openedStart = true;
-                } else {
-                    $scope.openedEnd = true;
-                }
-
-            };
-
             $scope.dateOptions = {
                 formatYear: 'yy',
-                startingDay: 1
+                startingDay: 1,
+                minDate: moment(),
+                maxDate: moment().add(3, 'months')
             };
 
-            $scope.dateFormat = 'MM-dd-yyyy';
-            $scope.minDate = Date.now();
-            $scope.initDate = Date.now();
-            $scope.maxDate = moment().add(6, 'months');
+            $scope.dateFormat = $scope.Settings.General["Data Formats"]["Date Format"].toLowerCase().split("m").join("M"); // Lowercase, then replace all m to M.
 
             $scope.scheduleCancellation = function () {
                 dataService.route.saveCancellation($scope.Cancellation).then(function (data) {
@@ -57,7 +40,7 @@
             };
 
             $scope.pendingSuspensions = function () {
-                dataService.route.pendingCancellations().then(function (data) {
+                dataService.route.getPendingCancellations().then(function (data) {
                     if (!data.Failed) {
                         var dlg = dialogs.create(settingsService.path + 'Components/Dialogs/Suspensions.html', 'SuspensionsController', data.ReturnObject);
                     } else {

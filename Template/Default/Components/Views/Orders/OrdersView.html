@@ -1,4 +1,4 @@
-﻿<div ng-controller="OrdersController" id="ordersForm" class="container fullPage">
+﻿<div ng-controller="OrdersController" id="ordersForm" class="fullPage">
     <div class="text-center">
         <h2>View Orders</h2>
         <br />
@@ -10,27 +10,25 @@
         </select>
     </div>
 
-    <div class="form-group" ng-show="Filters.Status == 130" style="max-width: 300px; margin: 10px auto;">
-        <button class="btn btn-info form-control control-label" ng-click="isCollapsed = !isCollapsed">
-            <label ng-if="isCollapsed">Select Dates</label>
-            <label ng-if="!isCollapsed">Hide Dates</label>
-        </button>
-        <div class="form-group" collapse="isCollapsed">
-            <label class="control-label">Start Date</label>
+    <div ng-show="Filters.Status == 130" class="medPage">
+        <div class="form-group" style="max-width: 300px; margin: 10px auto;">
+            <label class="btn btn-info form-control control-label" ng-click="hideShowDates()">{{ dateText }}</label>
+        </div>
 
-            <div class="input-group">
-                <span class="input-group-btn">
-                    <button type="button" class="btn btn-info" ng-click="open($event, true)"><i class="glyphicon glyphicon-calendar"></i></button>
-                </span>
-                <input type="text" class="form-control" datepicker-popup="{{dateFormat}}" ng-model="Filters.StartDate" is-open="openedStart" close-text="Close" placeholder="Start Date" ng-click="open($event, true)" ng-change="LoadOrders()" readonly required />
+        <div class="row form-group" style="margin:0 auto;" ng-show="isCollapsed">
+            <div class="col-sm-6">
+                <div class="input-group center">
+                    <label class="control-label">Start Date</label><br />
+                    {{Filters.StartDate | date:'fullDate' }}
+                    <uib-datepicker ng-model="Filters.StartDate" class="well well-sm" datepicker-options="dateOptions" ng-required="true" ng-change="LoadOrders()" required></uib-datepicker>
+                </div>
             </div>
-
-            <label class="control-label">End Date</label>
-            <div class="input-group">
-                <span class="input-group-btn">
-                    <button type="button" class="btn btn-info" ng-click="open($event, false)"><i class="glyphicon glyphicon-calendar"></i></button>
-                </span>
-                <input type="text" class="form-control" datepicker-popup="{{dateFormat}}" ng-model="Filters.EndDate" is-open="openedEnd" close-text="Close" placeholder="End Date" ng-click="open($event, false)" ng-change="LoadOrders()" readonly required />
+            <div class="col-sm-6">
+                <div class="input-group center">
+                    <label class="control-label">End Date</label><br />
+                    {{Filters.EndDate | date:'fullDate' }}
+                    <uib-datepicker ng-model="Filters.EndDate" class="well well-sm" datepicker-options="dateOptions" ng-required="true" ng-change="LoadOrders()" required></uib-datepicker>
+                </div>
             </div>
         </div>
     </div>
@@ -61,7 +59,7 @@
         </table>
     </div>
     <div class="form-group text-center">
-        <pagination boundary-links="true" max-size="3" items-per-page="itemsPerPage" total-items="Orders.length" ng-model="currentPage" ng-change="pageChanged()" num-pages="NumPages" previous-text="&lsaquo;" next-text="&rsaquo;" first-text="&laquo;" last-text="&raquo;"></pagination>
+        <uib-pagination boundary-links="true" max-size="3" items-per-page="itemsPerPage" total-items="Orders.length" ng-model="currentPage" ng-change="pageChanged()" num-pages="NumPages" previous-text="&lsaquo;" next-text="&rsaquo;" first-text="&laquo;" last-text="&raquo;"></uib-pagination>
     </div>
 
     <div class="table-responsive" ng-if="Filters.Status == 128">
@@ -86,6 +84,6 @@
         </table>
     </div>
     <div class="form-group text-center" ng-if="Filters.Status == 128">
-        <pagination boundary-links="true" max-size="3" items-per-page="itemsPerPage" total-items="ReadyOrders.length" ng-model="readyCurrentPage" ng-change="readyPageChanged()" num-pages="readyNumPages" previous-text="&lsaquo;" next-text="&rsaquo;" first-text="&laquo;" last-text="&raquo;"></pagination>
+        <uib-pagination boundary-links="true" max-size="3" items-per-page="itemsPerPage" total-items="ReadyOrders.length" ng-model="readyCurrentPage" ng-change="readyPageChanged()" num-pages="readyNumPages" previous-text="&lsaquo;" next-text="&rsaquo;" first-text="&laquo;" last-text="&raquo;"></uib-pagination>
     </div>
 </div>

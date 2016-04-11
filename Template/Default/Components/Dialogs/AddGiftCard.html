@@ -7,7 +7,13 @@
         <input class="form-control" type="text" placeholder="Enter the gift card number. (Required)" ng-model="data.Number" required />
     </div>
     <div class="modal-footer">
-        <label class="btn btn-success" ng-click="done()">Apply</label>
-        <label class="btn btn-danger" ng-click="cancel()">Cancel</label>
+        <div class="row">
+            <div class="col-sm-6" style="padding: 3px;">
+                <label class="btn btn-success btn-block" ng-click="done()">Apply</label>
+            </div>
+            <div class="col-sm-6" style="padding: 3px;">
+                <label class="btn btn-danger btn-block" ng-click="cancel()">Cancel</label>
+            </div>
+        </div>
     </div>
 </div>

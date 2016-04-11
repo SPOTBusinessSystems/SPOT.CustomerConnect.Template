@@ -1,28 +1,26 @@
-﻿<div ng-controller="SuspendController" class="smallPage">
+﻿<div ng-controller="SuspendController" class="medPage">
     <div class="text-center">
         <h2>Suspend Service</h2>
         <br />
     </div>
     <div class="form-group text-center">
         <form name="cancellationForm" novalidate>
-            <div class="input-group" ng-class="{'has-error':cancellationForm.fromDate.$invalid && cancellationForm.fromDate.$dirty, 'has-success':cancellationForm.fromDate.$valid && cancellationForm.fromDate.$dirty}">
-                <span class="input-group-btn">
-                    <button type="button" class="btn btn-info" ng-click="open($event)"><i class="glyphicon glyphicon-calendar"></i></button>
-                </span>
-                <input name="fromDate" type="text" class="form-control" datepicker-popup="{{dateFormat}}" ng-model="Cancellation.FromDate" is-open="openedStart" close-text="Close" placeholder="Choose a beginning date (Required)"
-                       ng-click="open($event, true)" min-date="minDate" max-date="maxDate" datepicker-options="dateOptions" ng-required="true" required />
-                <span class="glyphicon glyphicon-remove form-control-feedback" aria-hidden="true" ng-if="cancellationForm.fromDate.$invalid && cancellationForm.fromDate.$dirty"></span>
-                <span class="glyphicon glyphicon-ok form-control-feedback" aria-hidden="true" ng-if="cancellationForm.fromDate.$valid && cancellationForm.fromDate.$dirty"></span>
-            </div>
+            <div class="row form-group">
+                <div class="col-sm-6">
+                    <div class="input-group center">
+                        <label class="control-label">Start Date</label><br />
+                        {{Cancellation.FromDate | date:'fullDate' }}
+                        <uib-datepicker ng-model="Cancellation.FromDate" class="well well-sm" datepicker-options="dateOptions" ng-required="true" required></uib-datepicker>
+                    </div>
+                </div>
 
-            <div class="input-group" ng-class="{'has-error':cancellationForm.toDate.$invalid && cancellationForm.toDate.$dirty, 'has-success':cancellationForm.toDate.$valid && cancellationForm.toDate.$dirty}">
-                <span class="input-group-btn">
-                    <button type="button" class="btn btn-info" ng-click="open($event)"><i class="glyphicon glyphicon-calendar"></i></button>
-                </span>
-                <input name="toDate" type="text" class="form-control" datepicker-popup="{{dateFormat}}" ng-model="Cancellation.ToDate" is-open="openedEnd" close-text="Close" placeholder="Choose an ending date (Required)"
-                       ng-click="open($event, false)" min-date="minDate" max-date="maxDate" datepicker-options="dateOptions" ng-required="true" required />
-                <span class="glyphicon glyphicon-remove form-control-feedback" aria-hidden="true" ng-if="cancellationForm.toDate.$invalid && cancellationForm.toDate.$dirty"></span>
-                <span class="glyphicon glyphicon-ok form-control-feedback" aria-hidden="true" ng-if="cancellationForm.toDate.$valid && cancellationForm.toDate.$dirty"></span>
+                <div class="col-sm-6">
+                    <div class="input-group center">
+                        <label class="control-label">End Date</label><br />
+                        {{Cancellation.ToDate | date:'fullDate' }}
+                        <uib-datepicker ng-model="Cancellation.ToDate" class="well well-sm" datepicker-options="dateOptions" ng-required="true" required></uib-datepicker>
+                    </div>
+                </div>
             </div>
             <br />
 
@@ -32,9 +30,13 @@
                 <span>{{Cancellation.Comments.length}} / 250</span>
             </div>
 
-            <div class="form-group">
-                <label class="btn btn-info" ng-click="pendingSuspensions()">Show Pending Suspensions</label>
-                <label class="btn btn-success" ng-click="scheduleCancellation()" ng-disabled="!cancellationForm.$valid">Suspend Service</label>
+            <div class="row">
+                <div class="col-sm-6" style="padding: 3px;">
+                    <label class="btn btn-info btn-block" ng-click="pendingSuspensions()">Show Pending Suspensions</label>
+                </div>
+                <div class="col-sm-6" style="padding: 3px;">
+                    <label class="btn btn-success btn-block" ng-click="scheduleCancellation()" ng-disabled="!cancellationForm.$valid">Suspend Service</label>
+                </div>
             </div>
         </form>
     </div>

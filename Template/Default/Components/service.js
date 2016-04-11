@@ -250,6 +250,10 @@
                 return (createRequest('GetStates', null).then(handleSuccess, handleError));
             },
 
+            getTimeSlots: function () {
+                return (createRequest('GetTimeSlots', null).then(handleSuccess, handleError));
+            },
+
             storeJSON: function (name, json) {
                 return (createRequest('StoreJSON', { name: name, json: json }).then(handleSuccess, handleError));
             },

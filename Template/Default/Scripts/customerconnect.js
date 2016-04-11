@@ -347,6 +347,10 @@
             return new CustomerConnect.Request.CreateRequest('GetStates', null);
         },
 
+        GetTimeSlots: function() {
+            return new CustomerConnect.Request.CreateRequest('GetTimeSlots', null);
+        },
+
         StoreJSON: function (name, json) {
             return new CustomerConnect.Request.CreateRequest('StoreJSON', { name: name, json: json});
         },

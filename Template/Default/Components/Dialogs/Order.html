@@ -73,18 +73,16 @@
     </div>
 
     <div class="modal-footer">
-        <!-- Justified for large screens -->
-        <div class="btn-group btn-group-justified hidden-xs">
-            <label class="btn btn-warning" ng-controller="SendMessageController" ng-click="open(InvoiceID, SingleOrder.InvoiceKey)"><span class="glyphicon glyphicon-question-sign"></span>  Have a question?</label>
-            <label class="btn btn-info" ng-click="print('printBody')"><span class="glyphicon glyphicon-print"></span>  Print</label>
-            <label class="btn btn-primary" ng-click="close()">Close</label>
-        </div>
-
-        <!-- Stacked for small screens -->
-        <div class="btn-group btn-group-vertical visible-xs">
-            <label class="btn btn-warning" ng-controller="SendMessageController" ng-click="open(InvoiceID, SingleOrder.InvoiceKey)"><span class="glyphicon glyphicon-question-sign"></span>  Have a question?</label>
-            <label class="btn btn-info" ng-click="print('printBody')"><span class="glyphicon glyphicon-print"></span>  Print</label>
-            <label class="btn btn-primary" ng-click="close()">Close</label>
+        <div class="row">
+            <div class="col-sm-4" style="padding: 3px;">
+                <label class="btn btn-warning btn-block" ng-controller="SendMessageController" ng-click="open(InvoiceID, SingleOrder.InvoiceKey)"><span class="glyphicon glyphicon-question-sign"></span>  Have a question?</label>
+            </div>
+            <div class="col-sm-4" style="padding: 3px;">
+                <label class="btn btn-info btn-block" ng-click="print('printBody')"><span class="glyphicon glyphicon-print"></span>  Print</label>
+            </div>
+            <div class="col-sm-4" style="padding: 3px;">
+                <label class="btn btn-primary btn-block" ng-click="close()">Close</label>
+            </div>
         </div>
     </div>
 </div>
