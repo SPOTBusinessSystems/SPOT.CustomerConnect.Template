@@ -60,70 +60,72 @@
     <!-- Captcha -->
     <script src='//www.google.com/recaptcha/api.js?onload=vcRecaptchaApiLoaded&render=explicit' async defer></script>
 </head>
-<body ng-controller="maincontroller" ng-cloak ng-show="Loaded">
-    <!-- Navigation -->
-    <nav class="navbar navbar-default" ng-if="!LoggedIn">
-        <div class=" container-fluid">
-            <div class="navbar-header">
-                <button type="button" class="navbar-toggle collapsed" ng-click="isCollapsed = !isCollapsed">
-                    <span class=" sr-only">
-                        Toggle navigation
-                    </span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                </button>
-                <img class="navbar-brand brandImgIcon" ng-src="{{Settings.General['Logo Icon']}}" />
-                <a class="navbar-brand brandText" href="" ui-sref="login">{{Settings.General['Brand Name']}}</a>
+<body ng-controller="maincontroller" ng-cloak>
+    <div ng-show="Loaded">
+        <!-- Navigation -->
+        <nav class="navbar navbar-default" ng-if="!LoggedIn">
+            <div class=" container-fluid">
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle collapsed" ng-click="isCollapsed = !isCollapsed">
+                        <span class=" sr-only">
+                            Toggle navigation
+                        </span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <img class="navbar-brand brandImgIcon" ng-src="{{Settings.General['Logo Icon']}}" />
+                    <a class="navbar-brand brandText" href="" ui-sref="login">{{Settings.General['Brand Name']}}</a>
+                </div>
+                <div class="collapse navbar-collapse" uib-collapse="isCollapsed">
+                    <ul class="nav navbar-nav">
+                        <li role="presentation" ui-sref-active="active"><a href="" ui-sref="login" ng-click="isCollapsed = true">Login</a></li>
+                        <li role="presentation" ui-sref-active="active"><a href="" ui-sref="signup" ng-click="isCollapsed = true">{{Settings.Signup['Menu Synonym']}}</a></li>
+                        <li role="presentation" ng-click="isCollapsed = true"><a href="" ng-controller="SendMessageController" ng-click="open();">Contact</a></li>
+                    </ul>
+                </div>
             </div>
-            <div class="collapse navbar-collapse" uib-collapse="isCollapsed">
-                <ul class="nav navbar-nav">
-                    <li role="presentation" ui-sref-active="active"><a href="" ui-sref="login" ng-click="isCollapsed = true">Login</a></li>
-                    <li role="presentation" ui-sref-active="active"><a href="" ui-sref="signup" ng-click="isCollapsed = true">{{Settings.Signup['Menu Synonym']}}</a></li>
-                    <li role="presentation" ng-click="isCollapsed = true"><a href="" ng-controller="SendMessageController" ng-click="open();">Contact</a></li>
-                </ul>
+        </nav>
+
+        <nav class="navbar navbar-default" ng-if="LoggedIn">
+            <div class="container-fluid">
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle collapsed" ng-click="isCollapsed = !isCollapsed">
+                        <span class="sr-only">Toggle navigation</span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <img class="navbar-brand brandImgIcon" ng-src="{{Settings.General['Logo Icon']}}" />
+                    <a class="navbar-brand brandText" href="" ui-sref="account">{{Settings.General['Brand Name']}}</a>
+                </div>
+                <div class="collapse navbar-collapse" uib-collapse="isCollapsed">
+                    <ul class="nav navbar-nav">
+                        <li role="presentation" ui-sref-active="active"><a href="" ui-sref="account" ng-click="isCollapsed = true">Account</a></li>
+                        <li role="presentation" ui-sref-active="active" ng-show="Settings.General['Gift Cards Menu Enabled'] == 1"><a href="" ui-sref="giftcards" ng-click="isCollapsed = true">Gift Cards</a></li>
+                        <li role="presentation" ui-sref-active="active" ng-show="Settings.General['Kiosk Menu Enabled'] == 1"><a href="" ui-sref="kiosk" ng-click="isCollapsed = true">Kiosk</a></li>
+                        <li role="presentation" ui-sref-active="active"><a href="" ui-sref="orders" ng-click="isCollapsed = true">Orders</a></li>
+                        <li role="presentation" ui-sref-active="active" ng-show="(Customer.RouteName || Settings.Pickup['Allow Non-Route Pickup'] == 1) && Settings.General['Route Scheduling'] == 1 && Settings.Pickup['Menu Synonym']"><a href="" ui-sref="pickup" ng-click="isCollapsed = true">{{Settings.Pickup['Menu Synonym']}}</a></li>
+                        <li role="presentation" ui-sref-active="active" ng-show="Customer.RouteName && Settings.General['Route Scheduling'] == 1 && Settings.Cancellation['Menu Synonym']"><a href="" ui-sref="suspend" ng-click="isCollapsed = true">{{Settings.Cancellation['Menu Synonym']}}</a></li>
+                        <li role="presentation" ui-sref-active="active" ng-show="Customer.IsAR == true"><a href="" ui-sref="statements" ng-click="isCollapsed = true">Statements</a></li>
+                        <li role="presentation" ui-sref-active="active" ng-show="Customer.IsAR == true"><a href="" ui-sref="payment" ng-click="isCollapsed = true">Make Payment</a></li>
+                        <li role="presentation" ui-sref-active="active"><a href="" ng-click="openMessages();"><span class="glyphicon glyphicon-envelope"></span>  Messages  <span class="badge">{{unreadMessages}}</span></a></li>
+                        <li role="presentation" ng-click="isCollapsed = true" ng-show="Settings.General['Enable Two-Way Messaging'] == 1"><a href="" ng-controller="SendMessageController" ng-click="open();"><span class="glyphicon glyphicon-question-sign"></span>  Have a question?</a></li>
+                        <li role="presentation" ng-click="isCollapsed = true"><a href="" ui-sref="login" ng-click="LogOut(); isCollapsed = true">Logout</a></li>
+                    </ul>
+                </div>
             </div>
+        </nav>
+
+        <!-- Main -->
+        <div class="container">
+            <div ui-view=""></div>
         </div>
-    </nav>
 
-    <nav class="navbar navbar-default" ng-if="LoggedIn">
-        <div class="container-fluid">
-            <div class="navbar-header">
-                <button type="button" class="navbar-toggle collapsed" ng-click="isCollapsed = !isCollapsed">
-                    <span class="sr-only">Toggle navigation</span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                </button>
-                <img class="navbar-brand brandImgIcon" ng-src="{{Settings.General['Logo Icon']}}" />
-                <a class="navbar-brand brandText" href="" ui-sref="account">{{Settings.General['Brand Name']}}</a>
-            </div>
-            <div class="collapse navbar-collapse" uib-collapse="isCollapsed">
-                <ul class="nav navbar-nav">
-                    <li role="presentation" ui-sref-active="active"><a href="" ui-sref="account" ng-click="isCollapsed = true">Account</a></li>
-                    <li role="presentation" ui-sref-active="active" ng-show="Settings.General['Gift Cards Menu Enabled'] == 1"><a href="" ui-sref="giftcards" ng-click="isCollapsed = true">Gift Cards</a></li>
-                    <li role="presentation" ui-sref-active="active" ng-show="Settings.General['Kiosk Menu Enabled'] == 1"><a href="" ui-sref="kiosk" ng-click="isCollapsed = true">Kiosk</a></li>
-                    <li role="presentation" ui-sref-active="active"><a href="" ui-sref="orders" ng-click="isCollapsed = true">Orders</a></li>
-                    <li role="presentation" ui-sref-active="active" ng-show="(Customer.RouteName || Settings.Pickup['Allow Non-Route Pickup'] == 1) && Settings.General['Route Scheduling'] == 1 && Settings.Pickup['Menu Synonym']"><a href="" ui-sref="pickup" ng-click="isCollapsed = true">{{Settings.Pickup['Menu Synonym']}}</a></li>
-                    <li role="presentation" ui-sref-active="active" ng-show="Customer.RouteName && Settings.General['Route Scheduling'] == 1 && Settings.Cancellation['Menu Synonym']"><a href="" ui-sref="suspend" ng-click="isCollapsed = true">{{Settings.Cancellation['Menu Synonym']}}</a></li>
-                    <li role="presentation" ui-sref-active="active" ng-show="Customer.IsAR == true"><a href="" ui-sref="statements" ng-click="isCollapsed = true">Statements</a></li>
-                    <li role="presentation" ui-sref-active="active" ng-show="Customer.IsAR == true"><a href="" ui-sref="payment" ng-click="isCollapsed = true">Make Payment</a></li>
-                    <li role="presentation" ui-sref-active="active"><a href="" ng-click="openMessages();"><span class="glyphicon glyphicon-envelope"></span>  Messages  <span class="badge">{{unreadMessages}}</span></a></li>
-                    <li role="presentation" ng-click="isCollapsed = true" ng-show="Settings.General['Enable Two-Way Messaging'] == 1"><a href="" ng-controller="SendMessageController" ng-click="open();"><span class="glyphicon glyphicon-question-sign"></span>  Have a question?</a></li>
-                    <li role="presentation" ng-click="isCollapsed = true"><a href="" ui-sref="login" ng-click="LogOut(); isCollapsed = true">Logout</a></li>
-                </ul>
-            </div>
+        <!-- Message Alert -->
+        <div style="bottom: 0; right: 0; position: fixed;">
+            <uib-alert ng-repeat="alert in alerts" type="{{alert.type}}" dismiss-on-timeout="10000" close="closeAlert($index)">{{alert.msg}}</uib-alert>
         </div>
-    </nav>
-
-    <!-- Main -->
-    <div class="container">
-        <div ui-view=""></div>
-    </div>
-
-    <!-- Message Alert -->
-    <div style="bottom: 0; right: 0; position: fixed;">
-        <uib-alert ng-repeat="alert in alerts" type="{{alert.type}}" dismiss-on-timeout="10000" close="closeAlert($index)">{{alert.msg}}</uib-alert>
     </div>
 </body>
 </html>

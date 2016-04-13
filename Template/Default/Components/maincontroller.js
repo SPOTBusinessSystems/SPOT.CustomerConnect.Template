@@ -5,9 +5,9 @@
         .module('app')
         .controller('maincontroller', maincontroller);
 
-    maincontroller.$inject = ['$location', '$scope', 'localStorageService', '$state', 'dialogs', '$rootScope', 'settingsService', 'userService', 'dataService', 'configService', 'apiConfig', 'tmhDynamicLocale', '$interval'];
+    maincontroller.$inject = ['$location', '$scope', 'localStorageService', '$state', 'dialogs', '$rootScope', 'settingsService', 'userService', 'dataService', 'configService', 'apiConfig', 'tmhDynamicLocale', '$interval', 'blockUI'];
 
-    function maincontroller($location, $scope, localStorageService, $state, dialogs, $rootScope, settingsService, userService, dataService, configService, apiConfig, tmhDynamicLocale, $interval) {
+    function maincontroller($location, $scope, localStorageService, $state, dialogs, $rootScope, settingsService, userService, dataService, configService, apiConfig, tmhDynamicLocale, $interval, blockUI) {
         /* jshint validthis:true */
         var vm = this;
         vm.title = 'maincontroller';
@@ -15,6 +15,8 @@
         activate();
 
         function activate() {
+            blockUI.start();
+
             CustomerConnect.Config.Customer = null;
 
             if (userService.getCustomer()) {
@@ -129,7 +131,7 @@
                                         $scope.LoadUser();
                                         $scope.Loaded = true;
 
-                                        $state.go('account');
+                                        blockUI.stop();
                                     });
                                 });
                             })
