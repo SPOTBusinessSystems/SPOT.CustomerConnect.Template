@@ -109,7 +109,7 @@
                         <li role="presentation" ui-sref-active="active" ng-show="Customer.RouteName && Settings.General['Route Scheduling'] == 1 && Settings.Cancellation['Menu Synonym']"><a href="" ui-sref="suspend" ng-click="isCollapsed = true">{{Settings.Cancellation['Menu Synonym']}}</a></li>
                         <li role="presentation" ui-sref-active="active" ng-show="Customer.IsAR == true"><a href="" ui-sref="statements" ng-click="isCollapsed = true">Statements</a></li>
                         <li role="presentation" ui-sref-active="active" ng-show="Customer.IsAR == true"><a href="" ui-sref="payment" ng-click="isCollapsed = true">Make Payment</a></li>
-                        <li role="presentation" ui-sref-active="active"><a href="" ng-click="openMessages();"><span class="glyphicon glyphicon-envelope"></span>  Messages  <span class="badge">{{unreadMessages}}</span></a></li>
+                        <li role="presentation" ui-sref-active="active"><a href="" ng-click="openMessages();"><span class="glyphicon glyphicon-envelope"></span>  Messages  <span class="badge" ng-show="unreadMessages > 0">{{unreadMessages}}</span></a></li>
                         <li role="presentation" ng-click="isCollapsed = true" ng-show="Settings.General['Enable Two-Way Messaging'] == 1"><a href="" ng-controller="SendMessageController" ng-click="open();"><span class="glyphicon glyphicon-question-sign"></span>  Have a question?</a></li>
                         <li role="presentation" ng-click="isCollapsed = true"><a href="" ui-sref="login" ng-click="LogOut(); isCollapsed = true">Logout</a></li>
                     </ul>

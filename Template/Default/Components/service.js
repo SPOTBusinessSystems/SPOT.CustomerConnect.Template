@@ -114,6 +114,10 @@
         this.unreadMessageCount = function () {
             var count = null;
 
+            if (!this.messages) {
+                return 0;
+            }
+
             for (var x = 0; x < this.messages.length; x++) {
                 if (this.messages[x].ReadDateTime == null) {
                     count += 1;
@@ -356,18 +360,16 @@
         // I transform the error response, unwrapping the application dta from
         // the API response payload.
         function handleError(response) {
+            return (response.data);
             // The API response from the server should be returned in a
             // nomralized format. However, if the request was not handled by the
             // server (or what not handles properly - ex. server error), then we
             // may have to normalize it on our end, as best we can.
-            if (
-                !angular.isObject(response.data) ||
-                !response.data.message
-                ) {
+            if (!angular.isObject(response.data) || !response.data.message) {
                 return ($q.reject("An unknown error occurred."));
             }
             // Otherwise, use expected error message.
-            return ($q.reject(response.data.message));
+            return ($q.reject(response.data));
         }
         // I transform the successful response, unwrapping the application data
         // from the API response payload.
