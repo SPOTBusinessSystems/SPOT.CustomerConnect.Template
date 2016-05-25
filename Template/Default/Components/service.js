@@ -12,7 +12,7 @@
     userService.$inject = [];
     apiConfig.$inject = [];
     dataService.$inject = ['$http', '$q', 'apiConfig'];
-    configService.$inject = ['dataService'];
+    configService.$inject = ['dataService','$q'];
 
     function apiConfig() {
         this.setURL = function (url) {
@@ -52,7 +52,214 @@
         }
     }
 
-    function configService(dataService) {
+    function configService(dataService, $q) {
+        var parent = this;
+
+        this.authProviders = {
+            // Setup
+            setup: function () {
+                this.google.init();
+                this.facebook.init();
+            },
+
+            anyEnabled: function () {
+                return parent.authProviders.facebook.enabled || parent.authProviders.google.enabled;
+            },
+
+            facebook: {
+                enabled: false,
+                appId: "",
+                spotAuthType: "facebook",
+
+                init: function () {
+                    console.log('facebook init');
+                    if (parent.getProfile() != null) {
+                        var g = parent.getProfile().General['Authentication Providers'].Facebook;
+
+                        if (g != null) {
+                            if (g.Enabled == "1") {
+                                if (g.AppID.length > 0) {
+                                    this.enabled = true;
+                                    this.appId = g.AppID;
+
+                                    // Facebook API
+                                    FB.init({
+                                        appId: g.AppID,
+                                        status: true,
+                                        cookie: true,
+                                        xfbml: true,
+                                        version: 'v2.5'
+                                    });
+
+                                    console.log('facebook set up');
+                                } else {
+                                    console.log("AuthProvider Error: Facebook is enabled but AppID is not set. Leaving it disabled.");
+                                }
+                            }
+                        }
+                    }
+                },
+
+                isSignedIn: function () {
+                    var deferred = $q.defer();
+
+                    FB.getLoginStatus(function (data) {
+                        console.log('getstatus');
+                        console.log(data);
+                        if (data.authResponse && data.status == 'connected') {
+                            deferred.resolve(true);
+                        } else {
+                                deferred.resolve(false);
+                        }
+                    });
+
+                    return deferred.promise;
+                },
+
+                retrieveStatus: function () {
+                    FB.getLoginStatus(function (data) {
+                        return data;
+                    });
+                },
+
+                signin: function () {
+                    var deferred = $q.defer();
+
+                    FB.login(function (response) {
+                        if (response.authResponse) {
+                            deferred.resolve();
+                        } else {
+                            return false;
+                        }
+                    });
+
+                    return deferred.promise;
+                },
+
+                signout: function () {
+                    var deferred = $q.defer();
+
+                    FB.logout(function (data) {
+                        deferred.resolve();
+                    });
+
+                    return deferred.promise;
+                },
+
+                unlink: function () {
+                    var deferred = $q.defer();
+
+                    FB.api('/me/permissions', 'DELETE', function (response) {
+                        if (response.success == true) {
+                            // Re-initialize FB API.
+                            parent.authProviders.facebook.init();
+                            deferred.resolve();
+                        } else {
+                            deferred.reject();
+                        }
+                    });
+
+                    return deferred.promise;
+                }
+            },
+
+            // Google Start
+            google: {
+                enabled: false,
+                clientid: "",
+                spotAuthType: "googleoauthv2",
+                theme: "light",
+
+                init: function () {
+                    console.log('in google init');
+                    if (parent.getProfile() != null) {
+                        // Start Google
+                        var g = parent.getProfile().General['Authentication Providers'].Google;
+
+                        if (g != null) {
+                            if (g.Enabled == "1") {
+                                if (g.ClientID.length > 0) {
+                                    this.enabled = true;
+                                    this.clientid = g.ClientID;
+                                    this.theme = g.Theme.toLowerCase();
+
+                                    // Google API
+                                    gapi.load('auth2', function () {
+                                        gapi.auth2.init({
+                                            client_id: g.ClientID
+                                        });
+                                    });
+
+                                    console.log('google set up');
+                                } else {
+                                    console.log("AuthProvider Error: Google is enabled but ClientID is not set. Leaving it disabled.");
+                                }
+                            }
+                        }
+                    }
+                },
+
+                isSignedIn: function () {
+                    var x = gapi.auth2.getAuthInstance();
+
+                    if (x != null) {
+                        return x.isSignedIn.get();
+                    }
+                },
+
+                retrieveUserId: function () {
+                    var x = gapi.auth2.getAuthInstance();
+
+                    // Is not signed in, no user id.
+                    if (!this.isSignedIn) {
+                        return "";
+                    }
+
+                    if (x != null) {
+                        return x.currentUser.get().El;
+                    }
+                },
+
+                signin: function () {
+                    var deferred = $q.defer();
+                    var x = gapi.auth2.getAuthInstance();
+
+
+                    if (x != null) {
+                        x.signIn({ 'scope': 'profile email' })
+                            .then(function (data) {
+                                if (data) {
+                                    if (data.El && data.El.length > 0) {
+                                        deferred.resolve(data);
+                                    }
+                                }
+
+                                deferred.reject();
+                            });
+                    }
+
+                    return deferred.promise;
+                },
+
+                signout: function () {
+                    var x = gapi.auth2.getAuthInstance();
+
+                    if (x != null) {
+                        return x.signOut();
+                    }
+                },
+
+                unlink: function () {
+                    var x = gapi.auth2.getAuthInstance();
+
+                    if (x != null) {
+                        x.disconnect();
+                    }
+                }
+            }
+            // Google End
+        }
+
         this.setProfile = function (profile) {
             this.profile = profile;
         }
@@ -67,6 +274,14 @@
 
         this.getCSSPath = function (path) {
             return this.CSSPath;
+        }
+
+        this.init = function (init) {
+            this.initialized = init;
+        }
+
+        this.isInitialized = function () {
+            return this.initialized;
         }
     }
     
@@ -284,6 +499,10 @@
                 return (createRequest('ChangePassword', { newPassword: password }).then(handleSuccess, handleError));
             },
 
+            loginOAuth: function(provider, token) {
+                return (createRequest('Login', { authProvider: provider, authToken: token }).then(handleSuccess, handleError));
+            },
+
             login: function(emailAddress, password) {
                 return (createRequest('Login', { user: emailAddress, password: password }).then(handleSuccess, handleError));
             },
@@ -314,6 +533,14 @@
 
             deleteMessage: function (messageId) {
                 return (createRequest('DeleteMessage', { messageId: messageId }).then(handleSuccess, handleError));
+            },
+
+            updateAuthProvider(authType, userId, authToken) {
+                return (createRequest('UpdateAuthProvider', { authProvider: authType, userId: userId, authToken: authToken }).then(handleSuccess, handleError));
+            },
+
+            removeAuthProvider(authType) {
+                return (createRequest('RemoveAuthProvider', { authProvider: authType }).then(handleSuccess, handleError));
             }
 
         }

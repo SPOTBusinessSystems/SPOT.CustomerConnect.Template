@@ -181,6 +181,12 @@
             <preferences ng-model="Customer.Preferences" />
         </div>
 
+        <div ng-if="configService.authProviders.anyEnabled">
+            <h3>Linked Social Accounts</h3>
+            <google-auth></google-auth>
+            <facebook-auth></facebook-auth>
+        </div>
+
         <div class="form-group" style="text-align: center; margin-top: 10px;">
             <input type="button" class="btn btn-danger" value="Undo Changes" ng-click="UndoChanges(); accountForm.$setPristine();" ng-disabled="!accountForm.$dirty" />
             <input type="submit" class="btn btn-success" value="Save" ng-click="SaveAccount();" ng-disabled="!accountForm.$dirty" />

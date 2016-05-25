@@ -8,121 +8,78 @@
     <title>CustomerConnect</title>
 
     <!-- Dependencies -->
-    <link id="themeCss" rel="stylesheet" href="@TENANT/Template/Default/Content/bootstrap/bootstrap.min.css?v=3.3.2" />
-    <link rel="stylesheet" href="@TENANT/Template/Default/Content/css/styles-bundle.min.css?v=1.0.0" />
+    <link id="themeCss" rel="stylesheet" type="text/css" href="/@TENANT/Template/Default/Content/bootstrap/bootstrap.min.css?v=3.3.2" />
+    <link id="additionalCss" rel="stylesheet" type="text/css" href="" />
+    <link rel="stylesheet" href="/@TENANT/Template/Default/Content/css/styles-bundle.min.css?v=1.0.0" />
 
-    <script src="@TENANT/Template/Default/Scripts/extras-bundle.min.js?v=1.0.0"></script>
-    <script src="@TENANT/Template/Default/Scripts/bootstrap-bundle.min.js?v=1.0.0"></script>
-    <script src="@TENANT/Template/Default/Scripts/angular-bundle.min.js?v=1.0.0"></script>
+    <script src="/@TENANT/Template/Default/Scripts/extras-bundle.min.js?v=1.0.0"></script>
+    <script src="/@TENANT/Template/Default/Scripts/bootstrap-bundle.min.js?v=1.0.0"></script>
+    <script src="/@TENANT/Template/Default/Scripts/angular-bundle.min.js?v=1.0.0"></script>
 
     <!-- SPOT API -->
-    <script src="@TENANT/Template/Default/Scripts/customerconnect.min.js?v=1.0.0"></script>
+    <script src="/@TENANT/Template/Default/Scripts/customerconnect.min.js?v=1.0.0"></script>
 
     <!-- Core -->
-    <script src="@TENANT/Template/Default/Components/app.js"></script>
-    <script src="@TENANT/Template/Default/Components/service.js"></script>
+    <script src="/@TENANT/Template/Default/Components/app.js"></script>
+    <script src="/@TENANT/Template/Default/Components/service.js"></script>
 
     <!-- Directives -->
-    <script src="@TENANT/Template/Default/Components/Shared/PasswordIndicator/PasswordIndicatorDirective.js"></script>
-    <script src="@TENANT/Template/Default/Components/Shared/CCExp/CCExp.js"></script>
-    <script src="@TENANT/Template/Default/Components/Shared/Notifications/Notifications.js"></script>
-    <script src="@TENANT/Template/Default/Components/Shared/Preferences/Preferences.js"></script>
-    <script src="@TENANT/Template/Default/Components/Shared/States/States.js"></script>
-    <script src="@TENANT/Template/Default/Components/Shared/DynamicContent/DynamicContent.js"></script>
+    <script src="/@TENANT/Template/Default/Components/Shared/PasswordIndicator/PasswordIndicatorDirective.js"></script>
+    <script src="/@TENANT/Template/Default/Components/Shared/CCExp/CCExp.js"></script>
+    <script src="/@TENANT/Template/Default/Components/Shared/Notifications/Notifications.js"></script>
+    <script src="/@TENANT/Template/Default/Components/Shared/Preferences/Preferences.js"></script>
+    <script src="/@TENANT/Template/Default/Components/Shared/States/States.js"></script>
+    <script src="/@TENANT/Template/Default/Components/Shared/DynamicContent/DynamicContent.js"></script>
+
+    <!-- Components -->
+    <script src="/@TENANT/Template/Default/Components/Shared/MainMenu/MainMenu.js"></script>
+    <script src="/@TENANT/Template/Default/Components/Shared/SiteHeader/SiteHeader.js"></script>
+    <script src="/@TENANT/Template/Default/Components/Shared/SiteFooter/SiteFooter.js"></script>
+
+    <script src="/@TENANT/Template/Default/Components/Shared/AuthProviders/GoogleAuth/GoogleAuth.js"></script>
+    <script src="/@TENANT/Template/Default/Components/Shared/AuthProviders/FacebookAuth/FacebookAuth.js"></script>
+
+    <!-- View Components -->
+
 
     <!-- View Controllers - Anonymous -->
-    <script src="@TENANT/Template/Default/Components/maincontroller.js"></script>
-    <script src="@TENANT/Template/Default/Components/Views/Login/LoginController.js"></script>
-    <script src="@TENANT/Template/Default/Components/Views/Reminder/ReminderController.js"></script>
-    <script src="@TENANT/Template/Default/Components/Views/Signup/SignupController.js"></script>
-    <script src="@TENANT/Template/Default/Components/Views/Confirmation/ConfirmationController.js"></script>
+    <script src="/@TENANT/Template/Default/Components/Views/Login/LoginController.js"></script>
+    <script src="/@TENANT/Template/Default/Components/Views/Reminder/ReminderController.js"></script>
+    <script src="/@TENANT/Template/Default/Components/Views/Signup/SignupController.js"></script>
+    <script src="/@TENANT/Template/Default/Components/Views/Confirmation/ConfirmationController.js"></script>
 
     <!-- View Controllers - Authorized-->
-    <script src="@TENANT/Template/Default/Components/Views/Account/AccountController.js"></script>
-    <script src="@TENANT/Template/Default/Components/Views/GiftCards/GiftCardsController.js"></script>
-    <script src="@TENANT/Template/Default/Components/Views/Kiosk/KioskController.js"></script>
-    <script src="@TENANT/Template/Default/Components/Views/Orders/OrdersController.js"></script>
-    <script src="@TENANT/Template/Default/Components/Views/Payments/PaymentsController.js"></script>
-    <script src="@TENANT/Template/Default/Components/Views/Pickup/PickupController.js"></script>
-    <script src="@TENANT/Template/Default/Components/Views/Statements/StatementsController.js"></script>
-    <script src="@TENANT/Template/Default/Components/Views/Suspend/SuspendController.js"></script>
+    <script src="/@TENANT/Template/Default/Components/Views/Account/AccountController.js"></script>
+    <script src="/@TENANT/Template/Default/Components/Views/GiftCards/GiftCardsController.js"></script>
+    <script src="/@TENANT/Template/Default/Components/Views/Kiosk/KioskController.js"></script>
+    <script src="/@TENANT/Template/Default/Components/Views/Orders/OrdersController.js"></script>
+    <script src="/@TENANT/Template/Default/Components/Views/Payments/PaymentsController.js"></script>
+    <script src="/@TENANT/Template/Default/Components/Views/Pickup/PickupController.js"></script>
+    <script src="/@TENANT/Template/Default/Components/Views/Statements/StatementsController.js"></script>
+    <script src="/@TENANT/Template/Default/Components/Views/Suspend/SuspendController.js"></script>
 
     <!-- Dialog Controllers -->
-    <script src="@TENANT/Template/Default/Components/Dialogs/DialogController.js"></script>
-    <script src="@TENANT/Template/Default/Components/Dialogs/OrderController.js"></script>
-    <script src="@TENANT/Template/Default/Components/Dialogs/PickupsController.js"></script>
-    <script src="@TENANT/Template/Default/Components/Dialogs/SendMessageController.js"></script>
-    <script src="@TENANT/Template/Default/Components/Dialogs/StatementController.js"></script>
-    <script src="@TENANT/Template/Default/Components/Dialogs/SuspensionsController.js"></script>
-    <script src="@TENANT/Template/Default/Components/Dialogs/Messages/MessagesController.js"></script>
-    <script src="@TENANT/Template/Default/Components/Dialogs/Message/MessageController.js"></script>
+    <script src="/@TENANT/Template/Default/Components/Dialogs/DialogController.js"></script>
+    <script src="/@TENANT/Template/Default/Components/Dialogs/OrderController.js"></script>
+    <script src="/@TENANT/Template/Default/Components/Dialogs/PickupsController.js"></script>
+    <script src="/@TENANT/Template/Default/Components/Dialogs/SendMessageController.js"></script>
+    <script src="/@TENANT/Template/Default/Components/Dialogs/StatementController.js"></script>
+    <script src="/@TENANT/Template/Default/Components/Dialogs/SuspensionsController.js"></script>
+    <script src="/@TENANT/Template/Default/Components/Dialogs/Messages/MessagesController.js"></script>
+    <script src="/@TENANT/Template/Default/Components/Dialogs/Message/MessageController.js"></script>
 
     <!-- Captcha -->
     <script src='//www.google.com/recaptcha/api.js?onload=vcRecaptchaApiLoaded&render=explicit' async defer></script>
+
+    <!-- Auth Providers -->
+    <script src="//apis.google.com/js/platform.js"></script>
+    <script src="//connect.facebook.net/en_US/sdk.js"></script>
 </head>
-<body ng-controller="maincontroller" ng-cloak>
-    <div ng-show="Loaded">
-        <!-- Navigation -->
-        <nav class="navbar navbar-default" ng-if="!LoggedIn">
-            <div class=" container-fluid">
-                <div class="navbar-header">
-                    <button type="button" class="navbar-toggle collapsed" ng-click="isCollapsed = !isCollapsed">
-                        <span class=" sr-only">
-                            Toggle navigation
-                        </span>
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
-                    </button>
-                    <img class="navbar-brand brandImgIcon" ng-src="{{Settings.General['Logo Icon']}}" />
-                    <a class="navbar-brand brandText" href="" ui-sref="login">{{Settings.General['Brand Name']}}</a>
-                </div>
-                <div class="collapse navbar-collapse" uib-collapse="isCollapsed">
-                    <ul class="nav navbar-nav">
-                        <li role="presentation" ui-sref-active="active"><a href="" ui-sref="login" ng-click="isCollapsed = true">Login</a></li>
-                        <li role="presentation" ui-sref-active="active"><a href="" ui-sref="signup" ng-click="isCollapsed = true">{{Settings.Signup['Menu Synonym']}}</a></li>
-                        <li role="presentation" ng-click="isCollapsed = true"><a href="" ng-controller="SendMessageController" ng-click="open();">Contact</a></li>
-                    </ul>
-                </div>
-            </div>
-        </nav>
-
-        <nav class="navbar navbar-default" ng-if="LoggedIn">
-            <div class="container-fluid">
-                <div class="navbar-header">
-                    <button type="button" class="navbar-toggle collapsed" ng-click="isCollapsed = !isCollapsed">
-                        <span class="sr-only">Toggle navigation</span>
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
-                    </button>
-                    <img class="navbar-brand brandImgIcon" ng-src="{{Settings.General['Logo Icon']}}" />
-                    <a class="navbar-brand brandText" href="" ui-sref="account">{{Settings.General['Brand Name']}}</a>
-                </div>
-                <div class="collapse navbar-collapse" uib-collapse="isCollapsed">
-                    <ul class="nav navbar-nav">
-                        <li role="presentation" ui-sref-active="active"><a href="" ui-sref="account" ng-click="isCollapsed = true">Account</a></li>
-                        <li role="presentation" ui-sref-active="active" ng-show="Settings.General['Gift Cards Menu Enabled'] == 1"><a href="" ui-sref="giftcards" ng-click="isCollapsed = true">Gift Cards</a></li>
-                        <li role="presentation" ui-sref-active="active" ng-show="Settings.General['Kiosk Menu Enabled'] == 1"><a href="" ui-sref="kiosk" ng-click="isCollapsed = true">Kiosk</a></li>
-                        <li role="presentation" ui-sref-active="active"><a href="" ui-sref="orders" ng-click="isCollapsed = true">Orders</a></li>
-                        <li role="presentation" ui-sref-active="active" ng-show="(Customer.RouteName || Settings.Pickup['Allow Non-Route Pickup'] == 1) && Settings.General['Route Scheduling'] == 1 && Settings.Pickup['Menu Synonym']"><a href="" ui-sref="pickup" ng-click="isCollapsed = true">{{Settings.Pickup['Menu Synonym']}}</a></li>
-                        <li role="presentation" ui-sref-active="active" ng-show="Customer.RouteName && Settings.General['Route Scheduling'] == 1 && Settings.Cancellation['Menu Synonym']"><a href="" ui-sref="suspend" ng-click="isCollapsed = true">{{Settings.Cancellation['Menu Synonym']}}</a></li>
-                        <li role="presentation" ui-sref-active="active" ng-show="Customer.IsAR == true"><a href="" ui-sref="statements" ng-click="isCollapsed = true">Statements</a></li>
-                        <li role="presentation" ui-sref-active="active" ng-show="Customer.IsAR == true"><a href="" ui-sref="payment" ng-click="isCollapsed = true">Make Payment</a></li>
-                        <li role="presentation" ui-sref-active="active"><a href="" ng-click="openMessages();"><span class="glyphicon glyphicon-envelope"></span>  Messages  <span class="badge" ng-show="unreadMessages > 0">{{unreadMessages}}</span></a></li>
-                        <li role="presentation" ng-click="isCollapsed = true" ng-show="Settings.General['Enable Two-Way Messaging'] == 1"><a href="" ng-controller="SendMessageController" ng-click="open();"><span class="glyphicon glyphicon-question-sign"></span>  Have a question?</a></li>
-                        <li role="presentation" ng-click="isCollapsed = true"><a href="" ui-sref="login" ng-click="LogOut(); isCollapsed = true">Logout</a></li>
-                    </ul>
-                </div>
-            </div>
-        </nav>
-
-        <!-- Main -->
+<body ng-cloak>
+    <div>
         <div class="container">
             <div ui-view=""></div>
         </div>
-
-        <!-- Message Alert -->
         <div style="bottom: 0; right: 0; position: fixed;">
             <uib-alert ng-repeat="alert in alerts" type="{{alert.type}}" dismiss-on-timeout="10000" close="closeAlert($index)">{{alert.msg}}</uib-alert>
         </div>

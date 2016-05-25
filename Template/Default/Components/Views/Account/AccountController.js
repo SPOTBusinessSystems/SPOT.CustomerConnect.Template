@@ -1,13 +1,15 @@
-﻿(function () {
+﻿var authProvider;
+
+(function () {
     'use strict';
 
     angular
     .module('app')
     .controller('accountcontroller', accountcontroller);
 
-    accountcontroller.$inject = ['$scope','dialogs','$rootScope','$filter','settingsService','$state','dataService','userService'];
+    accountcontroller.$inject = ['$scope','dialogs','$rootScope','$filter','settingsService','$state','dataService','userService','configService'];
 
-    function accountcontroller($scope, dialogs, $rootScope, $filter, settingsService, $state, dataService, userService) {
+    function accountcontroller($scope, dialogs, $rootScope, $filter, settingsService, $state, dataService, userService, configService) {
         /* jshint validthis:true */
         var vm = this;
         vm.title = 'accountcontroller';
@@ -16,10 +18,13 @@
 
         function activate() {
             $scope.Customer = angular.copy(userService.getCustomer());
-            
+            $scope.Settings = configService.getProfile();
+            $scope.configService = configService;
+
+            console.log($scope.Settings);
+
             $scope.Customer.Notifications = $filter('orderBy')($scope.Customer.Notifications, 'NotificationTypeDescription', false);
             $scope.Settings.Notifications = $filter('orderBy')($scope.Settings.Notifications, ['Description', 'MethodName'], false);
-            $scope.Settings = $rootScope.Settings;
 
             $scope.$watch('birthMonth', function () {
                 $scope.setBirthDays();

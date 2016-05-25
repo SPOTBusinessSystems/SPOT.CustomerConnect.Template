@@ -13,6 +13,8 @@
         vm.title = 'LoginController';
 
         (function () {
+            $scope.configService = configService;
+
             if (localStorageService.get(CustomerConnect.Config.Tenant + '_e') != null) {
                 userService.setEmail(CustomerConnect.Util.base64._decode(localStorageService.get(CustomerConnect.Config.Tenant + '_e')));
             }
@@ -29,12 +31,11 @@
             }
 
             $scope.getCustomer = function () {
+                console.log('get customer');
                 dataService.customer.getCustomer().then(function (data) {
                     if (!data.Failed) {
                         CustomerConnect.Config.Customer = data.ReturnObject;
-                        $rootScope.Customer = data.ReturnObject;
                         userService.setCustomer(data.ReturnObject);
-                        $rootScope.LoggedIn = true;
 
                         dataService.user.getMessages().then(function (data) {
                             if (!data.Failed) {
@@ -138,6 +139,32 @@
 
             $scope.validEmail = function () {
                 return CustomerConnect.Util.Validate.EmailAddress($scope.emailAddress);
+            }
+
+            if (localStorageService.get(CustomerConnect.Config.Tenant + '_token') != null) {
+                CustomerConnect.Config.SessionId = localStorageService.get(CustomerConnect.Config.Tenant + '_token');
+                apiConfig.setSessionId(CustomerConnect.Config.SessionId);
+
+                dataService.customer.getCustomer().then(function (data) {
+                    if (!data.Failed) {
+                        userService.setCustomer(data.ReturnObject);
+
+                        dataService.user.getMessages().then(function (data) {
+                            if (!data.Failed) {
+                                userService.setMessages(data.ReturnObject);
+                            } else {
+                                dialogs.error('Messages Error', 'Unable to load messages.')
+                            }
+
+                            $state.go('account');
+                        });
+
+                    } else {
+                        //dialogs.error('Load Failed', 'Unable to retrieve customer data. Please login again.');
+                        localStorageService.remove(CustomerConnect.Config.Tenant + '_token');
+                        window.location.reload();
+                    }
+                });
             }
         })();
     };

@@ -26,3 +26,8 @@
 .boldText {
     font-weight: bold !important;
 }
+
+.social-right {
+    position: absolute;
+    right: 15px;
+}

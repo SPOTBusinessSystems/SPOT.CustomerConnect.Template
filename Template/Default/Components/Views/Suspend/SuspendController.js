@@ -5,9 +5,9 @@
     .module('app')
     .controller('SuspendController', SuspendController);
 
-    SuspendController.$inject = ['$rootScope', '$scope', 'blockUI', 'dialogs', 'settingsService', 'dataService', 'userService'];
+    SuspendController.$inject = ['$scope', 'blockUI', 'dialogs', 'settingsService', 'dataService', 'userService', 'configService'];
 
-    function SuspendController($rootScope, $scope, blockUI, dialogs, settingsService, dataService, userService) {
+    function SuspendController($scope, blockUI, dialogs, settingsService, dataService, userService, configService) {
         /* jshint validthis:true */
         var vm = this;
         vm.title = 'SuspendController';
@@ -16,6 +16,7 @@
 
         function activate() {
             $scope.Customer = userService.getCustomer();
+            $scope.Settings = configService.getProfile();
             $scope.Cancellation = { Comments: '' };
 
             $scope.dateOptions = {
