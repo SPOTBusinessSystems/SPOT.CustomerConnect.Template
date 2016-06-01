@@ -42,6 +42,13 @@
                 xdr.onprogress = function () { };
                 xdr.ontimeout = function () { };
                 xdr.onerror = function () {
+                    var data = jQuery.parseJSON(xdr.responseText);
+
+                    if (!data.Failed) {
+                        data.Failed = true;
+                        data.Message = "HTTP Request failed.";
+                    }
+
                     deferred.reject(data);
                 };
                 setTimeout(function () {
@@ -72,8 +79,13 @@
                         }
                     },
                     error: function (data) {
-                        data.Failed = true;
-                        data.Message = "HTTP Request failed.";
+                        var data = jQuery.parseJSON(data.responseText);
+
+                        if (!data.Failed) {
+                            data.Failed = true;
+                            data.Message = "HTTP Request failed.";
+                        }
+
                         deferred.reject(data);
                     }
                 });
@@ -300,6 +312,10 @@
             this.pickupDate = pickupDate;
             this.visitType = visitType;
             this.deliveryDate = deliveryDate;
+        },
+
+        GetRecommendedRoute: function (coordinates) {
+            return new CustomerConnect.Request.CreateRequest('GetRecommendedRoute', null);
         },
 
         GetRouteDeliveryZones: function () {

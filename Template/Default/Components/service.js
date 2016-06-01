@@ -181,7 +181,6 @@
                                 if (g.ClientID.length > 0) {
                                     this.enabled = true;
                                     this.clientid = g.ClientID;
-                                    this.theme = g.Theme.toLowerCase();
 
                                     // Google API
                                     gapi.load('auth2', function () {
