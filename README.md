@@ -5,7 +5,7 @@ This is the base HTML/JS templates for use with the SPOT API. These templates us
 ## Get Started ##
 Inside the Template folder there are copies of the site based on template you want to start with. Currently there is only Default. Copy the Default folder into your website or application. In Index.html, remove "@TENANT" from all resource files.
 
-In order to use the template, you must have acquired a session token from the API using the methods noted in the API getting started guide at https://developer.spotpos.com/gettingstarted.html. You will have to have 3 JavaScript variables set:
+In order to use the template, you must have acquired a session token from the API using the methods noted in the API getting started guide at https://developer.spotpos.com/api/gettingstarted.html. You will have to have 3 JavaScript variables set:
 
 * CustomerConnect.Config.AccountKey = 'APIACCOUNTKEY';
 * CustomerConnect.Config.PublishableId = 'APIPUBLISHABLEKEY'
