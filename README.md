@@ -3,13 +3,16 @@
 This is the base HTML/JS templates for use with the SPOT API. These templates use AngularJS 1.4 and Bootstrap to create a full customer portal. The documentation for the API can be found at https://developer.spotpos.com/. To use this, you must be familiar with HTML and JavaScript. Experience with AngularJS is helpful. You can also learn more about AngularJS at https://angularjs.org/.
 
 ## Get Started ##
-Inside the Template folder there are copies of the site based on template you want to start with. Currently there is only Default. Copy the Default folder into your website or application. In Index.html, remove "@TENANT/Template/" from all resource files.
+Inside the Template folder there are copies of the site based on template you want to start with. Currently there is only Default. Copy the Default folder into your website or application. In Index.html, remove "@TENANT" from all resource files.
 
 In order to use the template, you must have acquired a session token from the API using the methods noted in the API getting started guide at https://developer.spotpos.com/gettingstarted.html. You will have to have 3 JavaScript variables set:
 
-CustomerConnect.Config.AccountKey
-CustomerConnect.Config.URL
-CustomerConnect.Config.SessionId
+* CustomerConnect.Config.AccountKey = 'APIACCOUNTKEY';
+* CustomerConnect.Config.PublishableId = 'APIPUBLISHABLEKEY'
+* CustomerConnect.Config.URL = 'APIURL';
+* CustomerConnect.Config.SessionId = null;
+* CustomerConnect.Config.Template = 'Default';
+* CustomerConnect.Config.Tenant = '';
 
 Remember to always protect your SecurityID by keeping initial token retrieval in server-side code such as ASP.NET or PHP. Inject the returned session into your Index.html.
 
@@ -25,6 +28,8 @@ Remember to always protect your SecurityID by keeping initial token retrieval in
 The site uses Bootstrap. This template comes with some prebuilt themes. Which theme is used is determined by their settings in the POS system. Alternatively, you can change this manually in Components/maincontroller.js. There is also a complete Bootstrap customizer at http://getbootstrap.com/customize/. 
 
 ## Folder Structure ##
+It is best to leave the app in the Template/Default folder structure, however this can be modified if needed. Just make sure to find and replace all paths to match your target structure.
+
 * Scripts - These are all the JS dependencies.
 * Content - These are all the CSS dependencies.
 * Components - This is the app itself.
