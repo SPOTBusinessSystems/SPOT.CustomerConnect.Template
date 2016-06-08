@@ -58,8 +58,14 @@
         this.authProviders = {
             // Setup
             setup: function () {
-                this.google.init();
-                this.facebook.init();
+                var deferred = $q.defer();
+
+                parent.authProviders.google.init().then(function () {
+                    parent.authProviders.facebook.init();
+                    deferred.resolve();
+                });
+
+                return deferred.promise;
             },
 
             anyEnabled: function () {
@@ -171,6 +177,8 @@
                 theme: "light",
 
                 init: function () {
+                    var deferred = $q.defer();
+
                     console.log('in google init');
                     if (parent.getProfile() != null) {
                         // Start Google
@@ -190,20 +198,34 @@
                                     });
 
                                     console.log('google set up');
+                                    deferred.resolve();
                                 } else {
                                     console.log("AuthProvider Error: Google is enabled but ClientID is not set. Leaving it disabled.");
+                                    deferred.resolve();
                                 }
+                            } else {
+                                deferred.resolve();
                             }
+                        } else {
+                            deferred.resolve();
                         }
+                    } else {
+                        deferred.resolve();
                     }
+
+                    return deferred.promise;
                 },
 
                 isSignedIn: function () {
-                    var x = gapi.auth2.getAuthInstance();
+                    if (gapi.auth2) {
+                        var x = gapi.auth2.getAuthInstance();
 
-                    if (x != null) {
-                        return x.isSignedIn.get();
+                        if (x != null) {
+                            return x.isSignedIn.get();
+                        }
                     }
+
+                    return false;
                 },
 
                 retrieveUserId: function () {

@@ -304,8 +304,7 @@
             this.instructionsRequest = instructionsRequest;
         },
 
-        PickupRequest: function (accountTransactionNumber, pickupDate, comments, instructionsRequest, deliveryType, visitType, deliveryDate) {
-            this.accountTransactionNumber = accountTransactionNumber;
+        PickupRequest: function (pickupDate, comments, instructionsRequest, deliveryType, visitType, deliveryDate) {
             this.comments = comments;
             this.instructionsRequest = instructionsRequest;
             this.deliveryType = deliveryType;
@@ -315,7 +314,7 @@
         },
 
         GetRecommendedRoute: function (coordinates) {
-            return new CustomerConnect.Request.CreateRequest('GetRecommendedRoute', null);
+            return new CustomerConnect.Request.CreateRequest('GetRecommendedRoute', coordinates);
         },
 
         GetRouteDeliveryZones: function () {

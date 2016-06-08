@@ -21,6 +21,9 @@
             $scope.Settings = configService.getProfile();
             $scope.configService = configService;
 
+            console.log('authprov-account');
+            console.log(configService.authProviders.anyEnabled());
+
             console.log($scope.Settings);
 
             $scope.Customer.Notifications = $filter('orderBy')($scope.Customer.Notifications, 'NotificationTypeDescription', false);

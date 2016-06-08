@@ -41,9 +41,13 @@
             </div>
         </div>
 
-        <div class="form-group center" style="margin-top: 15px;" ng-if="configService.authProviders.anyEnabled">
-            <google-auth on-login="getCustomer()"></google-auth>
-            <facebook-auth on-login="getCustomer()"></facebook-auth>
+        <div class="row" style="margin-top: 35px;" ng-if="configService.authProviders.anyEnabled()">
+            <div class="col-sm-6" style="padding: 3px;">
+                <facebook-auth on-login="getCustomer()"></facebook-auth>    
+            </div>
+            <div class="col-sm-6" style="padding: 3px;">
+                <google-auth on-login="getCustomer()"></google-auth>
+            </div>
         </div>
 
         <input type="submit" style="display: none;" />

@@ -72,14 +72,12 @@
     <script src='//www.google.com/recaptcha/api.js?onload=vcRecaptchaApiLoaded&render=explicit' async defer></script>
 
     <!-- Auth Providers -->
-    <script src="//apis.google.com/js/platform.js"></script>
+    <script src="//apis.google.com/js/platform.js" async defer></script>
     <script src="//connect.facebook.net/en_US/sdk.js"></script>
 </head>
 <body ng-cloak>
     <div>
-        <div class="container">
-            <div ui-view=""></div>
-        </div>
+        <div ui-view=""></div>
         <div style="bottom: 0; right: 0; position: fixed;">
             <uib-alert ng-repeat="alert in alerts" type="{{alert.type}}" dismiss-on-timeout="10000" close="closeAlert($index)">{{alert.msg}}</uib-alert>
         </div>

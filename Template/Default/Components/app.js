@@ -131,7 +131,9 @@
             template: [
                 '<site-header></site-header>',
                 '<main-menu></main-menu>',
+                '<div class="container">',
                 '<ui-view></ui-view>',
+                '</div>',
                 '<site-footer></site-footer>'
             ].join(''),
             resolve: {
@@ -187,74 +189,75 @@
                                                 configService.setProfile(Settings);
 
                                                 console.log('auth setup');
-                                                configService.authProviders.setup();
-                                                console.log(Settings);
+                                                configService.authProviders.setup().then(function () {
+                                                    console.log(Settings);
 
-                                                var Themes = [
-                                                    { Name: 'Default', File: 'bootstrap.min.css' },
-                                                    { Name: 'Cerulean', File: 'bootstrap-cerulean.min.css' },
-                                                    { Name: 'Cosmo', File: 'bootstrap-cosmo.min.css' },
-                                                    { Name: 'Cyborg', File: 'bootstrap-cyborg.min.css' },
-                                                    { Name: 'Darkly', File: 'bootstrap-darkly.min.css' },
-                                                    { Name: 'Flatly', File: 'bootstrap-flatly.min.css' },
-                                                    { Name: 'Journal', File: 'bootstrap-journal.min.css' },
-                                                    { Name: 'Lumen', File: 'bootstrap-lumen.min.css' },
-                                                    { Name: 'Paper', File: 'bootstrap-paper.min.css' },
-                                                    { Name: 'Readable', File: 'bootstrap-readable.min.css' },
-                                                    { Name: 'Sandstone', File: 'bootstrap-sandstone.min.css' },
-                                                    { Name: 'Simplex', File: 'bootstrap-simplex.min.css' },
-                                                    { Name: 'Slate', File: 'bootstrap-slate.min.css' },
-                                                    { Name: 'Spacelab', File: 'bootstrap-spacelab.min.css' },
-                                                    { Name: 'Superhero', File: 'bootstrap-superhero.min.css' },
-                                                    { Name: 'United', File: 'bootstrap-united.min.css' },
-                                                    { Name: 'Yeti', File: 'bootstrap-yeti.min.css' }
-                                                ];
+                                                    var Themes = [
+                                                        { Name: 'Default', File: 'bootstrap.min.css' },
+                                                        { Name: 'Cerulean', File: 'bootstrap-cerulean.min.css' },
+                                                        { Name: 'Cosmo', File: 'bootstrap-cosmo.min.css' },
+                                                        { Name: 'Cyborg', File: 'bootstrap-cyborg.min.css' },
+                                                        { Name: 'Darkly', File: 'bootstrap-darkly.min.css' },
+                                                        { Name: 'Flatly', File: 'bootstrap-flatly.min.css' },
+                                                        { Name: 'Journal', File: 'bootstrap-journal.min.css' },
+                                                        { Name: 'Lumen', File: 'bootstrap-lumen.min.css' },
+                                                        { Name: 'Paper', File: 'bootstrap-paper.min.css' },
+                                                        { Name: 'Readable', File: 'bootstrap-readable.min.css' },
+                                                        { Name: 'Sandstone', File: 'bootstrap-sandstone.min.css' },
+                                                        { Name: 'Simplex', File: 'bootstrap-simplex.min.css' },
+                                                        { Name: 'Slate', File: 'bootstrap-slate.min.css' },
+                                                        { Name: 'Spacelab', File: 'bootstrap-spacelab.min.css' },
+                                                        { Name: 'Superhero', File: 'bootstrap-superhero.min.css' },
+                                                        { Name: 'United', File: 'bootstrap-united.min.css' },
+                                                        { Name: 'Yeti', File: 'bootstrap-yeti.min.css' }
+                                                    ];
 
-                                                if (Settings) {
-                                                    if (Settings.General != null) {
-                                                        // Put into setting dynamic language
-                                                        tmhDynamicLocale.set(Settings.General['Data Formats']['Language Tag']);
-                                                        moment.locale(Settings.General['Data Formats']['Language Tag']);
+                                                    if (Settings) {
+                                                        if (Settings.General != null) {
+                                                            // Put into setting dynamic language
+                                                            tmhDynamicLocale.set(Settings.General['Data Formats']['Language Tag']);
+                                                            moment.locale(Settings.General['Data Formats']['Language Tag']);
 
-                                                        if (Settings.General.Theme !== 'Custom') {
-                                                            for (var x = 0; x < Themes.length; x++) {
-                                                                if (Themes[x].Name === Settings.General.Theme) {
-                                                                    configService.setCSSPath(settingsService.path + 'Content/bootstrap/' + Themes[x].File);
-                                                                    $("#themeCss").attr("href", configService.getCSSPath());
+                                                            if (Settings.General.Theme !== 'Custom') {
+                                                                for (var x = 0; x < Themes.length; x++) {
+                                                                    if (Themes[x].Name === Settings.General.Theme) {
+                                                                        configService.setCSSPath(settingsService.path + 'Content/bootstrap/' + Themes[x].File);
+                                                                        $("#themeCss").attr("href", configService.getCSSPath());
+                                                                    }
                                                                 }
+                                                            } else {
+                                                                $("#themeCss").attr("href", Settings.General['Theme Custom URL']);
                                                             }
-                                                        } else {
-                                                            $("#themeCss").attr("href", Settings.General['Theme Custom URL']);
-                                                        }
 
-                                                        if (Settings.General['Additional CSS URL']) {
-                                                            $("#additionalCss").attr("href", Settings.General['Additional CSS URL']);
+                                                            if (Settings.General['Additional CSS URL']) {
+                                                                $("#additionalCss").attr("href", Settings.General['Additional CSS URL']);
+                                                            }
                                                         }
                                                     }
-                                                }
 
-                                                // Preview themes using &theme= or &themeurl=
-                                                if ($stateParams.theme) {
-                                                    for (var x = 0; x < Themes.length; x++) {
-                                                        if (Themes[x].Name.toLowerCase() === $stateParams.theme.toLowerCase()) {
-                                                            configService.setCSSPath(settingsService.path + 'Content/bootstrap/' + Themes[x].File);
-                                                            $("#themeCss").attr("href", configService.getCSSPath());
+                                                    // Preview themes using &theme= or &themeurl=
+                                                    if ($stateParams.theme) {
+                                                        for (var x = 0; x < Themes.length; x++) {
+                                                            if (Themes[x].Name.toLowerCase() === $stateParams.theme.toLowerCase()) {
+                                                                configService.setCSSPath(settingsService.path + 'Content/bootstrap/' + Themes[x].File);
+                                                                $("#themeCss").attr("href", configService.getCSSPath());
+                                                            }
                                                         }
                                                     }
-                                                }
 
-                                                if ($stateParams.themeurl) {
-                                                    $("#themeCss").attr("href", $stateParams.themeurl);
-                                                }
+                                                    if ($stateParams.themeurl) {
+                                                        $("#themeCss").attr("href", $stateParams.themeurl);
+                                                    }
 
-                                                if ($stateParams.cssurl) {
-                                                    $("#additionalCss").attr("href", $stateParams.cssurl);
-                                                }
+                                                    if ($stateParams.cssurl) {
+                                                        $("#additionalCss").attr("href", $stateParams.cssurl);
+                                                    }
 
-                                                // Config is initialized.
-                                                configService.init(true);
+                                                    // Config is initialized.
+                                                    configService.init(true);
 
-                                                deferred.resolve();
+                                                    deferred.resolve();
+                                                });;
                                             });
                                         });
                                     })
