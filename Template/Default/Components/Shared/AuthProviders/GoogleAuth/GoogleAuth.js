@@ -100,10 +100,13 @@
             };
         },
         template: [
-            '<div class="btn btn-block btn-social btn-google" ng-if="$ctrl.configService.authProviders.google.enabled">',
+            '<div class="btn btn-block btn-social btn-google" ng-if="$ctrl.configService.authProviders.google.enabled && !$ctrl.signedIn" ng-click="$ctrl.onSuccess($ctrl.signedIn);">',
                 '<span class="fa fa-google"></span>',
-                '<label ng-if="!$ctrl.signedIn" ng-click="$ctrl.onSuccess($ctrl.signedIn);">Login with Google</label>',
-                '<label ng-if="$ctrl.signedIn">Logged in with Google</label>',
+                '<label>Login with Google</label>',
+            '</div>',
+            '<div class="btn btn-block btn-social btn-google" ng-if="$ctrl.configService.authProviders.google.enabled && $ctrl.signedIn">',
+                '<span class="fa fa-google"></span>',
+                '<label>Logged in with Google</label>',
                 '<label class="social-right" ng-if="$ctrl.signedIn" ng-click="$ctrl.unlink();">Unlink</label>',
             '</div>'
         ].join('')

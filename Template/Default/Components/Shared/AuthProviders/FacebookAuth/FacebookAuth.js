@@ -92,12 +92,15 @@
             };
         },
         template: [
-            '<div class="btn btn-block btn-social btn-facebook" ng-if="$ctrl.configService.authProviders.facebook.enabled">',
+            '<div class="btn btn-block btn-social btn-facebook" ng-click="$ctrl.onSuccess($ctrl.signedIn);" ng-if="$ctrl.configService.authProviders.facebook.enabled && !$ctrl.signedIn">',
                 '<span class="fa fa-facebook"></span>',
-                '<label ng-if="!$ctrl.signedIn" ng-click="$ctrl.onSuccess($ctrl.signedIn);">Login with Facebook</label>',
-                '<label ng-if="$ctrl.signedIn">Logged in with Facebook</label>',
+                '<label>Login with Facebook</label>',
+            '</div>',
+            '<div class="btn btn-block btn-social btn-facebook" ng-if="$ctrl.configService.authProviders.facebook.enabled && $ctrl.signedIn">',
+                '<span class="fa fa-facebook"></span>',
+                '<label>Logged in with Facebook</label>',
                 '<label class="social-right" ng-if="$ctrl.signedIn" ng-click="$ctrl.unlink();">Unlink</label>',
-            '</div>'
+            '</div>',
         ].join('')
     });
 })();
