@@ -579,7 +579,7 @@
             },
 
             EmailAddress: function (s) {
-                return /^[A-Za-z0-9.]+@[A-Za-z0-9]+\.[A-Za-z]{2,4}/.test(s);
+                return /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}/.test(s);
             },
 
             GetCCType: function (s) {
