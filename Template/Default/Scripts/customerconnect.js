@@ -190,7 +190,7 @@
         },
 
         ConvertToDelivery: function (routeId) {
-            return new CustomerConnect.Request.CreateRequest('ConvertToDelivery', routeId);
+            return new CustomerConnect.Request.CreateRequest('ConvertToDelivery', { routeId: routeId });
         },
 
         // Public - Get Customer Info
