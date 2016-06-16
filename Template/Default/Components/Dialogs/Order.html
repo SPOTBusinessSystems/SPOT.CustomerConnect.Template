@@ -35,8 +35,12 @@
 
     <div class="form-group">
         <div ng-repeat="Coupon in SingleOrder.Coupons">
-
+            {{Coupon.Name}}<span class="pull-right">{{Coupon.Amount}}</span>
         </div>
+    </div>
+
+    <div class="form-group" ng-if="SingleOrder.DiscountTotal && SingleOrder.DiscountTotal != '0.00'">
+        (Discount) {{SingleOrder.DiscountName}}<span class="pull-right">{{SingleOrder.DiscountTotal}}</span>
     </div>
 
     <div class="form-group">
