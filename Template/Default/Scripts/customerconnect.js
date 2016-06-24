@@ -189,6 +189,10 @@
             this.notificationValue = notificationValue;
         },
 
+        CheckEmail: function (emailAddress) {
+            return new CustomerConnect.Request.CreateRequest('CheckEmail', { emailAddress: emailAddress });
+        },
+
         ConvertToDelivery: function (routeId) {
             return new CustomerConnect.Request.CreateRequest('ConvertToDelivery', { routeId: routeId });
         },
