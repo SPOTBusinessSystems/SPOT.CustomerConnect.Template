@@ -31,7 +31,7 @@
             $scope.scheduleCancellation = function () {
                 dataService.route.saveCancellation($scope.Cancellation).then(function (data) {
                     if (!data.Failed) {
-                        dialogs.notify('Success', 'Your suspension scheduled has been from ' + moment($scope.Cancellation.FromDate).format('MM-DD-YYYY') + ' to ' + moment($scope.Cancellation.ToDate).format('MM-DD-YYYY') + '.');
+                        dialogs.notify('Success', 'Your temporary suspension of service has been scheduled from ' + moment($scope.Cancellation.FromDate).format('MM-DD-YYYY') + ' to ' + moment($scope.Cancellation.ToDate).format('MM-DD-YYYY') + '.');
                         $scope.cancellationForm.$setPristine();
                         $scope.Cancellation = { FromDate: null, ToDate: null, Comments: '' };
                     } else {

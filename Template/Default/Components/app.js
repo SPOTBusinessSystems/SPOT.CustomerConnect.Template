@@ -121,7 +121,7 @@
             }
         })
         .state('confirmation', {
-            url: '/confirmation?Status&Type&PickupDate&TransactionID',
+            url: '/confirmation?Status&Type&PickupDate&TransactionID&Comment',
             parent: 'globaldependencies',
             templateUrl: settingsServiceProvider.getPath() + 'Components/Views/Confirmation/ConfirmationView.html'
         })
@@ -284,7 +284,7 @@
     // Restriction
     ccApp.run(function ($rootScope, userService, $state) {
         // enumerate routes that don't need authentication
-        var routesThatDontRequireAuth = ['/login', '/signup/:key', '/reminder/:key', '/confirmation?Status&Type&PickupDate&TransactionID'];
+        var routesThatDontRequireAuth = ['/login', '/signup/:key', '/reminder/:key', '/confirmation?Status&Type&PickupDate&TransactionID&Comment'];
 
         // check if current location matches route
         var routeClean = function (route) {
