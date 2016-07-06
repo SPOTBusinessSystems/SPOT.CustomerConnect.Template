@@ -7,12 +7,12 @@ Inside the Template folder there are copies of the site based on template you wa
 
 In order to use the template, you must have acquired a session token from the API using the methods noted in the API getting started guide at https://developer.spotpos.com/api/gettingstarted.html. You will have to have 3 JavaScript variables set:
 
-CustomerConnect.Config.AccountKey
-CustomerConnect.Config.URL
-CustomerConnect.Config.SessionId
-CustomerConnect.Config.PublishableId
-CustomerConnect.Config.Template = 'Default'
-CustomerConnect.Config.Tenant = ''
+CustomerConnect.Config.AccountKey<br />
+CustomerConnect.Config.URL<br />
+CustomerConnect.Config.SessionId<br />
+CustomerConnect.Config.PublishableId<br />
+CustomerConnect.Config.Template = 'Default'<br />
+CustomerConnect.Config.Tenant = ''<br />
 
 Remember to always protect your SecurityID by keeping initial token retrieval in server-side code such as ASP.NET or PHP. Inject the returned session into your Index.html.
 
