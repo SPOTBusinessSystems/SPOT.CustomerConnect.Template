@@ -556,11 +556,11 @@
                 return (createRequest('DeleteMessage', { messageId: messageId }).then(handleSuccess, handleError));
             },
 
-            updateAuthProvider(authType, userId, authToken) {
+            updateAuthProvider: function (authType, userId, authToken) {
                 return (createRequest('UpdateAuthProvider', { authProvider: authType, userId: userId, authToken: authToken }).then(handleSuccess, handleError));
             },
 
-            removeAuthProvider(authType) {
+            removeAuthProvider: function (authType) {
                 return (createRequest('RemoveAuthProvider', { authProvider: authType }).then(handleSuccess, handleError));
             }
 
