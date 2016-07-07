@@ -1,15 +1,18 @@
 # SPOT.CustomerConnect.Template
 
-This is the base HTML/JS templates for use with the SPOT API. These templates use AngularJS 1.4 and Bootstrap to create a full customer portal. The documentation for the API can be found at https://developer.spotpos.com/. To use this, you must be familiar with HTML and JavaScript. Experience with AngularJS is helpful. You can also learn more about AngularJS at https://angularjs.org/.
+This is the base HTML/JS templates for use with the SPOT API. These templates use AngularJS 1.4 and Bootstrap to create a full customer portal. The documentation for the API can be found at https://developer.spotpos.com/api. To use this, you must be familiar with HTML and JavaScript. Experience with AngularJS is helpful. You can also learn more about AngularJS at https://angularjs.org/.
 
 ## Get Started ##
 Inside the Template folder there are copies of the site based on template you want to start with. Currently there is only Default. Copy the Default folder into your website or application. In Index.html, remove "@TENANT/Template/" from all resource files.
 
-In order to use the template, you must have acquired a session token from the API using the methods noted in the API getting started guide at https://developer.spotpos.com/gettingstarted.html. You will have to have 3 JavaScript variables set:
+In order to use the template, you must have acquired a session token from the API using the methods noted in the API getting started guide at https://developer.spotpos.com/api/gettingstarted.html. You will have to have a handful of JavaScript variables set:
 
-CustomerConnect.Config.AccountKey
-CustomerConnect.Config.URL
-CustomerConnect.Config.SessionId
+CustomerConnect.Config.AccountKey<br />
+CustomerConnect.Config.URL<br />
+CustomerConnect.Config.SessionId<br />
+CustomerConnect.Config.PublishableId<br />
+CustomerConnect.Config.Template = 'Default'<br />
+CustomerConnect.Config.Tenant = ''<br />
 
 Remember to always protect your SecurityID by keeping initial token retrieval in server-side code such as ASP.NET or PHP. Inject the returned session into your Index.html.
 
