@@ -1,0 +1,16 @@
+﻿<div ng-controller="NotificationsController" class="fullPage" ng-cloak>
+    <div ng-if="Customer.Notifications.length > 0">
+        <form name="accountForm" novalidate>
+            <h3>Modify Notifications for {{EmailAddress}}</h3>
+            <notifications ng-model="Customer.Notifications" />
+
+            <div class="form-group" style="text-align: center; margin-top: 10px;">
+                <input type="button" class="btn btn-danger" value="Undo Changes" ng-click="UndoChanges(); accountForm.$setPristine();" ng-disabled="!accountForm.$dirty" />
+                <input type="submit" class="btn btn-success" value="Save" ng-click="SaveAccount();" ng-disabled="!accountForm.$dirty" />
+            </div>
+        </form>
+    </div>
+    <div ng-if="Customer.Notifications.length < 1">
+        <h3>Modify Notifications - Unable to locate customer.</h3>
+    </div>
+</div>

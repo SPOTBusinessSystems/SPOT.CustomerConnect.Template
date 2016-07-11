@@ -2,9 +2,9 @@
     'use strict';
 
     angular.module('app').directive('notifications', notifications);
-    notifications.$inject = ['settingsService', 'configService'];
+    notifications.$inject = ['settingsService', 'configService', '$filter'];
 
-    function notifications(settingsService, configService) {
+    function notifications(settingsService, configService, $filter) {
         var directive = {
             controller: controller,
             link: link,
@@ -107,6 +107,9 @@
                         });
                     }
                 }
+
+                // Sort
+                $scope.notifications = $filter('orderBy')($scope.notifications, ['Description', 'MethodName'], false);
 
                 // Set customer defaults
                 var model = $scope.ngModel;

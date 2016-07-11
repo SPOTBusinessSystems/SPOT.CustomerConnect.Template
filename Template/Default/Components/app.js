@@ -23,7 +23,7 @@
 
         this.getPath = function () {
             return path;
-        }
+        };
 
         function Settings() {
             return { path: path };
@@ -31,7 +31,7 @@
 
         this.$get = [function settingsServiceFactory() {
             return new Settings();
-        }]
+        }];
     });
 
     ccApp.config(function ($stateProvider, $urlRouterProvider, $urlMatcherFactoryProvider,
@@ -41,12 +41,12 @@
         $urlMatcherFactoryProvider.caseInsensitive(true); // Allow any case.
         $urlMatcherFactoryProvider.strictMode(false); // Allows trailing slash.
         
-        if (CustomerConnect.Config.Layout == null)
+        if (CustomerConnect.Config.Layout === null)
         {
-            CustomerConnect.Config.Layout == 'Default';
+            CustomerConnect.Config.Layout === 'Default';
         }
 
-        if (CustomerConnect.Config.Tenant == null) {
+        if (CustomerConnect.Config.Tenant === null) {
             settingsServiceProvider.setPath('/Template/' + CustomerConnect.Config.Layout + '/');
         } else {
             settingsServiceProvider.setPath('/' + CustomerConnect.Config.Tenant + '/Template/' + CustomerConnect.Config.Layout + '/');
@@ -125,6 +125,11 @@
             parent: 'globaldependencies',
             templateUrl: settingsServiceProvider.getPath() + 'Components/Views/Confirmation/ConfirmationView.html'
         })
+        .state('notifications', {
+            url: '/notifications?Id',
+            parent: 'globaldependencies',
+            templateUrl: settingsServiceProvider.getPath() + 'Components/Views/Notifications/NotificationsView.html'
+        })
         .state('globaldependencies', {
             abstract: true,
             url: '?theme&themeurl&cssurl', // for previewing themes.
@@ -149,7 +154,7 @@
                         apiConfig.setSessionId(CustomerConnect.Config.SessionId);
                         apiConfig.setPublishableId(CustomerConnect.Config.PublishableId);
 
-                        if (localStorageService.get(CustomerConnect.Config.Tenant + '_ccCache') != null) {
+                        if (localStorageService.get(CustomerConnect.Config.Tenant + '_ccCache') !== null) {
                             configService.setProfile(JSON.parse(CustomerConnect.Util.base64._decode(localStorageService.get(CustomerConnect.Config.Tenant + '_ccCache'))));
                             configService.authProviders.setup();
 
@@ -213,7 +218,7 @@
                                                     ];
 
                                                     if (Settings) {
-                                                        if (Settings.General != null) {
+                                                        if (Settings.General !== null) {
                                                             // Put into setting dynamic language
                                                             tmhDynamicLocale.set(Settings.General['Data Formats']['Language Tag']);
                                                             moment.locale(Settings.General['Data Formats']['Language Tag']);
@@ -237,9 +242,9 @@
 
                                                     // Preview themes using &theme= or &themeurl=
                                                     if ($stateParams.theme) {
-                                                        for (var x = 0; x < Themes.length; x++) {
-                                                            if (Themes[x].Name.toLowerCase() === $stateParams.theme.toLowerCase()) {
-                                                                configService.setCSSPath(settingsService.path + 'Content/bootstrap/' + Themes[x].File);
+                                                        for (var y = 0; y < Themes.length; y++) {
+                                                            if (Themes[y].Name.toLowerCase() === $stateParams.theme.toLowerCase()) {
+                                                                configService.setCSSPath(settingsService.path + 'Content/bootstrap/' + Themes[y].File);
                                                                 $("#themeCss").attr("href", configService.getCSSPath());
                                                             }
                                                         }
@@ -257,11 +262,11 @@
                                                     configService.init(true);
 
                                                     deferred.resolve();
-                                                });;
+                                                });
                                             });
                                         });
-                                    })
-                                })
+                                    });
+                                });
 
                             });
                         }
@@ -284,7 +289,7 @@
     // Restriction
     ccApp.run(function ($rootScope, userService, $state) {
         // enumerate routes that don't need authentication
-        var routesThatDontRequireAuth = ['/login', '/signup/:key', '/reminder/:key', '/confirmation?Status&Type&PickupDate&TransactionID&Comment'];
+        var routesThatDontRequireAuth = ['/login', '/signup/:key', '/reminder/:key', '/confirmation?Status&Type&PickupDate&TransactionID&Comment', '/notifications?Id'];
 
         // check if current location matches route
         var routeClean = function (route) {
@@ -297,7 +302,7 @@
                 console.log(to);
 
             // if route requires auth and user is not logged in
-            if (routeClean(to.url) == -1 && !userService.getCustomer()) {
+            if (routeClean(to.url) === -1 && !userService.getCustomer()) {
                 // redirect back to login
                 ev.preventDefault();
                 $state.go('login');
@@ -324,7 +329,7 @@
                     var plainNumber = data.replace(/[^\d|\-+|\+]/g, '');
                     var length = plainNumber.length;
                     var intValue = plainNumber.substring(0, length - precision);
-                    var decimalValue = plainNumber.substring(length - precision, length)
+                    var decimalValue = plainNumber.substring(length - precision, length);
 
                     if (decimalValue.length < 2) {
                         decimalValue = "0" + decimalValue;
