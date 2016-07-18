@@ -28,6 +28,11 @@
                 CaptchaValid: userService.getCaptchaValid()
             };
 
+            // if cc shown todo
+            if ($scope.Settings.Signup['Prompt for Credit Card'] == 1){
+                $scope.Customer.CreditCardsToSave = [{ CardInfo: null, CardExpiration: null }];
+            }
+
             $scope.finishedWizard = function () {
                 if (userService.getCaptchaValid() || $scope.Settings.General['Enable Captcha'] == 0) {
                     $scope.SaveCustomer();
@@ -40,7 +45,7 @@
                                 userService.setCaptchaValid(true);
                                 $scope.SaveCustomer();
                             } else {
-                                dialogs.error('Captcha Error', 'Unable to validate captcha. Please refresh your browser.')
+                                dialogs.error('Captcha Error', 'Unable to validate captcha. Please refresh your browser.');
                             }
                         });
                     }
@@ -48,18 +53,32 @@
             };
 
             $scope.addressValid = function () {
+                return ($scope.Customer.Address1 && $scope.Customer.City && $scope.Customer.State && $scope.Customer.Zip);
+            };
+
+            $scope.ccValid = function () {
+                // If using credit card, check to make sure it is valid.
+                if ($scope.Customer.CreditCardsToSave) {
+                    if ($scope.Customer.CreditCardsToSave[0]) {
+                        return (CustomerConnect.Util.Validate.CCExpiration($scope.Customer.CreditCardsToSave[0].CardExpiration) && CustomerConnect.Util.Validate.CCNumber($scope.Customer.CreditCardsToSave[0].CardInfo));
+                    }
+                }
+                
+                // Implicit false.
                 return false;
             };
 
             $scope.validEmail = function () {
                 return CustomerConnect.Util.Validate.EmailAddress($scope.Customer.Email);
-            }
+            };
 
             $scope.storePass = function (pass) {
                 $scope.Customer.Password = pass;
-            }
+            };
 
             $scope.SaveCustomer = function () {
+                console.log($scope.Customer);
+
                 var ci = {
                     accountNodeID: $scope.Settings.Signup['Default Store Id'],
                     clientAccountID: '',
@@ -86,6 +105,14 @@
                     referringCustomerKey: $scope.Customer.ReferringCustomerKey
                 };
 
+                if ($scope.Customer.CreditCardsToSave) {
+                    if ($scope.Customer.CreditCardsToSave[0]) {
+                        ci.CreditCardsToSave = [{ Number: $scope.Customer.CreditCardsToSave[0].CardInfo, Expiration: $scope.Customer.CreditCardsToSave[0].CardExpiration }];
+                    }
+                }
+
+                console.log(ci);
+
                 dataService.customer.signupCustomer(ci).then(function (data) {
                     if (!data.Failed) {
                         dialogs.notify('Signup submitted', $scope.Settings.Signup['Submitted Message']);
@@ -103,5 +130,5 @@
                 $scope.CaptchaID = widgetId;
             };
         })();
-    };
+    }
 })();

@@ -1,7 +1,8 @@
 ﻿<div id="signUpForm" class="smallPage container-fluid" ng-controller="SignupController">
     <wizard name="SignupWizard" on-finish="finishedWizard()">
-        <wz-step title="Basic">
+        <wz-step wz-title="Basic">
             <!-- Customer Type -->
+            <h2>Basic</h2>
             <form name="form" novalidate>
                 <div class="form-group">
                     <div class="input-group has-feedback" ng-class="{'has-error':!validEmail(), 'has-success':validEmail()}">
@@ -50,7 +51,8 @@
                 </div>
             </form>
         </wz-step>
-        <wz-step title="Type">
+        <wz-step wz-title="Type">
+            <h2>Delivery?</h2>
             <!-- Route or Counter -->
             <form novalidate>
                 <div class="form-group text-center">
@@ -64,7 +66,8 @@
                 </div>
             </form>
         </wz-step>
-        <wz-step title="Details">
+        <wz-step wz-title="Address">
+            <h2>Address<span ng-if="Customer.Type == 'DELIVERY'"> - Required</span></h2>
             <!-- Address -->
             <form name="addressForm" novalidate>
                 <div class="form-group">
@@ -95,48 +98,48 @@
 
                 <div class="form-group">
                     <input type="button" class="btn btn-danger" wz-previous value="Go Back" />
-                    <input type="submit" class="btn btn-success" ng-disabled="Customer.Type == 'DELIVERY' && !addressForm.$dirty && addressValid()" wz-next value="Continue" />
+                    <input type="submit" class="btn btn-success" ng-disabled="Customer.Type == 'DELIVERY' && !addressValid()" wz-next value="Continue" />
                 </div>
             </form>
         </wz-step>
-        <wz-step title="Confirm">
+        <wz-step wz-title="Credit Card" wz-disabled="{{ Settings.Signup['Prompt for Credit Card'] == 0 }}">
+            <h2>Credit Card<span ng-if="(Customer.Type == 'DELIVERY' && Settings.Signup.Route['Require Credit Card'] == 1) || (Customer.Type == 'RETAIL' && Settings.Signup.Counter['Require Credit Card'] == 1)"> - Required</span></h2>
+            <!-- Credit Card -->
+            <form novalidate>
+                <credit-card id="creditCard" card-info="Customer.CreditCardsToSave[0]"></credit-card>
+
+                <div class="form-group">
+                    <input type="button" class="btn btn-danger" wz-previous value="Go Back" />
+                    <input type="submit" class="btn btn-success" wz-next value="Continue" ng-disabled="(Customer.Type == 'DELIVERY' && Settings.Signup.Route['Require Credit Card'] == 1 && !ccValid()) || (Customer.Type == 'RETAIL' && Settings.Signup.Counter['Require Credit Card'] == 1 && !ccValid())" />
+                </div>
+            </form>
+        </wz-step>
+        <wz-step wz-title="Confirm">
+            <h2>Confirm</h2>
             <div class="form-group">
                 <!-- Basic -->
-                <div ng-if="Customer.Email">
+                <div>
+                    <h3>Basic</h3>
                     <label class="control-label">{{ Customer.Email }}</label><br />
-                </div>
-
-                <div ng-if="Customer.FirstName">
                     <label class="control-label">{{ Customer.FirstName }}</label><br />
-                </div>
-
-                <div ng-if="Customer.LastName">
                     <label class="control-label">{{ Customer.LastName }}</label><br />
-                </div>
-
-                <div ng-if="Customer.PhoneNumber">
                     <label class="control-label">{{ Customer.PhoneNumber }}</label><br />
                 </div>
 
                 <!-- Address -->
                 <div ng-if="Customer.Address1">
+                    <h3>Address</h3>
                     <label class="control-label">{{ Customer.Address1 }}</label><br />
-                </div>
-
-                <div ng-if="Customer.Address2">
                     <label class="control-label">{{ Customer.Address2 }}</label><br />
-                </div>
-
-                <div ng-if="Customer.City">
                     <label class="control-label">{{ Customer.City }}</label><br />
-                </div>
-
-                <div ng-if="Customer.State">
                     <label class="control-label">{{ Customer.State }}</label><br />
-                </div>
-
-                <div ng-if="Customer.Zip">
                     <label class="control-label">{{ Customer.Zip }}</label><br />
+                </div>
+                
+                <div ng-if="Customer.CreditCardsToSave && Customer.CreditCardsToSave[0]">
+                    <h3>Credit Card</h3>
+                    {{ "*" + Customer.CreditCardsToSave[0].CardNumber.substring(Customer.CreditCardsToSave[0].CardNumber - 4)}}<br />
+                    {{ Customer.CreditCardsToSave[0].CardExpiration }}<br />
                 </div>
             </div>
 

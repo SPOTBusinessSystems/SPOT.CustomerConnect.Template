@@ -163,13 +163,7 @@
         </div>
 
         <h3>Credit Card</h3>
-        <div class="form-group">
-            <div class="input-group">
-                <span class="input-group-addon"><i class="glyphicon glyphicon-credit-card"></i></span>
-                <input id="creditcardnumber" class="form-control" ng-model="Customer.CreditCards[0].CardInfo" placeholder="Card Number" />
-            </div>
-            <ccexp ng-model="Customer.CreditCards[0].CardExpiration" />
-        </div>
+        <credit-card card-info="Customer.CreditCards[0]"></credit-card>
 
         <div ng-if="Settings.Notifications">
             <h3>Notifications</h3>
