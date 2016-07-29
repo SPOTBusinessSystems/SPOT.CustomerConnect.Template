@@ -5,9 +5,9 @@
     .module('app')
     .controller('SendMessageController', SendMessageController);
 
-    SendMessageController.$inject = ['$rootScope','$scope','dialogs','blockUI','vcRecaptchaService','userService','settingsService','dataService'];
+    SendMessageController.$inject = ['$rootScope', '$scope', 'dialogs', 'blockUI', 'vcRecaptchaService', 'userService', 'settingsService', 'dataService', 'configService'];
 
-    function SendMessageController($rootScope, $scope, dialogs, blockUI, vcRecaptchaService, userService, settingsService, dataService) {
+    function SendMessageController($rootScope, $scope, dialogs, blockUI, vcRecaptchaService, userService, settingsService, dataService, configService) {
         /* jshint validthis:true */
         var vm = this;
         vm.title = 'SendMessageController';
@@ -17,10 +17,10 @@
         function activate() {
             $scope.open = function (invoiceId, invoiceKey) {
                 $scope.data = {
-                    LoggedIn: $rootScope.LoggedIn,
+                    LoggedIn: userService.getCustomer(),
                     InvoiceId: invoiceId,
                     InvoiceKey: invoiceKey,
-                    Settings: $rootScope.Settings,
+                    Settings: configService.getProfile(),
                     CaptchaValid: userService.getCaptchaValid()
                 };
 
