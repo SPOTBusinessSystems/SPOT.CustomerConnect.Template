@@ -59,7 +59,7 @@
             templateUrl: settingsServiceProvider.getPath() + 'Components/Views/Login/LoginView.html'
         })
         .state('signup', {
-            url: '/signup/:key',
+            url: '/signup?refid&refkey',
             parent: 'globaldependencies',
             templateUrl: settingsServiceProvider.getPath() + 'Components/Views/Signup/SignupView.html',
             params: {
@@ -289,7 +289,7 @@
     // Restriction
     ccApp.run(function ($rootScope, userService, $state) {
         // enumerate routes that don't need authentication
-        var routesThatDontRequireAuth = ['/login', '/signup/:key', '/reminder/:key', '/confirmation?Status&Type&PickupDate&TransactionID&Comment', '/notifications?Id'];
+        var routesThatDontRequireAuth = ['/login', '/signup?refid&refkey', '/reminder/:key', '/confirmation?Status&Type&PickupDate&TransactionID&Comment', '/notifications?Id'];
 
         // check if current location matches route
         var routeClean = function (route) {

@@ -24,9 +24,22 @@
                 Type: "DELIVERY",
                 Email: userService.getEmail(),
                 PhoneType: 'Choose Type',
-                ReferringCustomerKey: $stateParams.key,
+                ReferringCustomerKey: $stateParams.refkey,
                 CaptchaValid: userService.getCaptchaValid()
             };
+
+            // Init
+            if ($stateParams.refid) {
+                dataService.customer.retrieveReferralInfo($stateParams.refid).then(function (data) {
+                    if (!data.Failed) {
+                        $scope.Customer.Email = data.ReturnObject.EmailAddress;
+                        $scope.Customer.FirstName = data.ReturnObject.FirstName;
+                        $scope.Customer.LastName = data.ReturnObject.LastName;
+                        $scope.Customer.ReferralCode = data.ReturnObject.ReferralCode;
+                        $scope.Customer.ReferralId = $stateParams.refid;
+                    }
+                });
+            }
 
             // if cc shown todo
             if ($scope.Settings.Signup['Prompt for Credit Card'] == 1){

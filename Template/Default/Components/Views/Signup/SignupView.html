@@ -1,9 +1,9 @@
-﻿<div id="signUpForm" class="smallPage container-fluid" ng-controller="SignupController">
+﻿<div id="signUpForm" name="ctrl.form" class="smallPage container-fluid" ng-controller="SignupController">
     <wizard name="SignupWizard" on-finish="finishedWizard()">
         <wz-step wz-title="Basic">
             <!-- Customer Type -->
             <h2>Basic</h2>
-            <form name="form" novalidate>
+            <ng-form name="form" novalidate>
                 <div class="form-group">
                     <div class="input-group has-feedback" ng-class="{'has-error':!validEmail(), 'has-success':validEmail()}">
                         <span class="input-group-addon"><i class="glyphicon glyphicon-envelope"></i></span>
@@ -41,15 +41,21 @@
 
                     <div class="form-group" ng-show="Settings.General['Customer Referral']['Enable Customer Referral'] == 1">
                         <br />
-                        <label class="control-label">Referring Customer ID</label>
-                        <input class="form-control" type="text" id="referringCustomer" name="referringCustomer" ng-model="Customer.ReferringCustomerKey" placeholder="Referring Customer ID" />
+                        <div ng-show="Settings.General['Customer Referral']['Referral Type'] == 'Percentage'">
+                            <label class="control-label">Referring Customer ID</label>
+                            <input class="form-control" type="text" id="referringCustomer" name="referringCustomer" ng-model="Customer.ReferringCustomerKey" placeholder="Referring Customer ID" />
+                        </div>
+                        <div ng-show="Settings.General['Customer Referral']['Referral Type'] != 'Percentage'">
+                            <label class="control-label">Referral Code</label>
+                            <input class="form-control" type="text" id="referralCode" name="referralCode" ng-model="Customer.ReferralCode" placeholder="Referral Code" />
+                        </div>
                     </div>
                 </div>
 
                 <div class="form-group center">
                     <input type="submit" class="btn btn-success" wz-next ng-disabled="!form.$valid || data.PasswordConfirm != data.Password" ng-click="storePass(data.Password)" value="Continue" />
                 </div>
-            </form>
+            </ng-form>
         </wz-step>
         <wz-step wz-title="Type">
             <h2>Delivery?</h2>

@@ -339,6 +339,10 @@
 
         SavePickupRequest: function (pickupRequest) {
             return new CustomerConnect.Request.CreateRequest('PickupRequest', pickupRequest);
+        },
+
+        RequestVisits: function (addressTypeId) {
+            return new CustomerConnect.Request.CreateRequest('RequestVisits', addressTypeId);
         }
     },
 

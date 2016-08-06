@@ -429,6 +429,10 @@
                 return createRequest('GiftCardBalance', { giftCardNumber: giftCardNumber }).then(handleSuccess, handleError);
             },
 
+            retrieveReferralInfo: function (id) {
+                return createRequest('RetrieveReferralInfo', {id: id}).then(handleSuccess, handleError);
+            },
+
             saveCustomer: function (body) {
                 return createRequest('SaveCustomer', body).then(handleSuccess, handleError);
             },
