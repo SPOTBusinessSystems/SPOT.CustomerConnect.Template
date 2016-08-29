@@ -198,7 +198,7 @@
                                                     console.log(Settings);
 
                                                     var Themes = [
-                                                        { Name: 'Default', File: 'bootstrap.min.css' },
+                                                        { Name: 'Default', File: 'bootstrap-default.min.css' },
                                                         { Name: 'Cerulean', File: 'bootstrap-cerulean.min.css' },
                                                         { Name: 'Cosmo', File: 'bootstrap-cosmo.min.css' },
                                                         { Name: 'Cyborg', File: 'bootstrap-cyborg.min.css' },
