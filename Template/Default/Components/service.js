@@ -84,20 +84,28 @@
 
                         if (g !== null) {
                             if (g.Enabled === "1") {
-                                if (g.AppID.length > 0) {
+                                if (g.AppID.length > 0 && typeof(FB) !== "undefined") {
                                     this.enabled = true;
                                     this.appId = g.AppID;
 
                                     // Facebook API
-                                    FB.init({
-                                        appId: g.AppID,
-                                        status: true,
-                                        cookie: true,
-                                        xfbml: true,
-                                        version: 'v2.5'
-                                    });
+                                    try
+                                    {
+                                        FB.init({
+                                            appId: g.AppID,
+                                            status: true,
+                                            cookie: true,
+                                            xfbml: true,
+                                            version: 'v2.5'
+                                        });
 
-                                    console.log('facebook set up');
+                                        console.log('Facebook set up.');
+                                    }
+                                    catch(err)
+                                    {
+                                        this.enabled = false;
+                                        console.log('Unable to initialize Facebook SDK.');
+                                    }
                                 } else {
                                     console.log("AuthProvider Error: Facebook is enabled but AppID is not set. Leaving it disabled.");
                                 }
@@ -110,8 +118,6 @@
                     var deferred = $q.defer();
 
                     FB.getLoginStatus(function (data) {
-                        console.log('getstatus');
-                        console.log(data);
                         if (data.authResponse && data.status === 'connected') {
                             deferred.resolve(true);
                         } else {
@@ -186,18 +192,26 @@
 
                         if (g !== null) {
                             if (g.Enabled === "1") {
-                                if (g.ClientID.length > 0) {
+                                if (g.ClientID.length > 0 && typeof(gapi) !== "undefined") {
                                     this.enabled = true;
                                     this.clientid = g.ClientID;
 
-                                    // Google API
-                                    gapi.load('auth2', function () {
-                                        gapi.auth2.init({
-                                            client_id: g.ClientID
+                                    try
+                                    {
+                                        // Google API
+                                        gapi.load('auth2', function () {
+                                            gapi.auth2.init({
+                                                client_id: g.ClientID
+                                            });
                                         });
-                                    });
 
-                                    console.log('google set up');
+                                        console.log('Google set up.');
+                                    }
+                                    catch(err)
+                                    {
+                                        this.enabled = false;
+                                        console.log('Google SDK failed to initialize.');
+                                    }
                                     deferred.resolve();
                                 } else {
                                     console.log("AuthProvider Error: Google is enabled but ClientID is not set. Leaving it disabled.");
@@ -422,7 +436,7 @@
             },
 
             redeemGiftCard: function (giftCardNumber) {
-                return createRequest('GiftCardRedeem', { giftCardNumber: giftCardNumber }).then(handleSuccess, handleError);
+                return createRequest('GiftCardRedeem', { Number: giftCardNumber }).then(handleSuccess, handleError);
             },
 
             retrieveGiftCardBalance: function () {

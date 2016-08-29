@@ -42,10 +42,10 @@
         </div>
 
         <div class="row" style="margin-top: 35px;" ng-if="configService.authProviders.anyEnabled()">
-            <div class="col-sm-6" style="padding: 3px;">
+            <div class="col-sm-6" style="padding: 3px;" ng-if="configService.authProviders.facebook.enabled">
                 <facebook-auth on-login="getCustomer()"></facebook-auth>    
             </div>
-            <div class="col-sm-6" style="padding: 3px;">
+            <div class="col-sm-6" style="padding: 3px;" ng-if="configService.authProviders.google.enabled">
                 <google-auth on-login="getCustomer()"></google-auth>
             </div>
         </div>

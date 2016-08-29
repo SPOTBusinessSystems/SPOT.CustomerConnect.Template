@@ -18,6 +18,7 @@
             $scope.InvoiceID = data.key;
             $scope.Orders = data.orders;
             $scope.currentPage = 1;
+            $scope.hidePricing = configService.getProfile().General['Hide Prices On Order View'] == 1;
 
             for (var x = 0; x < data.orders.length; x++) {
                 if (data.orders[x].InvoiceID == data.key) {
