@@ -1,4 +1,27 @@
 (function () {
+    // Incase console is not valid. Stub in used console commands to avoid errors.
+    if (typeof console === "undefined") {
+        console = {
+            assert: function () { },
+            clear: function () { },
+            count: function () { },
+            dir: function () { },
+            error: function () { },
+            group: function () { },
+            groupCollapsed: function () { },
+            groupEnd: function () { },
+            info: function () { },
+            log: function () { },
+            profile: function () { },
+            profileEnd: function () { },
+            time: function () { },
+            timeEnd: function () { },
+            timeStamp: function () { },
+            trace: function () { },
+            warn: function () { }
+        };
+    }
+
     'use strict';
     var ccApp = angular.module('app', [
                 'ui.router',
@@ -143,6 +166,8 @@
             ].join(''),
             resolve: {
                 loadSettings: function ($q, apiConfig, configService, dataService, localStorageService, tmhDynamicLocale, settingsService, $stateParams) {
+                    console.groupCollapsed('loadingSettings');
+
                     console.log('load set');
                     var deferred = $q.defer();
 
@@ -185,83 +210,92 @@
                                         });
 
                                         loadStores.then(function () {
-                                            var loadStates = dataService.settings.getStates().then(function (data) {
+                                            var loadRoutes = dataService.route.getRouteDeliveryZones().then(function (data) {
                                                 console.log(data);
-                                                Settings.States = data.ReturnObject;
+                                                Settings.Routes = data.ReturnObject;
                                             });
 
-                                            loadStates.then(function () {
-                                                configService.setProfile(Settings);
+                                            loadRoutes.then(function () {
+                                                var loadStates = dataService.settings.getStates().then(function (data) {
+                                                    console.log(data);
+                                                    Settings.States = data.ReturnObject;
+                                                });
 
-                                                console.log('auth setup');
-                                                configService.authProviders.setup().then(function () {
-                                                    console.log(Settings);
+                                                loadStates.then(function () {
+                                                    configService.setProfile(Settings);
 
-                                                    var Themes = [
-                                                        { Name: 'Default', File: 'bootstrap-default.min.css' },
-                                                        { Name: 'Cerulean', File: 'bootstrap-cerulean.min.css' },
-                                                        { Name: 'Cosmo', File: 'bootstrap-cosmo.min.css' },
-                                                        { Name: 'Cyborg', File: 'bootstrap-cyborg.min.css' },
-                                                        { Name: 'Darkly', File: 'bootstrap-darkly.min.css' },
-                                                        { Name: 'Flatly', File: 'bootstrap-flatly.min.css' },
-                                                        { Name: 'Journal', File: 'bootstrap-journal.min.css' },
-                                                        { Name: 'Lumen', File: 'bootstrap-lumen.min.css' },
-                                                        { Name: 'Paper', File: 'bootstrap-paper.min.css' },
-                                                        { Name: 'Readable', File: 'bootstrap-readable.min.css' },
-                                                        { Name: 'Sandstone', File: 'bootstrap-sandstone.min.css' },
-                                                        { Name: 'Simplex', File: 'bootstrap-simplex.min.css' },
-                                                        { Name: 'Slate', File: 'bootstrap-slate.min.css' },
-                                                        { Name: 'Spacelab', File: 'bootstrap-spacelab.min.css' },
-                                                        { Name: 'Superhero', File: 'bootstrap-superhero.min.css' },
-                                                        { Name: 'United', File: 'bootstrap-united.min.css' },
-                                                        { Name: 'Yeti', File: 'bootstrap-yeti.min.css' }
-                                                    ];
+                                                    console.log('auth setup');
+                                                    configService.authProviders.setup().then(function () {
+                                                        console.log(Settings);
 
-                                                    if (Settings) {
-                                                        if (Settings.General !== null) {
-                                                            // Put into setting dynamic language
-                                                            tmhDynamicLocale.set(Settings.General['Data Formats']['Language Tag']);
-                                                            moment.locale(Settings.General['Data Formats']['Language Tag']);
+                                                        var Themes = [
+                                                            { Name: 'Default', File: 'bootstrap-default.min.css' },
+                                                            { Name: 'Cerulean', File: 'bootstrap-cerulean.min.css' },
+                                                            { Name: 'Cosmo', File: 'bootstrap-cosmo.min.css' },
+                                                            { Name: 'Cyborg', File: 'bootstrap-cyborg.min.css' },
+                                                            { Name: 'Darkly', File: 'bootstrap-darkly.min.css' },
+                                                            { Name: 'Flatly', File: 'bootstrap-flatly.min.css' },
+                                                            { Name: 'Journal', File: 'bootstrap-journal.min.css' },
+                                                            { Name: 'Lumen', File: 'bootstrap-lumen.min.css' },
+                                                            { Name: 'Paper', File: 'bootstrap-paper.min.css' },
+                                                            { Name: 'Readable', File: 'bootstrap-readable.min.css' },
+                                                            { Name: 'Sandstone', File: 'bootstrap-sandstone.min.css' },
+                                                            { Name: 'Simplex', File: 'bootstrap-simplex.min.css' },
+                                                            { Name: 'Slate', File: 'bootstrap-slate.min.css' },
+                                                            { Name: 'Spacelab', File: 'bootstrap-spacelab.min.css' },
+                                                            { Name: 'Superhero', File: 'bootstrap-superhero.min.css' },
+                                                            { Name: 'United', File: 'bootstrap-united.min.css' },
+                                                            { Name: 'Yeti', File: 'bootstrap-yeti.min.css' }
+                                                        ];
 
-                                                            if (Settings.General.Theme !== 'Custom') {
-                                                                for (var x = 0; x < Themes.length; x++) {
-                                                                    if (Themes[x].Name === Settings.General.Theme) {
-                                                                        configService.setCSSPath(settingsService.path + 'Content/bootstrap/' + Themes[x].File);
-                                                                        $("#themeCss").attr("href", configService.getCSSPath());
+                                                        if (Settings) {
+                                                            if (Settings.General !== null) {
+                                                                // Put into setting dynamic language
+                                                                tmhDynamicLocale.set(Settings.General['Data Formats']['Language Tag']);
+                                                                moment.locale(Settings.General['Data Formats']['Language Tag']);
+
+                                                                if (Settings.General.Theme !== 'Custom') {
+                                                                    for (var x = 0; x < Themes.length; x++) {
+                                                                        if (Themes[x].Name === Settings.General.Theme) {
+                                                                            configService.setCSSPath(settingsService.path + 'Content/bootstrap/' + Themes[x].File);
+                                                                            $("#themeCss").attr("href", configService.getCSSPath());
+                                                                        }
                                                                     }
+                                                                } else {
+                                                                    $("#themeCss").attr("href", Settings.General['Theme Custom URL']);
                                                                 }
-                                                            } else {
-                                                                $("#themeCss").attr("href", Settings.General['Theme Custom URL']);
-                                                            }
 
-                                                            if (Settings.General['Additional CSS URL']) {
-                                                                $("#additionalCss").attr("href", Settings.General['Additional CSS URL']);
+                                                                if (Settings.General['Additional CSS URL']) {
+                                                                    $("#additionalCss").attr("href", Settings.General['Additional CSS URL']);
+                                                                }
                                                             }
                                                         }
-                                                    }
 
-                                                    // Preview themes using &theme= or &themeurl=
-                                                    if ($stateParams.theme) {
-                                                        for (var y = 0; y < Themes.length; y++) {
-                                                            if (Themes[y].Name.toLowerCase() === $stateParams.theme.toLowerCase()) {
-                                                                configService.setCSSPath(settingsService.path + 'Content/bootstrap/' + Themes[y].File);
-                                                                $("#themeCss").attr("href", configService.getCSSPath());
+                                                        // Preview themes using &theme= or &themeurl=
+                                                        if ($stateParams.theme) {
+                                                            for (var y = 0; y < Themes.length; y++) {
+                                                                if (Themes[y].Name.toLowerCase() === $stateParams.theme.toLowerCase()) {
+                                                                    configService.setCSSPath(settingsService.path + 'Content/bootstrap/' + Themes[y].File);
+                                                                    $("#themeCss").attr("href", configService.getCSSPath());
+                                                                }
                                                             }
                                                         }
-                                                    }
 
-                                                    if ($stateParams.themeurl) {
-                                                        $("#themeCss").attr("href", $stateParams.themeurl);
-                                                    }
+                                                        if ($stateParams.themeurl) {
+                                                            $("#themeCss").attr("href", $stateParams.themeurl);
+                                                        }
 
-                                                    if ($stateParams.cssurl) {
-                                                        $("#additionalCss").attr("href", $stateParams.cssurl);
-                                                    }
+                                                        if ($stateParams.cssurl) {
+                                                            $("#additionalCss").attr("href", $stateParams.cssurl);
+                                                        }
 
-                                                    // Config is initialized.
-                                                    configService.init(true);
+                                                        // Config is initialized.
+                                                        configService.init(true);
 
-                                                    deferred.resolve();
+                                                        console.groupEnd();
+
+                                                        deferred.resolve();
+                                                    });
                                                 });
                                             });
                                         });
@@ -342,32 +376,6 @@
 
                     return Number(plainNumberWithDecimal);
                 });
-            }
-        };
-    });
-
-    ccApp.filter('capitalize', function () {
-        return function (input) {
-            if (input.indexOf(' ') !== -1) {
-                var inputPieces,
-                    i;
-
-                input = input.toLowerCase();
-                inputPieces = input.split(' ');
-
-                for (i = 0; i < inputPieces.length; i++) {
-                    inputPieces[i] = capitalizeString(inputPieces[i]);
-                }
-
-                return inputPieces.toString().replace(/,/g, ' ');
-            }
-            else {
-                input = input.toLowerCase();
-                return capitalizeString(input);
-            }
-
-            function capitalizeString(inputString) {
-                return inputString.substring(0, 1).toUpperCase() + inputString.substring(1);
             }
         };
     });

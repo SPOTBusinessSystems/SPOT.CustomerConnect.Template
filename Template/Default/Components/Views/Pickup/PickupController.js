@@ -17,7 +17,12 @@
         function activate() {
             $scope.Customer = userService.getCustomer();
             $scope.Settings = configService.getProfile();
+            $scope.Route = {};
+
             $scope.DaysAfterPickup = Number($scope.Settings.Pickup["Minimum Days After Pickup"]);
+
+            console.log($scope.Customer);
+            console.log($scope.Settings);
 
             // The number of days after the pickup date. Default is 2 days.
             if (Number($scope.Settings.Pickup["Minimum Days After Pickup"]) != 'NaN') {
@@ -35,10 +40,55 @@
                 return ($scope.Customer.RouteDays.charAt(index - 1) == '-');
             };
 
-            //Test Properties
-            //$scope.Settings.Pickup['Allow Delivery Date Selection'] = '1';
-            //$scope.Settings.Pickup['Allow Time Selection'] = '1';
-            
+            $scope.addTimeString = function (date, time) {
+                try
+                {
+                    if (typeof time === "undefined" || time.isBlank()) {
+                        return date;
+                    }
+
+                    var parts = time.split(":");
+
+                    var hour = 0;
+                    var minute = 0;
+                    var second = 0;
+
+                    date = moment(date).startOf('day');
+                
+                    // hour
+                    if (parts.length >= 1) {
+                        date = date.hours(parts[0]);
+                    }
+
+                    // minute
+                    if (parts.length >= 2) {
+                        date = date.minutes(parts[1]);
+                    }
+
+                    // second
+                    if (parts.length >= 3) {
+                        date = date.seconds(parts[2]);
+                    }
+
+                    return date.toDate();
+                }
+                catch(ex)
+                {
+                    return date;
+                }
+            };
+
+            $scope.findNextDate = function (date) {
+                // Skip invalid days - Only allow looping 30 days. If not found by then, no valid min delivery date exists.
+                var i = 0;
+
+                while ($scope.inValidDay(new Date(date).getDay()) && i < 30) {
+                    date = new Date(date).addDays(1);
+                    i++;
+                }
+
+                return date;
+            }
 
             // Retrieve Timeslots if we need to show the time.
             if ($scope.Settings.TimeSlots == null && $scope.Settings.Pickup["Allow Time Selection"] == '1') {
@@ -59,23 +109,46 @@
             $scope.pickupTimeSlot = '';
             $scope.deliveryTimeSlot = '';
 
+
+            // Find customer route.
+            if ($scope.Customer.RouteID !== '') {
+                for (var i = 0; i < $scope.Settings.Routes.length; i++) {
+                    if ($scope.Settings.Routes[i].RouteID == $scope.Customer.RouteID) {
+                        $scope.Route = $scope.Settings.Routes[i];
+                        break;
+                    }
+                }
+            }
+
             if ($scope.Settings.Pickup["Allow Delivery Date Selection"] == '1') {
                 $scope.Pickup.Visit = 'Both Pickup and Delivery';
             }
+
+            var minDate = $scope.addTimeString(Date.now(), $scope.Route.SameDayCutoffTime);
+
+            if (minDate < Date.now())
+            {
+                minDate = moment(minDate).add(1, 'days');
+            }
+
+            $scope.cutoffTime = moment(minDate).format('hh:mm A');
 
             // Date Control options
             $scope.pickupDateOptions = {
                 formatYear: 'yy',
                 startingDay: 1,
-                minDate: Date.now(),
+                minDate: $scope.findNextDate(minDate),
                 maxDate: moment().add(3, 'months'),
                 dateDisabled: disabled
             };
 
+            console.log('pickup date');
+            console.log($scope.pickupDateOptions);
+
             $scope.deliveryDateOptions = {
                 formatYear: 'yy',
                 startingDay: 1,
-                minDate: new Date($scope.Pickup.Date).addDays($scope.DaysAfterPickup),
+                minDate: new Date($scope.pickupDateOptions.minDate).addDays($scope.DaysAfterPickup),
                 maxDate: moment().add(3, 'months'),
                 dateDisabled: disabled
             };
@@ -135,7 +208,7 @@
                         dialogs.notify('Success', 'Your pickup has been scheduled for ' + moment($scope.Pickup.Date).format($scope.dateFormat.toUpperCase()) + '.');
                         $scope.resetForm();
                     } else {
-                        dialogs.error('Error', 'Your pickup was not able to be scheduled. Please try again.');
+                        dialogs.error('Error', data.Message);
                     }
                 });
             };
@@ -164,20 +237,19 @@
                     $scope.deliveryDateOptions = {
                         formatYear: 'yy',
                         startingDay: 1,
-                        minDate: new Date($scope.Pickup.Date).addDays($scope.DaysAfterPickup),
+                        minDate: new Date($scope.Pickup.Date).addDays($scope.DaysAfterPickup), // Todo need to exclude non-business days
                         maxDate: moment().add(3, 'months'),
                         dateDisabled: disabled
                     };
 
-                    // Skip invalid days
-                    while ($scope.inValidDay(new Date($scope.deliveryDateOptions.minDate).getDay())) {
-                        $scope.deliveryDateOptions.minDate = new Date($scope.deliveryDateOptions.minDate).addDays(1);
-                    }
+                    $scope.deliveryDateOptions.minDate = $scope.findNextDate($scope.deliveryDateOptions.minDate);
                     
                     if (new Date($scope.Pickup.DeliveryDate) < new Date($scope.deliveryDateOptions.minDate)) {
                         $scope.Pickup.DeliveryDate = $scope.deliveryDateOptions.minDate;
                     }
                 }
+
+                console.log($scope.Pickup.DeliveryDate);
             };
 
             // On time slot change, we need the start time to go into the date.

@@ -93,7 +93,6 @@
                 console.log($scope.Customer);
 
                 var ci = {
-                    accountNodeID: $scope.Settings.Signup['Default Store Id'],
                     clientAccountID: '',
                     firstName: $scope.Customer.FirstName,
                     lastName: $scope.Customer.LastName,

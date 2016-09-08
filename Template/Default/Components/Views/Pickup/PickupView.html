@@ -33,6 +33,10 @@
             <label class="control-label">&nbsp;&nbsp;&nbsp;Sunday</label>
             <br />
         </div>
+
+        <div ng-show="Route.SameDayCutoffTime != ''">
+            <span>Same day pickup must be scheduled before {{cutoffTime}}</span>
+        </div>
     </div>
 
     <div class="form-group">
