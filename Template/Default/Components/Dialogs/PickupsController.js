@@ -5,9 +5,9 @@
     .module('app')
     .controller('PickupsController', PickupsController);
 
-    PickupsController.$inject = ['$scope', '$uibModalInstance', 'blockUI', 'data', 'dialogs'];
+    PickupsController.$inject = ['$scope', '$uibModalInstance', 'blockUI', 'data', 'dialogs', 'configService'];
 
-    function PickupsController($scope, $uibModalInstance, blockUI, data, dialogs) {
+    function PickupsController($scope, $uibModalInstance, blockUI, data, dialogs, configService) {
         /* jshint validthis:true */
         var vm = this;
         vm.title = 'PickupsController';
@@ -16,6 +16,7 @@
 
         function activate() {
             $scope.Pickups = { PendingPickups: data };
+            $scope.Settings = configService.getProfile();
 
             $scope.filteredPickups = [];
             $scope.itemsPerPage = 5;
