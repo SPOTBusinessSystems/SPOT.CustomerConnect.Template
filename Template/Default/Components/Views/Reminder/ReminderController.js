@@ -14,10 +14,14 @@
 
         activate();
 
+        $scope.data = { Password: '', PasswordConfirm: '', Valid: false, Done: false };
+
         function activate() {
             $scope.Request = { RememberKey: $stateParams.key, ZipCode: '', NewPassword: '' };
 
             $scope.$watch('data.Password', function (data) {
+                console.log('change');
+                console.log(data);
                 $scope.Request.NewPassword = data;
             });
 

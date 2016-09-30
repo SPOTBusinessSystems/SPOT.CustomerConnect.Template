@@ -7,9 +7,9 @@
     .module('app')
     .controller('accountcontroller', accountcontroller);
 
-    accountcontroller.$inject = ['$scope','dialogs','$rootScope','$filter','settingsService','$state','dataService','userService','configService'];
+    accountcontroller.$inject = ['$scope','dialogs','$rootScope','$filter','settingsService','$state','dataService','userService','configService','$compile'];
 
-    function accountcontroller($scope, dialogs, $rootScope, $filter, settingsService, $state, dataService, userService, configService) {
+    function accountcontroller($scope, dialogs, $rootScope, $filter, settingsService, $state, dataService, userService, configService, $compile) {
         /* jshint validthis:true */
         var vm = this;
         vm.title = 'accountcontroller';
@@ -143,21 +143,21 @@
             };
 
             $scope.changePassword = function () {
-                var dlg = dialogs.create(settingsService.path + 'Components/Dialogs/ChangePassword.html', 'DialogController', $scope.data, { size: 'sm' });
-                dlg.result.then(function (data) {
-                    if (typeof (data) !== 'undefined') {
-                        dataService.user.changePassword(data.Password).then(function (data) {
-                            if (!data.Failed) {
-                                dialogs.notify('Password Changed', 'Your password has been changed.');
-                            } else {
-                                var dlge = dialogs.notify('Error', data.Message);
-                                dlge.result.then(function () {
-                                    $scope.changePassword();
-                                });
-                            }
-                        });
-                    }
-                });
+                //var dlg = dialogs.create(settingsService.path + 'Components/Dialogs/ChangePassword.html', 'DialogController', $scope.data, { size: 'sm' });
+                //dlg.result.then(function (data) {
+                //    if (typeof (data) !== 'undefined') {
+                //        dataService.user.changePassword(data.Password).then(function (data) {
+                //            if (!data.Failed) {
+                //                dialogs.notify('Password Changed', 'Your password has been changed.');
+                //            } else {
+                //                var dlge = dialogs.notify('Error', data.Message);
+                //                dlge.result.then(function () {
+                //                    $scope.changePassword();
+                //                });
+                //            }
+                //        });
+                //    }
+                //});
             };
 
             $scope.customerReferral = function () {
