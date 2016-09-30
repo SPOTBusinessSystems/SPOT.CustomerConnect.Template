@@ -181,6 +181,8 @@
                 clientid: "",
                 spotAuthType: "googleoauthv2",
                 theme: "light",
+                basicProfile: null,
+                authResponse: null,
 
                 init: function () {
                     var deferred = $q.defer();
@@ -264,7 +266,23 @@
                         x.signIn({ 'scope': 'profile email' })
                             .then(function (data) {
                                 if (data) {
-                                    if (data.El && data.El.length > 0) {
+                                    if (data.getId() && data.getId().length > 0) {
+                                        const basicProfile = data.getBasicProfile();
+                                        const authResponse = data.getAuthResponse();
+
+                                        data.googleId = basicProfile.getId();
+                                        data.tokenObj = authResponse;
+                                        data.tokenId = authResponse.id_token;
+                                        data.accessToken = authResponse.access_token;
+                                        data.profileObj = {
+                                            googleId: basicProfile.getId(),
+                                            imageUrl: basicProfile.getImageUrl(),
+                                            email: basicProfile.getEmail(),
+                                            name: basicProfile.getName(),
+                                            givenName: basicProfile.getGivenName(),
+                                            familyName: basicProfile.getFamilyName()
+                                        };
+
                                         deferred.resolve(data);
                                     }
                                 }

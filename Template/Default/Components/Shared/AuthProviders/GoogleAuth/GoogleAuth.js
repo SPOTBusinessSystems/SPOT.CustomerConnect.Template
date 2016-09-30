@@ -31,9 +31,9 @@
             this.login = function () {
                 // Google signin
                 configService.authProviders.google.signin().then(function (gData) {
-                    if (gData.hg) {
+                    if (gData.tokenId) {
                         // Use login to authenticate to API.
-                        dataService.user.loginOAuth(configService.authProviders.google.spotAuthType, gData.hg.id_token)
+                        dataService.user.loginOAuth(configService.authProviders.google.spotAuthType, gData.tokenId)
                             .then(function (data) {
                                 if (!data.Failed) {
                                     // Success, setup session.
@@ -60,8 +60,8 @@
             this.associate = function () {
                 // Login to Google.
                 configService.authProviders.google.signin().then(function (gData) {
-                    if (gData.hg) {
-                        dataService.user.updateAuthProvider(configService.authProviders.google.spotAuthType, gData.El, gData.hg.id_token)
+                    if (gData.tokenId) {
+                        dataService.user.updateAuthProvider(configService.authProviders.google.spotAuthType, gData.El, gData.tokenId)
                             .then(function (data) {
                                 if (!ctrl.signedIn) {
                                     $state.reload();

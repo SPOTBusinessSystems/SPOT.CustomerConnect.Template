@@ -64,7 +64,7 @@
 
                         console.log(data);
 
-                        if (invoiceId !== undefined) {
+                        if (typeof (invoiceId) == 'undefined') {
                             $scope.open(invoiceId, invoiceKey);
                         }
                     }
