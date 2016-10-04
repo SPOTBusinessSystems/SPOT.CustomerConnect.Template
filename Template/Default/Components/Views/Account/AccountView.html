@@ -162,8 +162,8 @@
             </div>
         </div>
 
-        <h3>Credit Card</h3>
-        <credit-card card-info="Customer.CreditCards[0]"></credit-card>
+        <h3>Credit Cards</h3>
+        <credit-cards cards="Customer.CreditCards" on-update="accountForm.$setDirty();"></credit-cards>
 
         <div ng-if="Settings.Notifications">
             <h3>Notifications</h3>
