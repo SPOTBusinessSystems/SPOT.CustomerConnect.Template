@@ -72,6 +72,7 @@
                 }
 
                 if ($scope.Customer.CreditCards.length > 0) {
+                    $scope.Customer.CreditCardSaveMode = 2;
                     var ccArray = $scope.Customer.CreditCards;
 
                     // Loop checking for changes.
