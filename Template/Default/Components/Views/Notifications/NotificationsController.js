@@ -8,7 +8,7 @@
     NotificationsController.$inject = ['$scope', '$stateParams', 'localStorageService', 'apiConfig', 'dataService', '$http', '$filter', 'configService', '$state', 'dialogs'];
 
     function NotificationsController($scope, $stateParams, localStorageService, apiConfig, dataService, $http, $filter, configService, $state, dialogs) {
-        $scope.Customer = { Notifications: [] };
+        $scope.Customer = { Notifications: [], loaded: false };
         $scope.Settings = configService.getProfile();
         $scope.Settings.Notifications = $filter('orderBy')($scope.Settings.Notifications, ['Description', 'MethodName'], false);
 
@@ -21,6 +21,7 @@
                     if (!data.Failed) {
                         $scope.Customer.ClientAccountID = $stateParams.Id;
                         $scope.Customer.Notifications = data.ReturnObject.Notifications;
+                        $scope.Customer.loaded = true;
                         $scope.Customer.Notifications = $filter('orderBy')($scope.Customer.Notifications, 'NotificationTypeDescription', false);
                         $scope.EmailAddress = data.ReturnObject.EmailAddress;
                     } else {

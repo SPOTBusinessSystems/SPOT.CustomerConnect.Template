@@ -5,7 +5,7 @@
     </div>
     <form name="accountForm" novalidate>
         <div class="form-group">
-            <label class="btn btn-success" ng-click="changePassword()">Change Password</label>
+            <change-password></change-password>
             <label class="btn btn-default" ng-click="customerReferral()" ng-show="Settings.General['Customer Referral']['Enable Customer Referral'] == 1 && Customer.ShowReferral">Refer a friend</label>
             <label class="btn btn-default" ng-click="convertToRoute()" ng-if="Customer.RouteName == '' && Settings.General['Route Scheduling'] == 1">Enable delivery</label>
         </div>
@@ -162,8 +162,8 @@
             </div>
         </div>
 
-        <h3>Credit Card</h3>
-        <credit-card card-info="Customer.CreditCards[0]"></credit-card>
+        <h3>Credit Cards</h3>
+        <credit-cards cards="Customer.CreditCards" on-update="accountForm.$setDirty();"></credit-cards>
 
         <div ng-if="Settings.Notifications">
             <h3>Notifications</h3>

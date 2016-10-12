@@ -16,13 +16,18 @@
             controller: controller,
             link: link,
             restrict: 'EA',
+            replace: true,
+            scope: {
+                data: '='
+            },
             templateUrl: settingsService.path + 'Components/Shared/PasswordIndicator/PasswordIndicatorView.html'
         };
         return directive;
 
         function link(scope, iElement, iAttrs, ctrl, data) {
+
             if (typeof (data) == 'undefined') {
-                scope.data = { Password: '', Valid: false };
+                scope.data = { Password: '', Valid: false, Done: false };
             }
 
             scope.$watch('data.Password', function () {
@@ -30,6 +35,11 @@
                 scope.getPasswordStrength(scope.data.Password);
                 scope.getCSSClass();
                 scope.data.Valid = scope.isValid(scope.data.Password);
+                scope.data.Done = scope.data.Valid && (scope.data.Password == scope.data.PasswordConfirm);
+            });
+
+            scope.$watch('data.PasswordConfirm', function () {
+                scope.data.Done = scope.data.Valid && (scope.data.Password == scope.data.PasswordConfirm);
             });
         }
 

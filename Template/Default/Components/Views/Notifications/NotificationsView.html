@@ -1,5 +1,5 @@
 ﻿<div ng-controller="NotificationsController" class="fullPage" ng-cloak>
-    <div ng-if="Customer.Notifications.length > 0">
+    <div ng-if="Customer.loaded">
         <form name="accountForm" novalidate>
             <h3>Modify Notifications for {{EmailAddress}}</h3>
             <notifications ng-model="Customer.Notifications" />
@@ -10,7 +10,7 @@
             </div>
         </form>
     </div>
-    <div ng-if="Customer.Notifications.length < 1">
+    <div ng-if="!Customer.loaded">
         <h3>Modify Notifications - Unable to locate customer.</h3>
     </div>
 </div>

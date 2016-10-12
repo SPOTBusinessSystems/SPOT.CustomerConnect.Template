@@ -13,6 +13,8 @@
     <link id="additionalCss" rel="stylesheet" type="text/css" href="" />
     <link rel="stylesheet" href="/@TENANT/Template/Default/Content/css/styles-bundle.min.css?v=1.0.0" />
 
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
     <script src="/@TENANT/Template/Default/Scripts/extras-bundle.min.js?v=1.0.0"></script>
     <script src="/@TENANT/Template/Default/Scripts/bootstrap-bundle.min.js?v=1.0.0"></script>
     <script src="/@TENANT/Template/Default/Scripts/angular-bundle.min.js?v=1.0.0"></script>
@@ -32,19 +34,20 @@
     <script src="/@TENANT/Template/Default/Components/Shared/States/States.js"></script>
     <script src="/@TENANT/Template/Default/Components/Shared/DynamicContent/DynamicContent.js"></script>
 
-    <!-- Components -->
-    <script src="/@TENANT/Template/Default/Components/Shared/MainMenu/MainMenu.js"></script>
-    <script src="/@TENANT/Template/Default/Components/Shared/SiteHeader/SiteHeader.js"></script>
-    <script src="/@TENANT/Template/Default/Components/Shared/SiteFooter/SiteFooter.js"></script>
+    <!-- Components - Base -->
+    <script src="/@TENANT/Template/Default/Components/Base/CreditCard.js"></script>
+    <script src="/@TENANT/Template/Default/Components/Base/AuthProviders/GoogleAuth.js"></script>
+    <script src="/@TENANT/Template/Default/Components/Base/AuthProviders/FacebookAuth.js"></script>
 
-    <script src="/@TENANT/Template/Default/Components/Shared/CreditCard/CreditCard.js"></script>
+    <!-- Components - Controls -->
+    <script src="/@TENANT/Template/Default/Components/Controls/MainMenu.js"></script>
+    <script src="/@TENANT/Template/Default/Components/Controls/SiteHeader.js"></script>
+    <script src="/@TENANT/Template/Default/Components/Controls/SiteFooter.js"></script>
 
-    <script src="/@TENANT/Template/Default/Components/Shared/AuthProviders/GoogleAuth/GoogleAuth.js"></script>
-    <script src="/@TENANT/Template/Default/Components/Shared/AuthProviders/FacebookAuth/FacebookAuth.js"></script>
+    <script src="/@TENANT/Template/Default/Components/Controls/ChangePassword.js"></script>
+    <script src="/@TENANT/Template/Default/Components/Controls/CreditCards.js"></script>
 
     <!-- View Components -->
-
-
     <!-- View Controllers - Anonymous -->
     <script src="/@TENANT/Template/Default/Components/Views/Login/LoginController.js"></script>
     <script src="/@TENANT/Template/Default/Components/Views/Reminder/ReminderController.js"></script>
@@ -76,7 +79,7 @@
     <script src='//www.google.com/recaptcha/api.js?onload=vcRecaptchaApiLoaded&render=explicit' async defer></script>
 
     <!-- Auth Providers -->
-    <script src="//apis.google.com/js/platform.js" async defer></script>
+    <script src="//apis.google.com/js/client:platform.js" async defer></script>
     <script src="//connect.facebook.net/en_US/sdk.js"></script>
 </head>
 <body ng-cloak>

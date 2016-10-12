@@ -34,7 +34,10 @@
                 'LocalStorageModule',
                 'tmh.dynamicLocale',
                 'ui.mask',
-                'vcRecaptcha'
+                'vcRecaptcha',
+                'ngMaterial',
+                'ngMessages',
+                'ngAria'
     ]);
 
     ccApp.provider('settingsService', function settingsServiceProvider() {

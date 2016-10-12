@@ -31,3 +31,11 @@
     position: absolute;
     right: 15px;
 }
+
+md-checkbox.md-checked.blue .md-icon {
+ background-color: #1995dc;
+}
+
+.md-errors-spacer {
+    display: none;
+}

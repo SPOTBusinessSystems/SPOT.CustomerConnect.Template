@@ -7,9 +7,9 @@
     .module('app')
     .controller('accountcontroller', accountcontroller);
 
-    accountcontroller.$inject = ['$scope','dialogs','$rootScope','$filter','settingsService','$state','dataService','userService','configService'];
+    accountcontroller.$inject = ['$scope','dialogs','$rootScope','$filter','settingsService','$state','dataService','userService','configService','$compile'];
 
-    function accountcontroller($scope, dialogs, $rootScope, $filter, settingsService, $state, dataService, userService, configService) {
+    function accountcontroller($scope, dialogs, $rootScope, $filter, settingsService, $state, dataService, userService, configService, $compile) {
         /* jshint validthis:true */
         var vm = this;
         vm.title = 'accountcontroller';
@@ -63,9 +63,6 @@
                 return CustomerConnect.Util.Validate.EmailAddress($scope.Customer.EmailAddress);
             }
 
-            // Initialize Customer
-            $scope.initCustomer();
-
             // Save Records
             $scope.SaveAccount = function () {
                 var ci = $scope.Customer;
@@ -75,26 +72,89 @@
                 }
 
                 if ($scope.Customer.CreditCards.length > 0) {
-                    if (userService.getCustomer().CreditCards.length > 0)
+                    $scope.Customer.CreditCardSaveMode = 2;
+                    var ccArray = $scope.Customer.CreditCards;
+
+                    // Loop checking for changes.
+                    for (var index = 0; index < ccArray.length; index++)
                     {
-                        if ($scope.Customer.CreditCards[0].CardInfo != userService.getCustomer().CreditCards[0].CardInfo || $scope.Customer.CreditCards[0].CardExpiration != userService.getCustomer().CreditCards[0].CardExpiration) {
-                            if (!CustomerConnect.Util.Validate.CCNumber($scope.Customer.CreditCards[0].CardInfo)) {
-                                dialogs.error('Credit Card Update', "When updating your credit card, please re-enter your full credit card number and expiration.");
+                        var ccIndex = ccArray[index];
+
+                        if (ccIndex.CardId.startsWith('New_')) {
+                            console.log('new card')
+                            // New credit card, move to new credit cards save.
+                                
+                            // Empty card added but removed
+                            if (ccIndex.MarkDeleted) {
+                                $scope.Customer.CreditCards.remove(ccIndex);
+                                continue;
+                            }
+
+                            // validate card info
+                            if (!CustomerConnect.Util.Validate.CCNumber(ccIndex.CardInfo)) {
+                                swal({
+                                    type: 'error',
+                                    title: 'Unable to add new credit card',
+                                    text: "A valid credit card number is required."
+                                });
                                 return;
-                            } else {
-                                $scope.Customer.creditCardsToSave = [{ number: $scope.Customer.CreditCards[0].CardInfo, type: CustomerConnect.Util.Validate.GetCCType($scope.Customer.CreditCards[0].CardInfo), expiration: $scope.Customer.CreditCards[0].CardExpiration }];
+                            }
+
+                            if (!$scope.Customer.CreditCardsToSave)
+                            {
+                                $scope.Customer.CreditCardsToSave = [];
+                            }
+
+                            // Verify card isn't already listed.
+                            var alreadyExists = false;
+
+                            for (var subIndex = 0; subIndex < $scope.Customer.CreditCardsToSave; subIndex++) {
+                                if ($scope.Customer.CreditCardsToSave[subIndex].CardInfo == ccIndex.CardInfo && $scope.Customer.CreditCardsToSave[subIndex].CardExpiration == ccIndex.CardExpiration) {
+                                    alreadyExists = true;
+                                    break;
+                                }
+                            }
+
+                            if (!alreadyExists) {
+                                $scope.Customer.CreditCardsToSave.push({ number: ccIndex.CardInfo, type: CustomerConnect.Util.Validate.GetCCType(ccIndex.CardInfo), expiration: ccIndex.CardExpiration, SetPrimary: ccIndex.SetPrimary, MarkDeleted: ccIndex.MarkDeleted });
+                                $scope.Customer.CreditCards.remove(ccIndex);
+                            }
+                        } else {
+                            console.log('existing card');
+                            if (ccIndex.CardInfo != userService.getCustomer().CreditCards[index].CardInfo || ccIndex.CardExpiration != moment(userService.getCustomer().CreditCards[index].CardExpiration).format("MM/YY")) {
+                                if (!CustomerConnect.Util.Validate.CCNumber(ccIndex.CardInfo)) {
+                                    console.log('error');
+                                    console.log(ccIndex);
+                                    swal({
+                                        type: 'error',
+                                        title: 'Credit Card Update',
+                                        text: 'When updating your credit card, please re-enter your full credit card number and expiration.'
+                                    });
+                                    return;
+                                } else {
+                                    // Delete, re-add with new CC Info and expiration
+                                    $scope.Customer.CreditCards[index].MarkDeleted = true;
+                                    $scope.Customer.creditCardsToSave = [{ number: ccIndex.CardInfo, type: CustomerConnect.Util.Validate.GetCCType(ccIndex.CardInfo), expiration: ccIndex.CardExpiration, SetPrimary: ccIndex.SetPrimary, MarkDeleted: ccIndex.MarkDeleted }];
+                                }
                             }
                         }
-                    } else
-                    {
-                        $scope.Customer.creditCardsToSave = [{ number: $scope.Customer.CreditCards[0].CardInfo, type: CustomerConnect.Util.Validate.GetCCType($scope.Customer.CreditCards[0].CardInfo), expiration: $scope.Customer.CreditCards[0].CardExpiration }];
                     }
+
+                    console.log('save');
+                    console.log($scope.Customer.CreditCardsToSave);
+                    console.log($scope.Customer.CreditCards);
+
+                    // temp
+                    //return;
                 }
 
                 dataService.customer.saveCustomer(ci).then(function (data) {
                     if (!data.Failed) {
-                        var dlg = dialogs.notify('Update submitted', $scope.Settings['Account Update']['Submitted Message']);
-                        dlg.result.then(function () {
+                        swal({
+                            type: 'success',
+                            title: 'Update submitted',
+                            text: $scope.Settings['Account Update']['Submitted Message']
+                        }).then(function () {
                             $scope.accountForm.$setPristine();
 
                             dataService.customer.getCustomer().then(function (data) {
@@ -104,9 +164,15 @@
 
                                 $state.reload();
                             });
-                        })
+                        });
                     } else {
-                        dialogs.error('Update failed.', data.Message);
+                        swal({
+                            type: 'error',
+                            title: 'Update Failed',
+                            text: data.Message
+                        });
+
+                        return;
                     }
                 });
             };
@@ -142,24 +208,6 @@
                 $scope.Customer.Phones.splice($index, 1);
             };
 
-            $scope.changePassword = function () {
-                var dlg = dialogs.create(settingsService.path + 'Components/Dialogs/ChangePassword.html', 'DialogController', $scope.data, { size: 'sm' });
-                dlg.result.then(function (data) {
-                    if (typeof (data) !== 'undefined') {
-                        dataService.user.changePassword(data.Password).then(function (data) {
-                            if (!data.Failed) {
-                                dialogs.notify('Password Changed', 'Your password has been changed.');
-                            } else {
-                                var dlge = dialogs.notify('Error', data.Message);
-                                dlge.result.then(function () {
-                                    $scope.changePassword();
-                                });
-                            }
-                        });
-                    }
-                });
-            };
-
             $scope.customerReferral = function () {
                 for (var x = 0; x < $scope.Settings.Stores.length; x++) {
                     if ($scope.Settings.Stores[x].StoreID == $scope.Customer.AccountNodeID) {
@@ -188,6 +236,9 @@
                     }
                 });
             };
+
+            // Initialize Customer
+            $scope.initCustomer();
         };
     }
 })();
