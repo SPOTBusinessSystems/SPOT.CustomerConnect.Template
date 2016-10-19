@@ -1,0 +1,35 @@
+﻿<div class="modal-header">
+    <h4 class="modal-title">Pending Suspensions</h4>
+</div>
+<div class="modal-body">
+    <div class="form-group">
+        <div class="table-responsive">
+            <table class="table table-condensed table-hover table-striped">
+                <thead>
+                    <tr>
+                        <th width="135px;">Start Date</th>
+                        <th>End Date</th>
+                        <th class="hidden-xs">Comments</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="cancellation in filteredCancellations | orderBy: 'FromDate'">
+                        <td width="135px;">{{cancellation.FromDate | date:'shortDate'}}</td>
+                        <td width="135px;">{{cancellation.ToDate | date:'shortDate'}}</td>
+                        <td class="hidden-xs">{{cancellation.Comments}}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="form-group text-center">
+            <uib-pagination boundary-links="true" max-size="3" items-per-page="itemsPerPage" total-items="Cancellations.PendingCancellations.length" ng-model="currentPage" ng-change="pageChanged()" num-pages="numPages" previous-text="&lsaquo;" next-text="&rsaquo;" first-text="&laquo;" last-text="&raquo;"></uib-pagination>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <div class="row">
+            <div class="col-sm-12" style="padding: 3px;">
+                <label class="btn btn-success btn-block" ng-click="done()">Close</label>
+            </div>
+        </div>
+    </div>
+</div>

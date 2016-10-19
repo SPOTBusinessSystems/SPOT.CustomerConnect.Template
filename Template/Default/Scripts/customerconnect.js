@@ -1,4 +1,4 @@
-﻿var CustomerConnect = {
+var CustomerConnect = {
     // Public - Configuration
     Config: {
         AccountKey: null,

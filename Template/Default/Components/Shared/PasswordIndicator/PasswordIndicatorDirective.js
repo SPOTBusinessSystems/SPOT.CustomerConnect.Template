@@ -1,4 +1,4 @@
-﻿(function () {
+(function () {
     'use strict';
 
     angular
@@ -46,8 +46,10 @@
         function controller($scope, userService) {
             $scope.setInit = function () {
                 if (userService.getPassword() != '') {
-                    $scope.data.Password = userService.getPassword();
-                    userService.setPassword('');
+                    if ($scope.data.Password) {
+                        $scope.data.Password = userService.getPassword();
+                        userService.setPassword('');
+                    }
                 }
             };
 

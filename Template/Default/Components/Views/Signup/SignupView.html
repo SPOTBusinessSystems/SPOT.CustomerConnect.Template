@@ -1,4 +1,4 @@
-﻿<div id="signUpForm" name="ctrl.form" class="smallPage container-fluid" ng-controller="SignupController">
+<div id="signUpForm" name="ctrl.form" class="smallPage container-fluid" ng-controller="SignupController">
     <wizard name="SignupWizard" on-finish="finishedWizard()">
         <wz-step wz-title="Basic">
             <!-- Customer Type -->
@@ -12,7 +12,7 @@
                         <span class="glyphicon glyphicon-ok form-control-feedback" aria-hidden="true" ng-if="validEmail() && (form.email.$dirty || form.email.value.length > 0)"></span>
                     </div>
 
-                    <passwordindicator />
+                    <passwordindicator data="Customer.Password" />
 
                     <div class="input-group has-feedback" ng-class="{'has-error':form.firstname.$invalid && form.firstname.$dirty, 'has-success':form.firstname.$valid && form.firstname.$dirty}">
                         <span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span>

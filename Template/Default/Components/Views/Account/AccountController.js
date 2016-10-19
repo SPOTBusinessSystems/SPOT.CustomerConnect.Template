@@ -1,4 +1,4 @@
-﻿var authProvider;
+var authProvider;
 
 (function () {
     'use strict';

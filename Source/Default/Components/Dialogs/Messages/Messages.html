@@ -1,0 +1,42 @@
+﻿<div class="modal-header">
+    <h4 class="modal-title"><span class="glyphicon glyphicon-envelope"></span>  Messages <span class="badge">{{unreadMessages}}</span></h4>
+</div>
+
+<div class="modal-body">
+    <div class="table-responsive">
+        <table class="table table-condensed table-hover table-striped">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th></th>
+                    <th>Subject</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-if="filteredMessages.length == 0"><td colspan="4">No messages found.</td></tr>
+                <tr ng-repeat="message in filteredMessages" ng-class="{'boldText': filteredMessages[$index].ReadDateTime == null}" ng-dblclick="selectedMessage = $index; open($index);">
+                    <td style="width: 130px;">{{message.CreatedDateTime | date:'short'}}</td>
+                    <td style="width: 70px;"><a href="" ng-click="open($index);">Open</a></td>
+                    <td>{{message.Subject}}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="form-group text-center">
+        <pagination boundary-links="true" max-size="3" items-per-page="itemsPerPage" total-items="Messages.length" ng-model="currentPage" ng-change="pageChanged()" num-pages="NumPages" previous-text="&lsaquo;" next-text="&rsaquo;" first-text="&laquo;" last-text="&raquo;"></pagination>
+    </div>
+</div>
+
+<div class="modal-footer">
+    <div class="row">
+        <div class="col-sm-4" style="padding: 3px;">
+            <button class="btn btn-warning btn-block" ng-controller="SendMessageController" ng-click="open()"><span class="glyphicon glyphicon-question-sign"></span>  Have a question?</button>
+        </div>
+        <div class="col-sm-4" style="padding: 3px;">
+            <button class="btn btn-info btn-block" ng-click="refresh()">Refresh</button>
+        </div>
+        <div class="col-sm-4" style="padding: 3px;">
+            <button class="btn btn-primary btn-block" ng-click="close()">Close</button>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,32 @@
+﻿<div class="modal-header">
+    <h4 class="modal-title"><span class="glyphicon glyphicon-envelope"></span>  Messages - {{Message.Subject}}</h4>
+</div>
+
+<div class="modal-body">
+    <dynamiccontent content="view"></dynamiccontent>
+
+    <div class="form-group" ng-class="{'has-error':messageManagerForm.messageManagerBody.$invalid && messageManagerForm.messageManagerBody.$dirty, 'has-success':messageManagerForm.messageManagerBody.$valid && messageManagerForm.messageManagerBody.$dirty}" ng-show="Reply">
+        <br />
+        <label for="messageManagerBody" class="control-label">Message</label>
+        <textarea name="messageManagerBody" class="form-control" ng-model="messageBody" placeholder="Enter message (Required)" title="Please enter a message. (Required)" maxlength="255" rows="6" required></textarea>
+        <span class="glyphicon glyphicon-remove form-control-feedback" aria-hidden="true" ng-if="messageManagerForm.messageManagerBody.$invalid && messageManagerForm.messageManagerBody.$dirty"></span>
+        <span class="glyphicon glyphicon-ok form-control-feedback" aria-hidden="true" ng-if="messageManagerForm.messageManagerBody.$valid && messageManagerForm.messageManagerBody.$dirty"></span>
+        <br />
+        <button class="btn btn-success" ng-click="sendReply()">Send</button>
+        <button class="btn btn-danger" ng-click="cancelReply()">Cancel</button>
+    </div>
+</div>
+
+<div class="modal-footer">
+    <div class="row">
+        <div class="col-sm-4" style="padding: 3px;">
+            <button class="btn btn-primary btn-block" ng-click="reply()">Reply</button>
+        </div>
+        <div class="col-sm-4" style="padding: 3px;">
+            <button class="btn btn-danger btn-block" ng-click="delete()">Delete</button>
+        </div>
+        <div class="col-sm-4" style="padding: 3px;">
+            <button class="btn btn-warning btn-block" ng-click="close()">Close</button>
+        </div>
+    </div>
+</div>

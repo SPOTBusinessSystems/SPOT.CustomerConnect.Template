@@ -1,0 +1,37 @@
+﻿<div class="modal-header">
+    <h4 class="modal-title">Pending Pickups</h4>
+</div>
+<div class="modal-body">
+    <div class="form-group">
+        <div class="table-responsive">
+            <table class="table table-condensed table-hover table-striped">
+                <thead>
+                    <tr>
+                        <th width="135px;">Pickup Date</th>
+                        <th width="135px;" ng-if="Settings.Pickup['Allow Delivery Date Selection'] == '1'">Delivery Date</th>
+                        <th class="hidden-xs">Comments</th>
+                        <th class="hidden-xs">Instructions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="pickup in filteredPickups | orderBy: 'PickupDate'">
+                        <td width="135px;">{{pickup.PickupDate | date:'shortDate'}}</td>
+                        <td width="135px;" ng-if="Settings.Pickup['Allow Delivery Date Selection'] == '1'">{{pickup.DeliveryDate | date:'shortDate'}}</td>
+                        <td class="hidden-xs">{{pickup.Comments}}</td>
+                        <td class="hidden-xs">{{pickup.InstructionsRequests}}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="form-group text-center">
+            <uib-pagination boundary-links="true" max-size="3" items-per-page="itemsPerPage" total-items="Pickups.PendingPickups.length" ng-model="currentPage" ng-change="pageChanged()" num-pages="numPages" previous-text="&lsaquo;" next-text="&rsaquo;" first-text="&laquo;" last-text="&raquo;"></uib-pagination>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <div class="row">
+            <div class="col-sm-12" style="padding: 3px;">
+                <label class="btn btn-success btn-block" ng-click="done()">Close</label>
+            </div>
+        </div>
+    </div>
+</div>

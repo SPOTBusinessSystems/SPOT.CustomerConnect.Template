@@ -1,0 +1,43 @@
+﻿<div ng-controller="SuspendController" class="medPage">
+    <div class="text-center">
+        <h2>Suspend Service</h2>
+        <br />
+    </div>
+    <div class="form-group text-center">
+        <form name="cancellationForm" novalidate>
+            <div class="row form-group">
+                <div class="col-sm-6">
+                    <div class="input-group center">
+                        <label class="control-label">Start Date</label><br />
+                        {{Cancellation.FromDate | date:'fullDate' }}
+                        <uib-datepicker ng-model="Cancellation.FromDate" class="well well-sm" datepicker-options="dateOptions" ng-required="true" required></uib-datepicker>
+                    </div>
+                </div>
+
+                <div class="col-sm-6">
+                    <div class="input-group center">
+                        <label class="control-label">End Date</label><br />
+                        {{Cancellation.ToDate | date:'fullDate' }}
+                        <uib-datepicker ng-model="Cancellation.ToDate" class="well well-sm" datepicker-options="dateOptions" ng-required="true" required></uib-datepicker>
+                    </div>
+                </div>
+            </div>
+            <br />
+
+            <div class="form-group">
+                <label for="comments" class="control-label">Comments</label>
+                <textarea name="comments" class="form-control" ng-model="Cancellation.Comments" title="Please enter a message." maxlength="250" rows="6"></textarea>
+                <span>{{Cancellation.Comments.length}} / 250</span>
+            </div>
+
+            <div class="row">
+                <div class="col-sm-6" style="padding: 3px;">
+                    <label class="btn btn-info btn-block" ng-click="pendingSuspensions()">Show Pending Suspensions</label>
+                </div>
+                <div class="col-sm-6" style="padding: 3px;">
+                    <label class="btn btn-success btn-block" ng-click="scheduleCancellation()" ng-disabled="!cancellationForm.$valid">Suspend Service</label>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

@@ -1,4 +1,4 @@
-﻿(function () {
+(function () {
     'use strict';
 
     angular.module('app').component('creditCard', {
@@ -21,11 +21,13 @@
                     ctrl.years.push((new Date().getYear() + 1900 + x));
                 }
                 
-                var d = moment(ctrl.cardInfo.CardExpiration, "MM/DD/YYYY hh:mm:ss a");
-                ctrl.ccMonth = d.month() + 1;
-                ctrl.ccYear = d.year();
+                if (ctrl.cardInfo) {
+                    var d = moment(ctrl.cardInfo.CardExpiration, "MM/DD/YYYY hh:mm:ss a");
+                    ctrl.ccMonth = d.month() + 1;
+                    ctrl.ccYear = d.year();
 
-                ctrl.cardInfo.CardExpiration = moment(ctrl.ccMonth + "/1/" + ctrl.ccYear, "MM/dd/YYYY").format("MM/YY");
+                    ctrl.cardInfo.CardExpiration = moment(ctrl.ccMonth + "/1/" + ctrl.ccYear, "MM/dd/YYYY").format("MM/YY");
+                }
 
                 $scope.$watch('$ctrl.ccMonth', function () {
                     ctrl.UpdateExpiration();

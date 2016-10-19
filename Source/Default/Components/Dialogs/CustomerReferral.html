@@ -1,0 +1,38 @@
+﻿<div class="modal-header">
+    <h4 class="modal-title">Refer A Friend</h4>
+</div>
+<div class="modal-body text-center">
+    <div class="form-group">
+        {{ data.Store.StoreName }}<br />
+        {{ data.Store.PhysicalAddress.Address1 }}<br />
+        {{ data.Store.PhysicalAddress.City }}, {{ data.Store.PhysicalAddress.State }} {{ data.Store.PhysicalAddress.Zip }}<br />
+        {{ data.Store.PhysicalAddress.Phone }}<br />
+        {{ data.Store.HoursOfOperation }}
+    </div>
+
+    <div class="form-group">
+        <figure>
+            <img ng-src="{{ data.Customer.CustomerKeyBarcode }}" style="width: 268px;" />
+            <figcaption>{{ data.Customer.CustomerKey }}</figcaption>
+        </figure>
+    </div>
+    <div class="form-group">
+        Referring Customer<br />
+        {{ data.Customer.Name }}
+    </div>
+    <div class="form-group">
+        {{ data.Settings.General['Customer Referral']['Referral Coupon'] }}
+        <hr />
+        Please present this coupon with your first order.
+    </div>
+</div>
+<div class="modal-footer">
+    <div class="row">
+        <div class="col-sm-6" style="padding: 3px;">
+            <label class="btn btn-primary btn-block" ng-click="print('printBody')"><span class="glyphicon glyphicon-print"></span>  Print</label>
+        </div>
+        <div class="col-sm-6" style="padding: 3px;">
+            <label class="btn btn-success btn-block" ng-click="done()">Close</label>
+        </div>
+    </div>
+</div>

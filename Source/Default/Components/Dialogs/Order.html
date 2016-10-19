@@ -1,0 +1,92 @@
+﻿<div class="modal-header">
+    <h4 class="modal-title">{{SingleOrder.InvoiceKey}}<span class="pull-right glyphicon glyphicon-remove" ng-click="close()"></span></h4>
+</div>
+<div class="modal-body">
+    <h4>{{SingleOrder.DepartmentGroupName}}</h4>
+    <h5 ng-if="showPromisedDate(SingleOrder.PromisedDate)">Promised:&nbsp;&nbsp;{{SingleOrder.PromisedDate | date:'short'}}</h5>
+
+    <div class="form-group" ng-repeat="Item in SingleOrder.Items">
+        {{Item.Quantity}} - {{Item.CategoryName}} - {{Item.ItemName}}<span class="pull-right" ng-hide="hidePricing">{{Item.Amount}}</span>
+
+        <div style="margin-left: 20px;">
+            <span ng-repeat="Detail in Item.Details">
+                {{Detail.Name}} <span ng-if="Detail.Price != '0.00'" ng-hide="hidePricing">{{Detail.Price | currency}}</span><span ng-if="!$last">,</span>
+            </span>
+        </div>
+
+        <div ng-repeat="Alteration in Item.Alterations" style="margin-left: 20px;">
+            {{Alteration.Name}}<span class="pull-right" ng-hide="hidePricing">{{Alteration.Amount}}</span>
+        </div>
+
+        <div ng-repeat="Comment in Item.Comments" style="margin-left: 20px;">
+            {{Comment.Comment}}
+        </div>
+
+        <div ng-repeat="Adjustment in Item.Adjustments" style="margin-left: 20px;">
+            {{Adjustment.Name}}<span class="pull-right" ng-hide="hidePricing">{{Adjustment.Amount}}</span>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <div ng-repeat="Adjustment in SingleOrder.Adjustments">
+            {{Adjustment.Name}}<span class="pull-right" ng-hide="hidePricing">{{Adjustment.Amount}}</span>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <div ng-repeat="Coupon in SingleOrder.Coupons">
+            {{Coupon.Name}}<span class="pull-right" ng-hide="hidePricing">{{Coupon.Amount}}</span>
+        </div>
+    </div>
+
+    <div class="form-group" ng-if="SingleOrder.DiscountTotal && SingleOrder.DiscountTotal != '0.00'" ng-hide="hidePricing">
+        (Discount) {{SingleOrder.DiscountName}}<span class="pull-right">{{SingleOrder.DiscountTotal}}</span>
+    </div>
+
+    <div class="form-group">
+        <div ng-repeat="Comment in SingleOrder.Comments">
+            {{Comment.Comment}}
+        </div>
+        <div ng-if="SingleOrder.InvoiceManualComment != ''">
+            {{SingleOrder.InvoiceManualComment}}
+        </div>
+    </div>
+
+    <div class="form-group" ng-hide="hidePricing">
+        <span class="pull-right">Subtotal:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{SingleOrder.SubTotal}}</span><br />
+        <span class="pull-right">Tax:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{SingleOrder.TaxTotal}}</span><br />
+        <div ng-if="SingleOrder.EnviroTax != '0.00'">
+            <span class="pull-right">Enviro:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{SingleOrder.EnviroTax}}</span>
+            <br />
+        </div>
+        <span class="pull-right">Total:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{SingleOrder.Total}}</span><br />
+    </div>
+
+    <div class="form-group" ng-hide="hidePricing">
+        <div ng-repeat="Payment in SingleOrder.Payments">
+            {{Payment.StatusDateTime | date:'short'}} - {{Payment.TenderTypeToken}}<span class="pull-right">{{Payment.AppliedAmount}}</span>
+        </div>
+    </div>
+
+    <div class="form-group" ng-hide="hidePricing">
+        <span class="pull-right">Balance:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{SingleOrder.Balance | currency}}</span><br />
+    </div>
+
+    <div class="form-group text-center">
+        <pager total-items="Orders.length" ng-model="currentPage" items-per-page="1" num-pages="numPages" ng-change="pageChanged()"></pager>
+    </div>
+
+    <div class="modal-footer">
+        <div class="row">
+            <div class="col-sm-4" style="padding: 3px;">
+                <label class="btn btn-warning btn-block" ng-controller="SendMessageController" ng-click="open(InvoiceID, SingleOrder.InvoiceKey)"><span class="glyphicon glyphicon-question-sign"></span>  Have a question?</label>
+            </div>
+            <div class="col-sm-4" style="padding: 3px;">
+                <label class="btn btn-info btn-block" ng-click="print('printBody')"><span class="glyphicon glyphicon-print"></span>  Print</label>
+            </div>
+            <div class="col-sm-4" style="padding: 3px;">
+                <label class="btn btn-primary btn-block" ng-click="close()">Close</label>
+            </div>
+        </div>
+    </div>
+</div>
