@@ -31,26 +31,33 @@
             }
 
             scope.$watch('data.Password', function () {
+                console.log('watch');
                 scope.setInit();
-                scope.getPasswordStrength(scope.data.Password);
+
+                if (scope.data && scope.data.Password) {
+                    scope.getPasswordStrength(scope.data.Password);
+                    scope.data.Valid = scope.isValid(scope.data.Password);
+                    scope.data.Done = scope.data.Valid && (scope.data.Password == scope.data.PasswordConfirm);
+                } else {
+                    scope.getPasswordStrength('');
+                }
+
                 scope.getCSSClass();
-                scope.data.Valid = scope.isValid(scope.data.Password);
-                scope.data.Done = scope.data.Valid && (scope.data.Password == scope.data.PasswordConfirm);
             });
 
             scope.$watch('data.PasswordConfirm', function () {
-                scope.data.Done = scope.data.Valid && (scope.data.Password == scope.data.PasswordConfirm);
+                if (scope.data && scope.data.Password) {
+                    scope.data.Done = scope.data.Valid && (scope.data.Password == scope.data.PasswordConfirm);
+                }
             });
         }
 
         function controller($scope, userService) {
             $scope.setInit = function () {
-                if (userService.getPassword() != '') {
-                    if ($scope.data.Password) {
-                        $scope.data.Password = userService.getPassword();
-                        userService.setPassword('');
-                    }
-                }
+                //if (userService.getPassword() != '') {
+                //        $scope.data.Password = userService.getPassword();
+                //        userService.setPassword('');
+                //}
             };
 
             $scope.getStrength = function (pass) {

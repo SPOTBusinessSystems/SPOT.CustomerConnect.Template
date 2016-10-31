@@ -12,7 +12,7 @@
                         <span class="glyphicon glyphicon-ok form-control-feedback" aria-hidden="true" ng-if="validEmail() && (form.email.$dirty || form.email.value.length > 0)"></span>
                     </div>
 
-                    <passwordindicator data="Customer.Password" />
+                    <passwordindicator data="Customer.PasswordField"></passwordindicator>
 
                     <div class="input-group has-feedback" ng-class="{'has-error':form.firstname.$invalid && form.firstname.$dirty, 'has-success':form.firstname.$valid && form.firstname.$dirty}">
                         <span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span>
@@ -53,7 +53,7 @@
                 </div>
 
                 <div class="form-group center">
-                    <input type="submit" class="btn btn-success" wz-next ng-disabled="!form.$valid || data.PasswordConfirm != data.Password" ng-click="storePass(data.Password)" value="Continue" />
+                    <input type="submit" class="btn btn-success" wz-next ng-disabled="!form.$valid || Customer.PasswordField.PasswordConfirm != Customer.PasswordField.Password" ng-click="storePass(data.Password)" value="Continue" />
                 </div>
             </ng-form>
         </wz-step>

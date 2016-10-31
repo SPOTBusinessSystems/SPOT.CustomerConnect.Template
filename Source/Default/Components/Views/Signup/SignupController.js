@@ -1,4 +1,4 @@
-﻿(function () {
+(function () {
     'use strict';
 
     angular
@@ -40,6 +40,8 @@
                     }
                 });
             }
+
+            $scope.Customer.Password = { Password: '', PasswordConfirm: '', Valid: false, Done: false };
 
             // if cc shown todo
             if ($scope.Settings.Signup['Prompt for Credit Card'] == 1){
@@ -86,7 +88,9 @@
             };
 
             $scope.storePass = function (pass) {
-                $scope.Customer.Password = pass;
+                console.log('storepass');
+                console.log($scope.Customer);
+                console.log(pass);
             };
 
             $scope.SaveCustomer = function () {
@@ -99,7 +103,7 @@
                     name: $scope.Customer.LastName + ', ' + $scope.Customer.FirstName,
                     emailAddress: $scope.Customer.Email,
                     serviceType: $scope.Customer.Type,
-                    password: $scope.Customer.Password,
+                    password: $scope.Customer.PasswordField.Password,
                     phones: [
                         {
                             number: $scope.Customer.PhoneNumber,
