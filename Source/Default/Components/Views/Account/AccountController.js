@@ -1,4 +1,4 @@
-﻿var authProvider;
+var authProvider;
 
 (function () {
     'use strict';
@@ -7,9 +7,9 @@
     .module('app')
     .controller('accountcontroller', accountcontroller);
 
-    accountcontroller.$inject = ['$scope','dialogs','$rootScope','$filter','settingsService','$state','dataService','userService','configService','$compile'];
+    accountcontroller.$inject = ['$scope','dialogs','$rootScope','$filter','settingsService','$state','dataService','userService','configService','$compile','$stateParams'];
 
-    function accountcontroller($scope, dialogs, $rootScope, $filter, settingsService, $state, dataService, userService, configService, $compile) {
+    function accountcontroller($scope, dialogs, $rootScope, $filter, settingsService, $state, dataService, userService, configService, $compile, $stateParams) {
         /* jshint validthis:true */
         var vm = this;
         vm.title = 'accountcontroller';
@@ -20,9 +20,13 @@
             $scope.Customer = angular.copy(userService.getCustomer());
             $scope.Settings = configService.getProfile();
             $scope.configService = configService;
-
-            console.log('authprov-account');
-            console.log(configService.authProviders.anyEnabled());
+            
+            // Password change
+            if ($stateParams.requirePasswordChange) {
+                $scope.requirePasswordChange = $stateParams.requirePasswordChange;
+            } else {
+                $scope.requirePasswordChange = false;
+            }
 
             console.log($scope.Settings);
 
@@ -55,8 +59,6 @@
                     $scope.setBirthDays();
                     $scope.birthDate = moment($scope.Customer.Birthdate).date();
                 }
-
-                console.log($scope.Customer);
             };
 
             $scope.validEmail = function () {

@@ -12,6 +12,8 @@
         var vm = this;
         vm.title = 'ReminderController';
 
+        redirectToAppProtocolLink();
+
         activate();
 
         $scope.data = { Password: '', PasswordConfirm: '', Valid: false, Done: false };
@@ -35,6 +37,18 @@
                     }
                 });
             };
+        };
+
+        function redirectToAppProtocolLink() {
+            console.log('attempt to redirect to spot protocol link...');
+
+            var isiOS = navigator.userAgent.match('iPad') || navigator.userAgent.match('iPhone') || navigator.userAgent.match('iPod');
+            var isAndroid = navigator.userAgent.match('Android');
+
+            if (isiOS || isAndroid) {
+                var protocolLink = 'spot://mdc.mobile.app/changepassword?guid=' + $stateParams.key;
+                document.getElementById('app-protocol-loader').src = protocolLink;
+            }
         };
     };
 })();

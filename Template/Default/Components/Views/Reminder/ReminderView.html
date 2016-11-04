@@ -9,4 +9,6 @@
 
         <input type="submit" class="btn btn-primary" value="Change Password" ng-click="ChangePassword();" ng-disabled="!form.$valid || data.PasswordConfirm != data.Password" />
     </form>
+    <!-- iframe used for attempting to load a custom protocol -->
+    <iframe style="display:none" height="0" width="0" id="app-protocol-loader"></iframe>
 </div>

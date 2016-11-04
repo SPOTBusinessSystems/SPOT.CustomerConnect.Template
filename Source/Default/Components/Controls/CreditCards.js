@@ -22,7 +22,7 @@
 
             ctrl.AddCreditCard = function () {
                 if (ctrl.cards.length < 6) {
-                    ctrl.cards.push({CardId: 'New_' + Math.random().toString(), CardDisabled: false, CardExpiration: '', FormattedCardExpiration: '', CardInfo: '', CardUsage: 'Automatic', SetPrimary: false, MarkDeleted: false});
+                    ctrl.cards.push({ CardId: 'New_' + Math.random().toString(), CardDisabled: false, CardExpiration: '', FormattedCardExpiration: '', CardInfo: '', CardUsage: 'Automatic', SetPrimary: false, MarkDeleted: false });
                 }
 
                 ctrl.onUpdate();

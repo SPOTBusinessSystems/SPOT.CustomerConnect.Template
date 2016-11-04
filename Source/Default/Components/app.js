@@ -69,9 +69,8 @@
 
         $urlMatcherFactoryProvider.caseInsensitive(true); // Allow any case.
         $urlMatcherFactoryProvider.strictMode(false); // Allows trailing slash.
-        
-        if (CustomerConnect.Config.Layout === null)
-        {
+
+        if (CustomerConnect.Config.Layout === null) {
             CustomerConnect.Config.Layout === 'Default';
         }
 
@@ -80,7 +79,7 @@
         } else {
             settingsServiceProvider.setPath('/' + CustomerConnect.Config.Tenant + '/Template/' + CustomerConnect.Config.Layout + '/');
         }
-        
+
         // Views
         $stateProvider.state('login', {
             url: '/login',
@@ -106,7 +105,8 @@
         .state('account', {
             url: '/account',
             parent: 'globaldependencies',
-            templateUrl: settingsServiceProvider.getPath() + 'Components/Views/Account/AccountView.html'
+            templateUrl: settingsServiceProvider.getPath() + 'Components/Views/Account/AccountView.html',
+            params: { requirePasswordChange: null }
         })
         .state('giftcards', {
             url: '/giftcards',
@@ -304,9 +304,9 @@
         };
 
         $rootScope.$on('$stateChangeStart', function (ev, to, toParams, from, fromParams) {
-                console.log('route');
-                console.log(ev);
-                console.log(to);
+            console.log('route');
+            console.log(ev);
+            console.log(to);
 
             // if route requires auth and user is not logged in
             if (routeClean(to.url) === -1 && !userService.getCustomer()) {

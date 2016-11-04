@@ -25,7 +25,9 @@
                 Email: userService.getEmail(),
                 PhoneType: 'Choose Type',
                 ReferringCustomerKey: $stateParams.refkey,
-                CaptchaValid: userService.getCaptchaValid()
+                CaptchaValid: userService.getCaptchaValid(),
+                ReferralSource: "",
+                ReferralDetail: ""
             };
 
             // Init
@@ -104,6 +106,9 @@
                     emailAddress: $scope.Customer.Email,
                     serviceType: $scope.Customer.Type,
                     password: $scope.Customer.PasswordField.Password,
+                    referralSource: $scope.Customer.ReferralSource,
+                    referralDetail: $scope.Customer.ReferralDetail,
+                    awardId: $scope.Customer.AwardId,
                     phones: [
                         {
                             number: $scope.Customer.PhoneNumber,

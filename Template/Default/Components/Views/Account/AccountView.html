@@ -5,7 +5,7 @@
     </div>
     <form name="accountForm" novalidate>
         <div class="form-group">
-            <change-password></change-password>
+            <change-password require="requirePasswordChange"></change-password>
             <label class="btn btn-default" ng-click="customerReferral()" ng-show="Settings.General['Customer Referral']['Enable Customer Referral'] == 1 && Customer.ShowReferral">Refer a friend</label>
             <label class="btn btn-default" ng-click="convertToRoute()" ng-if="Customer.RouteName == '' && Settings.General['Route Scheduling'] == 1">Enable delivery</label>
         </div>

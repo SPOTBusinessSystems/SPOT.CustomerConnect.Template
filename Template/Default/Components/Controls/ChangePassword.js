@@ -3,6 +3,7 @@
 
     angular.module('app').component('changePassword', {
         bindings: {
+            require: '<'
         },
         controller: function ($compile,$scope,dataService) {
             var ctrl = this;
@@ -23,11 +24,22 @@
                         }
                     }
                 });
+
+                if (ctrl.require) {
+                    ctrl.changePassword(ctrl.require);
+                }
             };
 
-            ctrl.changePassword = function () {
+            ctrl.changePassword = function (required) {
+                var title = 'Change Password';
+                console.log(required);
+
+                if (required) {
+                    title = 'Password Change Required';
+                }
+
                 swal({
-                    title: 'Change Password',
+                    title: title,
                     html: '<div class="model-body"><passwordindicator data="$ctrl.data"></passwordindicator></div>',
                     showCancelButton: true,
                     confirmButtonText: 'Save',

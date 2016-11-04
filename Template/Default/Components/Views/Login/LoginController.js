@@ -5,15 +5,17 @@
     .module('app')
     .controller('LoginController', LoginController);
 
-    LoginController.$inject = ['$rootScope','$scope','$state','dialogs','blockUI','localStorageService','userService','settingsService','dataService','configService','apiConfig'];
+    LoginController.$inject = ['$compile', '$rootScope','$scope','$state','dialogs','blockUI','localStorageService','userService','settingsService','dataService','configService','apiConfig'];
 
-    function LoginController($rootScope, $scope, $state, dialogs, blockUI, localStorageService, userService, settingsService, dataService, configService, apiConfig) {
+    function LoginController($compile, $rootScope, $scope, $state, dialogs, blockUI, localStorageService, userService, settingsService, dataService, configService, apiConfig) {
         /* jshint validthis:true */
         var vm = this;
         vm.title = 'LoginController';
 
         (function () {
             $scope.configService = configService;
+            $scope.requiresPasswordChange = false;
+
 
             if (localStorageService.get(CustomerConnect.Config.Tenant + '_e') != null) {
                 userService.setEmail(CustomerConnect.Util.base64._decode(localStorageService.get(CustomerConnect.Config.Tenant + '_e')));
@@ -45,7 +47,7 @@
                                 dialogs.error('Messages Error', 'Unable to load messages.')
                             }
 
-                            $state.go('account');
+                            $state.go('account', { requirePasswordChange: $scope.requiresPasswordChange });
                         });
                     } else {
                         dialogs.error('Load Failed', data.Message);
@@ -64,10 +66,12 @@
                         CustomerConnect.Config.SessionId = data.ReturnObject.SessionID;
 
                         if (data.ReturnObject.PasswordComment != null) {
-                            var dlg = dialogs.notify('Password Change Required', data.ReturnObject.PasswordComment);
-                            dlg.result.then(function () {
-                                $scope.changePassword();
-                            });
+                            $scope.requiresPasswordChange = true;
+
+                            //var dlg = dialogs.notify('Password Change Required', data.ReturnObject.PasswordComment);
+                            //dlg.result.then(function () {
+                            //    $scope.changePassword();
+                            //});
                         }
 
                         localStorageService.set(CustomerConnect.Config.Tenant + '_token', data.ReturnObject.SessionID);
@@ -118,24 +122,24 @@
                 });
             };
 
-            $scope.changePassword = function () {
-                var dlg = dialogs.create(settingsService.path + 'Components/Dialogs/ChangePassword.html', 'DialogController', $scope.data, { size: 'sm' });
-                dlg.result.then(function (data) {
-                    if (typeof (data) !== 'undefined') {
-                        dataService.user.changePassword(data.Password).then(function (data) {
-                            if (!data.Failed) {
-                                dialogs.notify('Password Changed', 'Your password has been changed.');
-                            } else {
-                                var dlge = dialogs.notify('Error', cpData.Message);
-                                dlge.result.then(function () {
-                                    $scope.changePassword();
-                                });
-                            }
+            //$scope.changePassword = function () {
+            //    var dlg = dialogs.create(settingsService.path + 'Components/Dialogs/ChangePassword.html', 'DialogController', $scope.data, { size: 'sm' });
+            //    dlg.result.then(function (data) {
+            //        if (typeof (data) !== 'undefined') {
+            //            dataService.user.changePassword(data.Password).then(function (data) {
+            //                if (!data.Failed) {
+            //                    dialogs.notify('Password Changed', 'Your password has been changed.');
+            //                } else {
+            //                    var dlge = dialogs.notify('Error', cpData.Message);
+            //                    dlge.result.then(function () {
+            //                        $scope.changePassword();
+            //                    });
+            //                }
 
-                        });
-                    }
-                });
-            };
+            //            });
+            //        }
+            //    });
+            //};
 
             $scope.validEmail = function () {
                 return CustomerConnect.Util.Validate.EmailAddress($scope.emailAddress);

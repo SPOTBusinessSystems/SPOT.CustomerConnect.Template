@@ -5,7 +5,7 @@
     .module('app')
     .controller('SignupController', SignupController);
 
-    SignupController.$inject = ['$scope','dialogs','blockUI','$state','userService','$stateParams','$rootScope','vcRecaptchaService','dataService','configService'];
+    SignupController.$inject = ['$scope', 'dialogs', 'blockUI', '$state', 'userService', '$stateParams', '$rootScope', 'vcRecaptchaService', 'dataService', 'configService'];
 
     function SignupController($scope, dialogs, blockUI, $state, userService, $stateParams, $rootScope, vcRecaptchaService, dataService, configService) {
         /* jshint validthis:true */
@@ -25,7 +25,9 @@
                 Email: userService.getEmail(),
                 PhoneType: 'Choose Type',
                 ReferringCustomerKey: $stateParams.refkey,
-                CaptchaValid: userService.getCaptchaValid()
+                CaptchaValid: userService.getCaptchaValid(),
+                ReferralSource: "",
+                ReferralDetail: ""
             };
 
             // Init
@@ -44,7 +46,7 @@
             $scope.Customer.Password = { Password: '', PasswordConfirm: '', Valid: false, Done: false };
 
             // if cc shown todo
-            if ($scope.Settings.Signup['Prompt for Credit Card'] == 1){
+            if ($scope.Settings.Signup['Prompt for Credit Card'] == 1) {
                 $scope.Customer.CreditCardsToSave = [{ CardInfo: null, CardExpiration: null }];
             }
 
@@ -78,7 +80,7 @@
                         return (CustomerConnect.Util.Validate.CCExpiration($scope.Customer.CreditCardsToSave[0].CardExpiration) && CustomerConnect.Util.Validate.CCNumber($scope.Customer.CreditCardsToSave[0].CardInfo));
                     }
                 }
-                
+
                 // Implicit false.
                 return false;
             };
@@ -104,6 +106,9 @@
                     emailAddress: $scope.Customer.Email,
                     serviceType: $scope.Customer.Type,
                     password: $scope.Customer.PasswordField.Password,
+                    referralSource: $scope.Customer.ReferralSource,
+                    referralDetail: $scope.Customer.ReferralDetail,
+                    awardId: $scope.Customer.AwardId,
                     phones: [
                         {
                             number: $scope.Customer.PhoneNumber,

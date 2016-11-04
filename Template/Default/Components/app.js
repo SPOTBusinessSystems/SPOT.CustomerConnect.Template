@@ -105,7 +105,8 @@
         .state('account', {
             url: '/account',
             parent: 'globaldependencies',
-            templateUrl: settingsServiceProvider.getPath() + 'Components/Views/Account/AccountView.html'
+            templateUrl: settingsServiceProvider.getPath() + 'Components/Views/Account/AccountView.html',
+            params: { requirePasswordChange: null }
         })
         .state('giftcards', {
             url: '/giftcards',
