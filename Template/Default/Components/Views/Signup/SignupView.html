@@ -1,4 +1,4 @@
-﻿<div id="signUpForm" name="ctrl.form" class="smallPage container-fluid" ng-controller="SignupController">
+<div id="signUpForm" name="ctrl.form" class="smallPage container-fluid" ng-controller="SignupController">
     <wizard name="SignupWizard" on-finish="finishedWizard()">
         <wz-step wz-title="Basic">
             <!-- Customer Type -->
@@ -7,12 +7,22 @@
                 <div class="form-group">
                     <div class="input-group has-feedback" ng-class="{'has-error':!validEmail(), 'has-success':validEmail()}">
                         <span class="input-group-addon"><i class="glyphicon glyphicon-envelope"></i></span>
-                        <input type="email" id="emailAddress" name="email" ng-model="Customer.Email" class="form-control" placeholder="Email Address (Required)" required />
+                        <input type="email" id="emailAddress" name="email" ng-model="Customer.Email" class="form-control" placeholder="Email Address (Required)" required ng-blur="checkEmail()"/>
                         <span class="glyphicon glyphicon-remove form-control-feedback" aria-hidden="true" ng-if="!validEmail() && (form.email.$dirty || form.email.value.length > 0)"></span>
                         <span class="glyphicon glyphicon-ok form-control-feedback" aria-hidden="true" ng-if="validEmail() && (form.email.$dirty || form.email.value.length > 0)"></span>
                     </div>
+                    <div class="alert alert-danger" role="alert" ng-if="!validEmail() && checkEmailErrorMessage">
+                        {{checkEmailErrorMessage}}
+                        <div ng-if="checkEmailErrorIsDuplicateEmail()">
+                            Please use the
+                            <span ng-click="goToLoginPage()"><b><u>Login</u></b></span>
+                            option or use the
+                            <span ng-click="goToLoginPangeAndResetPassword()"><b><u>reset password</u></b></span>
+                            feature to login to your account.
+                        </div>
+                    </div>
 
-                    <passwordindicator />
+                    <passwordindicator data="Customer.PasswordField"></passwordindicator>
 
                     <div class="input-group has-feedback" ng-class="{'has-error':form.firstname.$invalid && form.firstname.$dirty, 'has-success':form.firstname.$valid && form.firstname.$dirty}">
                         <span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span>
@@ -50,10 +60,20 @@
                             <input class="form-control" type="text" id="referralCode" name="referralCode" ng-model="Customer.ReferralCode" placeholder="Referral Code" />
                         </div>
                     </div>
+
+                    <div class="form-group" ng-if="Settings.ReferralSources.length > 0">
+                        <label class="control-label">How did you hear about us?</label>
+                        <referral-sources referral-source="Customer.ReferralSource" referral-detail="Customer.ReferralDetail"></referral-sources>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="cotnrol-label">Promo Code</label>
+                        <input class="form-control" type="text" ng-model="Customer.AwardId" placeholder="Promo Code" />
+                    </div>
                 </div>
 
                 <div class="form-group center">
-                    <input type="submit" class="btn btn-success" wz-next ng-disabled="!form.$valid || data.PasswordConfirm != data.Password" ng-click="storePass(data.Password)" value="Continue" />
+                    <input type="submit" class="btn btn-success" wz-next ng-disabled="!form.$valid || Customer.PasswordField.PasswordConfirm != Customer.PasswordField.Password || !validEmail()" ng-click="storePass(data.Password)" value="Continue" />
                 </div>
             </ng-form>
         </wz-step>
@@ -141,7 +161,7 @@
                     <label class="control-label">{{ Customer.State }}</label><br />
                     <label class="control-label">{{ Customer.Zip }}</label><br />
                 </div>
-                
+
                 <div ng-if="Customer.CreditCardsToSave && Customer.CreditCardsToSave[0]">
                     <h3>Credit Card</h3>
                     {{ "*" + Customer.CreditCardsToSave[0].CardNumber.substring(Customer.CreditCardsToSave[0].CardNumber - 4)}}<br />
@@ -150,7 +170,7 @@
             </div>
 
             <form novalidate>
-                <div ng-if="Customer.Settings.General['Enable Captcha'] == 1 && !Customer.CaptchaValid" vc-recaptcha key="'6LcFpwUTAAAAADf8OJeuriHgIZiI6Av9hcC3wqok'" on-create="setWidgetId(widgetId)"></div>
+                <div ng-if="Settings.General['Enable Captcha'] == 1 && !Customer.CaptchaValid" vc-recaptcha key="'6LcFpwUTAAAAADf8OJeuriHgIZiI6Av9hcC3wqok'" on-create="setWidgetId(widgetId)"></div>
             </form>
 
             <div class="form-group">

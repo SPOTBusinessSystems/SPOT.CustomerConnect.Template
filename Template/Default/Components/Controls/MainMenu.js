@@ -1,10 +1,10 @@
-﻿(function () {
+(function () {
     'use strict';
 
     angular.module('app').component('mainMenu', {
         bindings: {
         },
-        controller: function (dataService, userService, configService, $state, localStorageService, dialogs, settingsService, $interval) {
+        controller: function (dataService, userService, configService, $state, localStorageService, dialogs, settingsService, $interval, $ocLazyLoad) {
             var ctrl = this;
 
             this.$onInit = function () {
@@ -23,9 +23,13 @@
                 };
 
                 ctrl.openMessages = function () {
-                    var dlg = dialogs.create(settingsService.path + 'Components/Dialogs/Messages/Messages.html', 'MessagesController', ctrl.data);
-                    dlg.result.then(function (data) {
-                        ctrl.unreadMessages = userService.unreadMessageCount();
+                    var p = $ocLazyLoad.load(settingsService.path + 'Components/Dialogs/Messages/MessagesController.js');
+
+                    p.then(function () {
+                        var dlg = dialogs.create(settingsService.path + 'Components/Dialogs/Messages/Messages.html', 'MessagesController', ctrl.data);
+                        dlg.result.then(function (data) {
+                            ctrl.unreadMessages = userService.unreadMessageCount();
+                        });
                     });
                 };
 

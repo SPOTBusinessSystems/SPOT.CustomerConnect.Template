@@ -1,13 +1,13 @@
-﻿(function () {
+(function () {
     'use strict';
 
     angular
     .module('app')
     .controller('MessagesController', MessagesController);
 
-    MessagesController.$inject = ['$rootScope', '$scope', 'dialogs', 'blockUI', 'vcRecaptchaService', 'userService', 'settingsService', 'dataService', '$uibModalInstance'];
+    MessagesController.$inject = ['$rootScope', '$scope', 'dialogs', 'blockUI', 'vcRecaptchaService', 'userService', 'settingsService', 'dataService', '$uibModalInstance', '$ocLazyLoad'];
 
-    function MessagesController($rootScope, $scope, dialogs, blockUI, vcRecaptchaService, userService, settingsService, dataService, $uibModalInstance) {
+    function MessagesController($rootScope, $scope, dialogs, blockUI, vcRecaptchaService, userService, settingsService, dataService, $uibModalInstance, $ocLazyLoad) {
         /* jshint validthis:true */
         var vm = this;
         vm.title = 'MessagesController';
@@ -44,13 +44,17 @@
             };
 
             $scope.open = function (index) {
-                console.log($scope.filteredMessages[index]);
+                //console.log($scope.filteredMessages[index]);
                 dataService.user.readMessage($scope.filteredMessages[index].MessageID).then(function (data) {
-                    
+
                 });
 
-                var dlg = dialogs.create(settingsService.path + 'Components/Dialogs/Message/Message.html', 'MessageController', $scope.filteredMessages[index], 'md').result.then(function () {
-                    $scope.LoadMessages();
+                var p = $ocLazyLoad.load(settingsService.path + 'Components/Dialogs/Message/MessageController.js');
+                p.then(function () {
+
+                    var dlg = dialogs.create(settingsService.path + 'Components/Dialogs/Message/Message.html', 'MessageController', $scope.filteredMessages[index], 'md').result.then(function () {
+                        $scope.LoadMessages();
+                    });
                 });
             }
 
@@ -67,7 +71,7 @@
 
             $scope.LoadMessages = function () {
                 $scope.selectedMessage = null;
-                
+
                 dataService.user.getMessages().then(function (data) {
                     if (data.Failed == false) {
                         userService.setMessages(data.ReturnObject);

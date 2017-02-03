@@ -1,4 +1,4 @@
-﻿(function () {
+(function () {
     'use strict';
 
     angular.module('app').component('siteHeader', {
@@ -12,7 +12,7 @@
                 ctrl.settings = configService;
                 ctrl.tokens = {};
 
-                console.log(ctrl.settings);
+                //console.log(ctrl.settings);
 
                 if (ctrl.settings.getProfile()) {
                     if (ctrl.settings.getProfile().General['Show Header'] == "1") {

@@ -1,4 +1,4 @@
-﻿(function () {
+(function () {
     'use strict';
 
     angular.module('app').component('creditCards', {
@@ -20,8 +20,8 @@
 
             };
 
-            ctrl.AddCreditCard = function () {
-                if (ctrl.cards.length < 6) {
+            this.AddCreditCard = function () {
+                if (ctrl.getCount() < 6) {
                     ctrl.cards.push({CardId: 'New_' + Math.random().toString(), CardDisabled: false, CardExpiration: '', FormattedCardExpiration: '', CardInfo: '', CardUsage: 'Automatic', SetPrimary: false, MarkDeleted: false});
                 }
 
@@ -31,6 +31,15 @@
             this.RemoveCC = function (card) {
                 ctrl.cards[ctrl.cards.indexOf(card)].MarkDeleted = true;
                 ctrl.onUpdate();
+            };
+
+            this.getCount = function(){
+                var x = 0;
+                for(var i=0; i<ctrl.cards.length;i++)
+                    if(!ctrl.cards[i].MarkDeleted)
+                        x++;
+
+                return x;
             };
         },
         template: [
@@ -43,7 +52,7 @@
                 '</div>',
             '</div>',
             '<div class="form-group">',
-                '<div class="input-group btn btn-info" ng-if="$ctrl.cards.length < 6" ng-click="$ctrl.AddCreditCard();">',
+                '<div class="input-group btn btn-info" ng-if="$ctrl.getCount() < 6" ng-click="$ctrl.AddCreditCard();">',
                     '<label class="glyphicon glyphicon-plus"></label><label>&nbsp;&nbsp;Add Credit Card</label>',
                 '</div>',
             '</div>',

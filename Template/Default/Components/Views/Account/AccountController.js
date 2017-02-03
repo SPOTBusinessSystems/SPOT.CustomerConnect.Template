@@ -1,4 +1,4 @@
-﻿var authProvider;
+var authProvider;
 
 (function () {
     'use strict';
@@ -7,9 +7,9 @@
     .module('app')
     .controller('accountcontroller', accountcontroller);
 
-    accountcontroller.$inject = ['$scope','dialogs','$rootScope','$filter','settingsService','$state','dataService','userService','configService','$compile'];
+    accountcontroller.$inject = ['$scope', 'dialogs', '$rootScope', '$filter', 'settingsService', '$state', 'dataService', 'userService', 'configService', '$compile', '$stateParams', '$ocLazyLoad'];
 
-    function accountcontroller($scope, dialogs, $rootScope, $filter, settingsService, $state, dataService, userService, configService, $compile) {
+    function accountcontroller($scope, dialogs, $rootScope, $filter, settingsService, $state, dataService, userService, configService, $compile, $stateParams, $ocLazyLoad) {
         /* jshint validthis:true */
         var vm = this;
         vm.title = 'accountcontroller';
@@ -20,11 +20,15 @@
             $scope.Customer = angular.copy(userService.getCustomer());
             $scope.Settings = configService.getProfile();
             $scope.configService = configService;
+            
+            // Password change
+            if ($stateParams.requirePasswordChange) {
+                $scope.requirePasswordChange = $stateParams.requirePasswordChange;
+            } else {
+                $scope.requirePasswordChange = false;
+            }
 
-            console.log('authprov-account');
-            console.log(configService.authProviders.anyEnabled());
-
-            console.log($scope.Settings);
+            //console.log($scope.Settings);
 
             $scope.Customer.Notifications = $filter('orderBy')($scope.Customer.Notifications, 'NotificationTypeDescription', false);
             $scope.Settings.Notifications = $filter('orderBy')($scope.Settings.Notifications, ['Description', 'MethodName'], false);
@@ -55,8 +59,6 @@
                     $scope.setBirthDays();
                     $scope.birthDate = moment($scope.Customer.Birthdate).date();
                 }
-
-                console.log($scope.Customer);
             };
 
             $scope.validEmail = function () {
@@ -68,7 +70,7 @@
                 var ci = $scope.Customer;
 
                 if ($scope.birthMonth) {
-                    ci.Birthdate = new Date(2012, $scope.birthMonth - 1, $scope.birthDate);
+                    ci.Birthdate = new Date(Date.UTC(2012, $scope.birthMonth - 1, $scope.birthDate));
                 }
 
                 if ($scope.Customer.CreditCards.length > 0) {
@@ -81,7 +83,7 @@
                         var ccIndex = ccArray[index];
 
                         if (ccIndex.CardId.startsWith('New_')) {
-                            console.log('new card')
+                            //console.log('new card')
                             // New credit card, move to new credit cards save.
                                 
                             // Empty card added but removed
@@ -120,11 +122,11 @@
                                 $scope.Customer.CreditCards.remove(ccIndex);
                             }
                         } else {
-                            console.log('existing card');
+                            //console.log('existing card');
                             if (ccIndex.CardInfo != userService.getCustomer().CreditCards[index].CardInfo || ccIndex.CardExpiration != moment(userService.getCustomer().CreditCards[index].CardExpiration).format("MM/YY")) {
                                 if (!CustomerConnect.Util.Validate.CCNumber(ccIndex.CardInfo)) {
-                                    console.log('error');
-                                    console.log(ccIndex);
+                                    //console.log('error');
+                                    //console.log(ccIndex);
                                     swal({
                                         type: 'error',
                                         title: 'Credit Card Update',
@@ -140,9 +142,9 @@
                         }
                     }
 
-                    console.log('save');
-                    console.log($scope.Customer.CreditCardsToSave);
-                    console.log($scope.Customer.CreditCards);
+                    //console.log('save');
+                    //console.log($scope.Customer.CreditCardsToSave);
+                    //console.log($scope.Customer.CreditCards);
 
                     // temp
                     //return;
@@ -215,7 +217,10 @@
                     }
                 }
 
-                var dlg = dialogs.create(settingsService.path + 'Components/Dialogs/CustomerReferral.html', 'DialogController', { Customer: $scope.Customer, Settings: $scope.Settings, Store: $scope.Store }, { size: 'sm' });
+                var p = $ocLazyLoad.load(settingsService.path + 'Components/Dialogs/DialogController.js');
+                p.then(function () {
+                    var dlg = dialogs.create(settingsService.path + 'Components/Dialogs/CustomerReferral.html', 'DialogController', { Customer: $scope.Customer, Settings: $scope.Settings, Store: $scope.Store }, { size: 'sm' });
+                });
             };
 
             $scope.convertToRoute = function () {

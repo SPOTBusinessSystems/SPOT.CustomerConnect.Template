@@ -1,4 +1,4 @@
-﻿<div class="modal-header">
+<div class="modal-header">
     <h4 class="modal-title">Refer A Friend</h4>
 </div>
 <div class="modal-body text-center">
@@ -9,22 +9,24 @@
         {{ data.Store.PhysicalAddress.Phone }}<br />
         {{ data.Store.HoursOfOperation }}
     </div>
+    <div class="form-group">
+	<hr/>
+	Share MyDryCleaner with your friends and you both receive $10.00
+    </div>
+    <div class="form-group">
+	Simply share your personal referral code and receive credit when your friend uses us for the first time
+    </div>
+    <div class="form-group">
+	<span class="btn btn-success" ng-click="inviteFriend()" role="button" tabindex="0">Invite Friends</span>
+    </div>
+    <div class="form-group">
+	<hr/>
+	<div class="text-left">
+		<label class='form-label'>Your code</label>
+	</div>
+        <span>{{ data.Customer.ReferralCode }}</span>
+    </div>
 
-    <div class="form-group">
-        <figure>
-            <img ng-src="{{ data.Customer.CustomerKeyBarcode }}" style="width: 268px;" />
-            <figcaption>{{ data.Customer.CustomerKey }}</figcaption>
-        </figure>
-    </div>
-    <div class="form-group">
-        Referring Customer<br />
-        {{ data.Customer.Name }}
-    </div>
-    <div class="form-group">
-        {{ data.Settings.General['Customer Referral']['Referral Coupon'] }}
-        <hr />
-        Please present this coupon with your first order.
-    </div>
 </div>
 <div class="modal-footer">
     <div class="row">

@@ -1,13 +1,13 @@
-﻿(function () {
+(function () {
     'use strict';
 
     angular
     .module('app')
     .controller('StatementController', StatementController);
 
-    StatementController.$inject = ['$rootScope','$scope','$uibModalInstance','blockUI','data','dialogs','settingsService','dataService', 'configService', '$q'];
+    StatementController.$inject = ['$rootScope', '$scope', '$uibModalInstance', 'blockUI', 'data', 'dialogs', 'settingsService', 'dataService', 'configService', '$q', '$ocLazyLoad'];
 
-    function StatementController($rootScope, $scope, $uibModalInstance, blockUI, data, dialogs, settingsService, dataService, configService, $q) {
+    function StatementController($rootScope, $scope, $uibModalInstance, blockUI, data, dialogs, settingsService, dataService, configService, $q, $ocLazyLoad) {
         /* jshint validthis:true */
         var vm = this;
         vm.title = 'StatementController';
@@ -61,7 +61,10 @@
             // Show Order
             $scope.ShowOrder = function (key, orders) {
                 $scope.data = { key: key, orders: orders };
-                var dlg = dialogs.create(settingsService.path + 'Components/Dialogs/Order.html', 'OrderController', $scope.data, 'sm');
+                var p = $ocLazyLoad.load(settingsService.path + 'Components/Dialogs/OrderController.js');
+                p.then(function () {
+                    var dlg = dialogs.create(settingsService.path + 'Components/Dialogs/Order.html', 'OrderController', $scope.data, 'sm');
+                });
             };
 
             $scope.close = function () {

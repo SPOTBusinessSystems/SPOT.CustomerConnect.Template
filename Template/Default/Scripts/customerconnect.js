@@ -1,11 +1,12 @@
-﻿var CustomerConnect = {
+var CustomerConnect = {
     // Public - Configuration
     Config: {
         AccountKey: null,
         SessionId: null,
         CustomerName: null,
         URL: null,
-        Settings: null
+        Settings: null,
+        ReminderURL: null
     },
 
     // Request Functions and Objects
@@ -556,7 +557,7 @@
         Validate: {
             CCExpiration: function (s) {
                 if (/^[0-9]{2}[//][0-9]{2}$/.test(s)) {
-                    if (new Date().getFullYear() < Number(s.split('/')[1]) + 2000) {
+                    if (new Date().getFullYear() <= Number(s.split('/')[1]) + 2000) {
                         return true;
                     }
                 }

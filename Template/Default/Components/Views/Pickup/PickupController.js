@@ -1,13 +1,13 @@
-﻿(function () {
+(function () {
     'use strict';
 
     angular
     .module('app')
     .controller('PickupController', PickupController);
 
-    PickupController.$inject = ['$rootScope', '$scope', 'dialogs','blockUI','$state','settingsService','dataService','userService','configService'];
+    PickupController.$inject = ['$rootScope', '$scope', 'dialogs', 'blockUI', '$state', 'settingsService', 'dataService', 'userService', 'configService', '$ocLazyLoad'];
 
-    function PickupController($rootScope, $scope, dialogs, blockUI, $state, settingsService, dataService, userService, configService) {
+    function PickupController($rootScope, $scope, dialogs, blockUI, $state, settingsService, dataService, userService, configService, $ocLazyLoad) {
         /* jshint validthis:true */
         var vm = this;
         vm.title = 'PickupController';
@@ -27,8 +27,7 @@
             // The number of days after the pickup date. Default is 2 days.
             if (Number($scope.Settings.Pickup["Minimum Days After Pickup"]) != 'NaN') {
                 $scope.DaysAfterPickup = Number($scope.Settings.Pickup["Minimum Days After Pickup"]);
-            } else
-            {
+            } else {
                 $scope.DaysAfterPickup = 2;
             }
 
@@ -41,8 +40,7 @@
             };
 
             $scope.addTimeString = function (date, time) {
-                try
-                {
+                try {
                     if (typeof time === "undefined" || time.isBlank()) {
                         return date;
                     }
@@ -54,7 +52,7 @@
                     var second = 0;
 
                     date = moment(date).startOf('day');
-                
+
                     // hour
                     if (parts.length >= 1) {
                         date = date.hours(parts[0]);
@@ -72,8 +70,7 @@
 
                     return date.toDate();
                 }
-                catch(ex)
-                {
+                catch (ex) {
                     return date;
                 }
             };
@@ -88,6 +85,26 @@
                 }
 
                 return date;
+            }
+
+            // Excludes non-business days
+            $scope.getMinDeliveryDate = function (date) {
+                var x = new Date(date);
+                x = $scope.addBusinessDays(x, $scope.DaysAfterPickup);
+                x = $scope.findNextDate(x);
+                return x;
+            };
+
+            $scope.addBusinessDays = function (date, n) {
+                var d = date;
+
+                for (var i = 0; i < n;) {
+                    var dow = d.getDay();
+                    if (dow != 0 && dow != 6)
+                        i++;
+                    d = d.addDays(1);
+                }
+                return d;
             }
 
             // Retrieve Timeslots if we need to show the time.
@@ -126,8 +143,7 @@
 
             var minDate = $scope.addTimeString(Date.now(), $scope.Route.SameDayCutoffTime);
 
-            if (minDate < Date.now())
-            {
+            if (minDate < Date.now()) {
                 minDate = moment(minDate).add(1, 'days');
             }
 
@@ -148,7 +164,7 @@
             $scope.deliveryDateOptions = {
                 formatYear: 'yy',
                 startingDay: 1,
-                minDate: new Date($scope.pickupDateOptions.minDate).addDays($scope.DaysAfterPickup),
+                minDate: $scope.getMinDeliveryDate($scope.pickupDateOptions.minDate),
                 maxDate: moment().add(3, 'months'),
                 dateDisabled: disabled
             };
@@ -221,7 +237,10 @@
             $scope.pendingPickups = function () {
                 dataService.route.getPendingPickups().then(function (data) {
                     if (!data.Failed) {
-                        var dlg = dialogs.create(settingsService.path + 'Components/Dialogs/Pickups.html', 'PickupsController', data.ReturnObject);
+                        var p = $ocLazyLoad.load(settingsService.path + 'Components/Dialogs/PickupsController.js');
+                        p.then(function () {
+                            var dlg = dialogs.create(settingsService.path + 'Components/Dialogs/Pickups.html', 'PickupsController', data.ReturnObject);
+                        });
                     } else {
                         dialogs.error('Error', 'Unable to display pending pickups.');
                     }
@@ -237,13 +256,11 @@
                     $scope.deliveryDateOptions = {
                         formatYear: 'yy',
                         startingDay: 1,
-                        minDate: new Date($scope.Pickup.Date).addDays($scope.DaysAfterPickup), // Todo need to exclude non-business days
+                        minDate: $scope.getMinDeliveryDate($scope.Pickup.Date),
                         maxDate: moment().add(3, 'months'),
                         dateDisabled: disabled
                     };
 
-                    $scope.deliveryDateOptions.minDate = $scope.findNextDate($scope.deliveryDateOptions.minDate);
-                    
                     if (new Date($scope.Pickup.DeliveryDate) < new Date($scope.deliveryDateOptions.minDate)) {
                         $scope.Pickup.DeliveryDate = $scope.deliveryDateOptions.minDate;
                     }

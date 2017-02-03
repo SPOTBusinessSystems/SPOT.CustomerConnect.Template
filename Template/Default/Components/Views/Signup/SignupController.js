@@ -1,4 +1,4 @@
-﻿(function () {
+(function () {
     'use strict';
 
     angular
@@ -25,7 +25,9 @@
                 Email: userService.getEmail(),
                 PhoneType: 'Choose Type',
                 ReferringCustomerKey: $stateParams.refkey,
-                CaptchaValid: userService.getCaptchaValid()
+                CaptchaValid: userService.getCaptchaValid(),
+                ReferralSource: "",
+                ReferralDetail: ""
             };
 
             // Init
@@ -40,6 +42,8 @@
                     }
                 });
             }
+
+            $scope.Customer.Password = { Password: '', PasswordConfirm: '', Valid: false, Done: false };
 
             // if cc shown todo
             if ($scope.Settings.Signup['Prompt for Credit Card'] == 1){
@@ -76,17 +80,50 @@
                         return (CustomerConnect.Util.Validate.CCExpiration($scope.Customer.CreditCardsToSave[0].CardExpiration) && CustomerConnect.Util.Validate.CCNumber($scope.Customer.CreditCardsToSave[0].CardInfo));
                     }
                 }
-                
+
                 // Implicit false.
                 return false;
             };
 
+            $scope.checkEmailHasError = false;
+            $scope.checkEmailErrorMessage = '';
+
             $scope.validEmail = function () {
-                return CustomerConnect.Util.Validate.EmailAddress($scope.Customer.Email);
+                return CustomerConnect.Util.Validate.EmailAddress($scope.Customer.Email) && !$scope.checkEmailHasError;
             };
 
+            $scope.checkEmail = function () {
+                dataService.customer.checkEmail($scope.Customer.Email).then(function (d) {
+                    var data = d.data;
+                    if (!data.Failed) {
+                        $scope.checkEmailHasError = false;
+                        $scope.checkEmailErrorMessage = '';
+                    } else {
+                        $scope.checkEmailHasError = true;
+                        $scope.checkEmailErrorMessage = data.Message;
+                    }
+                });
+            };
+
+            $scope.checkEmailErrorIsDuplicateEmail = function () {
+                return $scope.checkEmailErrorMessage === 'Email address already exists.';
+            };
+
+            $scope.goToLoginPage = function () {
+                $state.go('login');
+            };
+            $scope.goToLoginPangeAndResetPassword = function () {
+                $state.go('login', { forgotPasswordEmail: $scope.Customer.Email });
+            };
+
+            if ($scope.Customer.Email) {
+                $scope.checkEmail();
+            }
+
             $scope.storePass = function (pass) {
-                $scope.Customer.Password = pass;
+                console.log('storepass');
+                console.log($scope.Customer);
+                console.log(pass);
             };
 
             $scope.SaveCustomer = function () {
@@ -99,7 +136,11 @@
                     name: $scope.Customer.LastName + ', ' + $scope.Customer.FirstName,
                     emailAddress: $scope.Customer.Email,
                     serviceType: $scope.Customer.Type,
-                    password: $scope.Customer.Password,
+                    password: $scope.Customer.PasswordField.Password,
+                    referralCode: $scope.Customer.ReferralCode,
+                    referralSource: $scope.Customer.ReferralSource,
+                    referralDetail: $scope.Customer.ReferralDetail,
+                    awardId: $scope.Customer.AwardId,
                     phones: [
                         {
                             number: $scope.Customer.PhoneNumber,

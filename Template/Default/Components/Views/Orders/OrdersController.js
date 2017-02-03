@@ -1,13 +1,13 @@
-﻿(function () {
+(function () {
     'use strict';
 
     angular
     .module('app')
     .controller('OrdersController', OrdersController);
 
-    OrdersController.$inject = ['$scope', 'dialogs', 'blockUI', '$filter', '$uibModal', 'settingsService', 'dataService', 'userService', 'configService'];
+    OrdersController.$inject = ['$scope', 'dialogs', 'blockUI', '$filter', '$uibModal', 'settingsService', 'dataService', 'userService', 'configService', '$ocLazyLoad'];
 
-    function OrdersController($scope, dialogs, blockUI, $filter, $uibModal, settingsService, dataService, userService, configService) {
+    function OrdersController($scope, dialogs, blockUI, $filter, $uibModal, settingsService, dataService, userService, configService, $ocLazyLoad) {
         /* jshint validthis:true */
         var vm = this;
         vm.title = 'OrdersController';
@@ -21,6 +21,7 @@
             $scope.SingleOrder = null;
             $scope.Filters = { Status: '128', StartDate: moment().subtract(90, 'days').format(), EndDate: moment().format() };
             $scope.dateText = "Hide Dates";
+            $scope.isCollapsed = false;
             $scope.Customer = userService.getCustomer();
             $scope.Settings = configService.getProfile();
 
@@ -67,8 +68,11 @@
 
             $scope.hideShowDates = function () {
                 $scope.isCollapsed = !$scope.isCollapsed;
+                $scope.updateDateText();
+            };
 
-                if (!$scope.isCollapsed) {
+            $scope.updateDateText = function () {
+                if ($scope.isCollapsed) {
                     $scope.dateText = "Select Dates";
                 } else {
                     $scope.dateText = "Hide Dates";
@@ -119,7 +123,10 @@
             $scope.ShowOrder = function (key, orders) {
                 $scope.data = { key: key, orders: orders };
 
-                var dlg = dialogs.create(settingsService.path + 'Components/Dialogs/Order.html', 'OrderController', $scope.data, { size: 'md' });
+                var p = $ocLazyLoad.load(settingsService.path + 'Components/Dialogs/OrderController.js');
+                p.then(function () {
+                    var dlg = dialogs.create(settingsService.path + 'Components/Dialogs/Order.html', 'OrderController', $scope.data, { size: 'md' });
+                });
             };
 
             // Get first data.

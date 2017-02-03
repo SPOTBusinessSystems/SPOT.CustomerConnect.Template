@@ -1,13 +1,13 @@
-﻿(function () {
+(function () {
     'use strict';
 
     angular
     .module('app')
     .controller('GiftCardsController', GiftCardsController);
 
-    GiftCardsController.$inject = ['$scope','dialogs','blockUI','settingsService','userService','dataService'];
+    GiftCardsController.$inject = ['$scope', 'dialogs', 'blockUI', 'settingsService', 'userService', 'dataService', '$ocLazyLoad'];
 
-    function GiftCardsController($scope, dialogs, blockUI, settingsService, userService, dataService) {
+    function GiftCardsController($scope, dialogs, blockUI, settingsService, userService, dataService, $ocLazyLoad) {
         /* jshint validthis:true */
         var vm = this;
         vm.title = 'GiftCardsController';
@@ -27,18 +27,21 @@
             };
 
             $scope.AddCard = function () {
-                var dlg = dialogs.create(settingsService.path + 'Components/Dialogs/AddGiftCard.html', 'DialogController', $scope.data, { size: 'sm' });
-                dlg.result.then(function (data) {
-                    if (typeof (data) != 'undefined') {
-                        dataService.customer.redeemGiftCard().then(function (data) {
-                            if (!data.Failed) {
-                                dialogs.notify('Gift Card Reedemed', 'The gift card has been applied to your account.');
-                                $scope.LoadCards();
-                            } else {
-                                dialogs.error('Error', 'Unable to add gift card to account.');
-                            }
-                        });
-                    }
+                var p = $ocLazyLoad.load(settingsService.path + 'Components/Dialogs/DialogController.js');
+                p.then(function () {
+                    var dlg = dialogs.create(settingsService.path + 'Components/Dialogs/AddGiftCard.html', 'DialogController', $scope.data, { size: 'sm' });
+                    dlg.result.then(function (data) {
+                        if (typeof (data) != 'undefined') {
+                            dataService.customer.redeemGiftCard().then(function (data) {
+                                if (!data.Failed) {
+                                    dialogs.notify('Gift Card Reedemed', 'The gift card has been applied to your account.');
+                                    $scope.LoadCards();
+                                } else {
+                                    dialogs.error('Error', 'Unable to add gift card to account.');
+                                }
+                            });
+                        }
+                    });
                 });
             };
 

@@ -1,4 +1,4 @@
-﻿<div ng-controller="LoginController" class="smallPage">
+<div ng-controller="LoginController" class="smallPage">
     <div class="text-center">
         <h2>Login</h2>
         <br />
@@ -6,9 +6,9 @@
 
     <form name="loginForm" ng-submit="loginUser();" novalidate>
         <div class="form-group">
-            <div class="input-group has-feedback" ng-class="{'has-error':loginForm.loginEmail.$dirty && !validEmail(), 'has-success':loginForm.loginEmail.$dirty && validEmail()}">
+            <div class="input-group has-feedback" ng-class="{'has-error':!loginForm.loginEmail.$dirty, 'has-success':loginForm.loginEmail.$dirty}">
                 <span class="input-group-addon"><i class="glyphicon glyphicon-envelope"></i></span>
-                <input type="email" class="form-control" ng-model="emailAddress" name="loginEmail" placeholder="Email Address" title="Please enter your email address." required />
+                <input type="text" class="form-control" ng-model="emailAddress" name="loginEmail" placeholder="Email Address or Customer ID" title="Please enter your email address or customer ID." required />
                 <span class="glyphicon glyphicon-remove form-control-feedback" aria-hidden="true" ng-if="loginForm.loginEmail.$dirty && !validEmail()"></span>
                 <span class="glyphicon glyphicon-ok form-control-feedback" aria-hidden="true" ng-if="loginForm.loginEmail.$dirty && validEmail()"></span>
             </div>
@@ -43,7 +43,7 @@
 
         <div class="row" style="margin-top: 35px;" ng-if="configService.authProviders.anyEnabled()">
             <div class="col-sm-6" style="padding: 3px;" ng-if="configService.authProviders.facebook.enabled">
-                <facebook-auth on-login="getCustomer()"></facebook-auth>    
+                <facebook-auth on-login="getCustomer()"></facebook-auth>
             </div>
             <div class="col-sm-6" style="padding: 3px;" ng-if="configService.authProviders.google.enabled">
                 <google-auth on-login="getCustomer()"></google-auth>
@@ -52,4 +52,21 @@
 
         <input type="submit" style="display: none;" />
     </form>
+
+    <div style="margin-top: 40px;">
+        <div class="input-group">
+            <input ng-model="giftCardNumbers" name="giftCardNumbers" id="giftCardNumbers" type="text" class="form-control" placeholder="Enter gift card number(s)" title="Gift card number or numbers separated with comma" />
+            <span class="input-group-btn">
+                <button class="btn btn-default" type="button" ng-click="getGiftCardsBalances()">Check Balance</button>
+            </span>
+        </div>
+        <div class="alert alert-danger" role="alert" ng-if="checkGiftCardBalanceErrorMessage">
+            {{checkGiftCardBalanceErrorMessage}}
+        </div>
+        <div class="alert alert-info" role="alert" ng-if="checkGiftCardBalanceResult">
+            <div ng-repeat="c in checkGiftCardBalanceResult">
+                {{c.Number}}: {{c.Balance}}
+            </div>
+        </div>
+    </div>
 </div>

@@ -1,4 +1,4 @@
-﻿(function() {
+﻿(function () {
     'use strict';
 
     angular
@@ -8,11 +8,11 @@
         .service('dataService', dataService)
         .service('apiConfig', apiConfig);
 
-    
+
     userService.$inject = [];
     apiConfig.$inject = [];
     dataService.$inject = ['$http', '$q', 'apiConfig'];
-    configService.$inject = ['dataService','$q'];
+    configService.$inject = ['dataService', '$q', '$ocLazyLoad'];
 
     function apiConfig() {
         this.setURL = function (url) {
@@ -58,14 +58,18 @@
         this.authProviders = {
             // Setup
             setup: function () {
-                var deferred = $q.defer();
+                //var deferred = $q.defer();
+                //parent.authProviders.google.init().then(function () {
+                //    parent.authProviders.facebook.init();
+                //    deferred.resolve();
+                //});
+                //return deferred.promise;
 
-                parent.authProviders.google.init().then(function () {
-                    parent.authProviders.facebook.init();
-                    deferred.resolve();
-                });
 
-                return deferred.promise;
+                return Promise.all([
+                                   parent.authProviders.google.init(),
+                                   parent.authProviders.facebook.init()
+                ]);
             },
 
             anyEnabled: function () {
@@ -84,13 +88,12 @@
 
                         if (g !== null) {
                             if (g.Enabled === "1") {
-                                if (g.AppID.length > 0 && typeof(FB) !== "undefined") {
+                                if (g.AppID.length > 0 && typeof (FB) !== "undefined") {
                                     this.enabled = true;
                                     this.appId = g.AppID;
 
                                     // Facebook API
-                                    try
-                                    {
+                                    try {
                                         FB.init({
                                             appId: g.AppID,
                                             status: true,
@@ -101,8 +104,7 @@
 
                                         console.log('Facebook set up.');
                                     }
-                                    catch(err)
-                                    {
+                                    catch (err) {
                                         this.enabled = false;
                                         console.log('Unable to initialize Facebook SDK.');
                                     }
@@ -194,12 +196,11 @@
 
                         if (g !== null) {
                             if (g.Enabled === "1") {
-                                if (g.ClientID.length > 0 && typeof(gapi) !== "undefined") {
+                                if (g.ClientID.length > 0 && typeof (gapi) !== "undefined") {
                                     this.enabled = true;
                                     this.clientid = g.ClientID;
 
-                                    try
-                                    {
+                                    try {
                                         // Google API
                                         gapi.load('auth2', function () {
                                             gapi.auth2.init({
@@ -209,8 +210,7 @@
 
                                         console.log('Google set up.');
                                     }
-                                    catch(err)
-                                    {
+                                    catch (err) {
                                         this.enabled = false;
                                         console.log('Google SDK failed to initialize.');
                                     }
@@ -337,7 +337,7 @@
             return this.initialized;
         };
     }
-    
+
     function userService() {
         this.setEmail = function (email) {
             this.email = email;
@@ -370,7 +370,7 @@
         this.getCustomer = function () {
             return this.customer;
         };
-        
+
         this.setMessages = function (messages) {
             this.messages = messages;
         };
@@ -461,8 +461,12 @@
                 return createRequest('GiftCardBalance', { giftCardNumber: giftCardNumber }).then(handleSuccess, handleError);
             },
 
+            retrieveGiftCardsBalances: function (cardNumbers) {
+                return createRequest('GiftCardsBalances', _.map(cardNumbers, function (x) { return { Number: x }; })).then(handleSuccess, handleError);
+            },
+
             retrieveReferralInfo: function (id) {
-                return createRequest('RetrieveReferralInfo', {id: id}).then(handleSuccess, handleError);
+                return createRequest('RetrieveReferralInfo', { id: id }).then(handleSuccess, handleError);
             },
 
             saveCustomer: function (body) {
@@ -475,6 +479,14 @@
 
             signupCustomer: function (body) {
                 return createRequest('Signup', body).then(handleSuccess, handleError);
+            },
+
+            checkEmail: function (emailAddress) {
+                return createRequest('CheckEmail', { emailAddress: emailAddress });
+            },
+
+            inviteFriend: function (body) {
+                return createRequest('CreateReferralRequest', body).then(handleSuccess, handleError);
             }
         };
 
@@ -518,12 +530,30 @@
 
         // Settings
         var settings = {
+            getSpecificSettings: function (customerConnectSettings, notifications, preferences, referralSources, states, timeSlots, stores, routes) {
+                return createRequest('GetSpecificSettings',
+                    {
+                        CustomerConnectSettings: customerConnectSettings,
+                        Notifications: notifications,
+                        Preferences: preferences,
+                        ReferralSources: referralSources,
+                        States: states,
+                        TimeSlots: timeSlots,
+                        Stores: stores,
+                        Routes: routes
+                    }).then(handleSuccess, handleError);
+            },
+
             getNotifications: function () {
                 return createRequest('GetNotifications', null).then(handleSuccess, handleError);
             },
 
             getPreferences: function () {
                 return createRequest('GetPreferences', null).then(handleSuccess, handleError);
+            },
+
+            getReferralSources: function () {
+                return createRequest('GetReferralSources', null).then(handleSuccess, handleError);
             },
 
             getSettings: function () {
@@ -637,7 +667,7 @@
                 async: true,
                 contentType: "application/json",
                 dataType: "json",
-                headers: {'Content-Type': null}
+                headers: { 'Content-Type': null }
             });
         }
 

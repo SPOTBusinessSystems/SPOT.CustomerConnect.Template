@@ -1,13 +1,13 @@
-﻿(function () {
+(function () {
     'use strict';
 
     angular
     .module('app')
     .controller('StatementsController', StatementsController);
 
-    StatementsController.$inject = ['$scope','dialogs','blockUI','$filter','settingsService','userService','dataService'];
+    StatementsController.$inject = ['$scope', 'dialogs', 'blockUI', '$filter', 'settingsService', 'userService', 'dataService', '$ocLazyLoad'];
 
-    function StatementsController($scope, dialogs, blockUI, $filter, settingsService, userService, dataService) {
+    function StatementsController($scope, dialogs, blockUI, $filter, settingsService, userService, dataService, $ocLazyLoad) {
         /* jshint validthis:true */
         var vm = this;
         vm.title = 'StatementsController';
@@ -52,7 +52,10 @@
 
             $scope.ShowStatement = function (key) {
                 $scope.key = key;
-                var dlg = dialogs.create(settingsService.path + 'Components/Dialogs/Statement.html', 'StatementController', $scope.key, 'lg');
+                var p = $ocLazyLoad.load(settingsService.path + 'Components/Dialogs/StatementController.js');
+                p.then(function () {
+                    var dlg = dialogs.create(settingsService.path + 'Components/Dialogs/Statement.html', 'StatementController', $scope.key, 'lg');
+                });
             };
 
             $scope.init = function () {

@@ -1,4 +1,4 @@
-﻿(function () {
+(function () {
     'use strict';
 
     angular.module('app').component('siteFooter', {
@@ -12,7 +12,7 @@
                 ctrl.settings = configService;
                 ctrl.tokens = {};
 
-                console.log(ctrl.settings.getProfile());
+                //console.log(ctrl.settings.getProfile());
 
                 if (ctrl.settings.getProfile()) {
                     if (ctrl.settings.getProfile().General['Show Footer'] == "1") {

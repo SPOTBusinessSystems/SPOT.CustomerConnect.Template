@@ -1,4 +1,4 @@
-﻿(function () {
+(function () {
     'use strict';
 
     angular
@@ -46,7 +46,7 @@
                     if (data.Failed == false) {
                         dataService.user.getMessages().then(function (data) {
                             if (data.Failed == false) {
-                                console.log(data);
+                                //console.log(data);
                                 userService.setMessages(data.ReturnObject);
                             }
 

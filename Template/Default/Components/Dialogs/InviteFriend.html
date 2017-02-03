@@ -1,0 +1,29 @@
+<div class="modal-header">
+    <h4 class="modal-title">Invite Friend</h4>
+</div>
+<div class="modal-body">
+    <div class="form-group">
+        <div class="">
+            <label class="control-label">First Name</label>
+            <input class="form-control" type="text" placeholder="Friend's first name. (Required)" ng-model="data.firstName" required />
+        </div>
+        <div class="">
+            <label class="control-label">Last Name</label>
+            <input class="form-control" type="text" placeholder="Friend's last name. (Required)" ng-model="data.lastName" required />
+        </div>
+        <div class="">
+            <label class="control-label">Email</label>
+            <input class="form-control" type="email" placeholder="Friend's email. (Required)" ng-model="data.emailAddress" required />
+        </div>
+    </div>
+    <div class="modal-footer">
+        <div class="row">
+            <div class="col-sm-6" style="padding: 3px;">
+                <label class="btn btn-success btn-block" ng-click="done()">Apply</label>
+            </div>
+            <div class="col-sm-6" style="padding: 3px;">
+                <label class="btn btn-danger btn-block" ng-click="cancel()">Cancel</label>
+            </div>
+        </div>
+    </div>
+</div>
