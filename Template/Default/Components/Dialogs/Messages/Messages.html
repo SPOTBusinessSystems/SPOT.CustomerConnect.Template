@@ -22,8 +22,8 @@
             </tbody>
         </table>
     </div>
-    <div class="form-group text-center">
-        <pagination boundary-links="true" max-size="3" items-per-page="itemsPerPage" total-items="Messages.length" ng-model="currentPage" ng-change="pageChanged()" num-pages="NumPages" previous-text="&lsaquo;" next-text="&rsaquo;" first-text="&laquo;" last-text="&raquo;"></pagination>
+    <div class="form-group text-center" ng-if="numPages > 1">
+        <uib-pagination boundary-links="true" max-size="3" items-per-page="itemsPerPage" total-items="Messages.length" ng-model="currentPage" ng-change="pageChanged()" num-pages="numPages" previous-text="&lsaquo;" next-text="&rsaquo;" first-text="&laquo;" last-text="&raquo;"></uib-pagination>
     </div>
 </div>
 

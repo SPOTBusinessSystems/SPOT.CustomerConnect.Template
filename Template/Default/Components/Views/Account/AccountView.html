@@ -18,17 +18,24 @@
                 <span class="glyphicon glyphicon-ok form-control-feedback" aria-hidden="true" ng-if="validEmail() && basicForm.email.$dirty"></span>
             </div>
 
-            <div class="input-group has-feedback" ng-class="{'has-error':basicForm.firstname.$invalid && basicForm.firstname.$dirty, 'has-success':basicForm.firstname.$valid && basicForm.firstname.$dirty}">
+            <div class="input-group has-feedback" ng-class="{'has-error':basicForm.firstname.$invalid && basicForm.firstname.$dirty, 'has-success':basicForm.firstname.$valid && basicForm.firstname.$dirty}" ng-if="isFirstLastName()">
                 <span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span>
                 <input id="firstName" name="firstname" ng-model="Customer.FirstName" class="form-control" placeholder="First Name (Required)" required />
                 <span class="glyphicon glyphicon-remove form-control-feedback" aria-hidden="true" ng-if="basicForm.firstname.$invalid && basicForm.firstname.$dirty"></span>
                 <span class="glyphicon glyphicon-ok form-control-feedback" aria-hidden="true" ng-if="basicForm.firstname.$valid && basicForm.firstname.$dirty"></span>
             </div>
-            <div class="input-group has-feedback" ng-class="{'has-error':basicForm.lastname.$invalid && basicForm.lastname.$dirty, 'has-success':basicForm.lastname.$valid && basicForm.lastname.$dirty}">
+            <div class="input-group has-feedback" ng-class="{'has-error':basicForm.lastname.$invalid && basicForm.lastname.$dirty, 'has-success':basicForm.lastname.$valid && basicForm.lastname.$dirty}" ng-if="isFirstLastName()">
                 <span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span>
                 <input id="lastName" name="lastname" ng-model="Customer.LastName" class="form-control" placeholder="Last Name (Required)" required />
                 <span class="glyphicon glyphicon-remove form-control-feedback" aria-hidden="true" ng-if="basicForm.lastname.$invalid && basicForm.lastname.$dirty"></span>
                 <span class="glyphicon glyphicon-ok form-control-feedback" aria-hidden="true" ng-if="basicForm.lastname.$valid && basicForm.lastname.$dirty"></span>
+            </div>
+
+            <div class="input-group has-feedback" ng-class="{'has-error':basicForm.name.$invalid && basicForm.name.$dirty, 'has-success':basicForm.name.$valid && basicForm.name.$dirty}" ng-if="isName()">
+                <span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span>
+                <input id="Name" name="name" ng-model="Customer.Name" class="form-control" placeholder="Name (Required)" required />
+                <span class="glyphicon glyphicon-remove form-control-feedback" aria-hidden="true" ng-if="basicForm.name.$invalid && basicForm.name.$dirty"></span>
+                <span class="glyphicon glyphicon-ok form-control-feedback" aria-hidden="true" ng-if="basicForm.name.$valid && basicForm.name.$dirty"></span>
             </div>
 
             <div class="form-group" style="display:table-row;">

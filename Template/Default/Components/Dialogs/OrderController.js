@@ -5,9 +5,9 @@
     .module('app')
     .controller('OrderController', OrderController);
 
-    OrderController.$inject = ['$rootScope', '$scope', '$uibModalInstance', 'blockUI', 'data', 'dataService','configService'];
+    OrderController.$inject = ['$rootScope', '$scope', '$uibModalInstance', 'blockUI', 'data', 'dataService', 'configService', 'dialogs'];
 
-    function OrderController($rootScope, $scope, $uibModalInstance, blockUI, data, dataService, configService) {
+    function OrderController($rootScope, $scope, $uibModalInstance, blockUI, data, dataService, configService, dialogs) {
         /* jshint validthis:true */
         var vm = this;
         vm.title = 'OrderController';

@@ -20,7 +20,7 @@ var authProvider;
             $scope.Customer = angular.copy(userService.getCustomer());
             $scope.Settings = configService.getProfile();
             $scope.configService = configService;
-            
+
             // Password change
             if ($stateParams.requirePasswordChange) {
                 $scope.requirePasswordChange = $stateParams.requirePasswordChange;
@@ -65,6 +65,14 @@ var authProvider;
                 return CustomerConnect.Util.Validate.EmailAddress($scope.Customer.EmailAddress);
             }
 
+            $scope.isFirstLastName = function () {
+                return !$scope.isName();
+            }
+
+            $scope.isName = function () {
+                return $scope.Customer.CustomerType == "Business" || $scope.Customer.CustomerType == "Hotel";
+            }
+
             // Save Records
             $scope.SaveAccount = function () {
                 var ci = $scope.Customer;
@@ -78,14 +86,13 @@ var authProvider;
                     var ccArray = $scope.Customer.CreditCards;
 
                     // Loop checking for changes.
-                    for (var index = 0; index < ccArray.length; index++)
-                    {
+                    for (var index = 0; index < ccArray.length; index++) {
                         var ccIndex = ccArray[index];
 
                         if (ccIndex.CardId.startsWith('New_')) {
                             //console.log('new card')
                             // New credit card, move to new credit cards save.
-                                
+
                             // Empty card added but removed
                             if (ccIndex.MarkDeleted) {
                                 $scope.Customer.CreditCards.remove(ccIndex);
@@ -102,8 +109,7 @@ var authProvider;
                                 return;
                             }
 
-                            if (!$scope.Customer.CreditCardsToSave)
-                            {
+                            if (!$scope.Customer.CreditCardsToSave) {
                                 $scope.Customer.CreditCardsToSave = [];
                             }
 

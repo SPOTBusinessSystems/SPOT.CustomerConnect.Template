@@ -29,7 +29,7 @@
     var ccApp = angular.module('app', [
                 'ui.router',
                 'ngTouch',
-//                'ngAnimate',
+                'ngAnimate',
                 'ui.bootstrap',
                 'dialogs.main',
                 'mgo-angular-wizard',
@@ -38,7 +38,7 @@
                 'tmh.dynamicLocale',
                 'ui.mask',
                 'vcRecaptcha',
-//                'ngMaterial',
+                'ngMaterial',
                 'ngMessages',
                 'ngAria',
                 'oc.lazyLoad'
@@ -63,6 +63,63 @@
             return new Settings();
         }];
     });
+
+
+    ccApp.factory('googleAnalyticsService', ['$window', '$ocLazyLoad', function ($window, $ocLazyLoad) {
+        var isLoaded = false;
+        return {
+            load: function (Settings, onCompleted) {
+
+                if (Settings && Settings.General && Settings.General["Google Analytics"]
+                    && (Settings.General["Google Analytics"]["Google Analytics Enabled"] == 1)
+                    && Settings.General["Google Analytics"]["Account Key"]) {
+
+                    var key = Settings.General["Google Analytics"]["Account Key"];
+                    var i = window;
+                    var r = 'ga';
+
+                    (function (i, s, o, g, r, a, m) {
+                        i['GoogleAnalyticsObject'] = r; i[r] = i[r] || function () {
+                            (i[r].q = i[r].q || []).push(arguments)
+                        }, i[r].l = 1 * new Date();
+                    })(window, document, 'script', '//www.google-analytics.com/analytics.js', 'ga');
+
+                    $ocLazyLoad.load('googleAnalytics').then(function () {
+
+                        if (Settings.General["Google Analytics"]["Cross Domain Linker"] == '1') {
+                            $window.ga('create', key, 'auto', { 'allowLinker': true });
+                            ga('require', 'linker');
+                            var domains = Settings.General["Google Analytics"]["Cross Link Domains"].split(";");
+                            ga('linker:autoLink', domains);
+                        }
+                        else
+                            $window.ga('create', key, 'auto');
+
+
+                        console.log('Google Analytics loaded');
+                        isLoaded = true;
+                        if (onCompleted)
+                            onCompleted();
+                    });
+                }
+                else
+                    if (onCompleted)
+                        onCompleted();
+            },
+
+            pageview: function (url) {
+                if (!isLoaded || !$window.ga)
+                    return;
+
+                var p = url.toLowerCase();
+                if (p != '/init') {//ignore this state
+                    $window.ga('send', 'pageview', p);
+                }
+                console.log('Google Analytics pageview ' + p);
+            }
+
+        }
+    }]);
 
 
     ccApp.config(function ($stateProvider, $urlRouterProvider, $urlMatcherFactoryProvider,
@@ -126,8 +183,8 @@
                 },
                 {
                     name: 'account',
-                    files: [scriptPath('angular-material-bundle.min.js?v=1.0.0'),
-                            cssPath('styles-material-bundle.min.css'),
+                    files: [cssPath('styles-material-bundle.min.css'),
+                            scriptPath('angular-material-bundle.min.js?v=1.0.0'),
 
                             componentPath('Base/CreditCard.js'),
                             componentPath('Controls/CreditCards.js'),
@@ -208,7 +265,12 @@
                             files: [componentPath('Shared/Notifications/Notifications.js'),
                                     controllerPath('Notifications')
                             ]
-                        }
+                        },
+                 {
+                     name: 'googleAnalytics',
+                     files: ['https://www.google-analytics.com/analytics.js'
+                     ]
+                 }
             ]
         });
 
@@ -327,10 +389,15 @@
                 '<site-footer></site-footer>'
             ].join(''),
             resolve: {
-                loadSettings: function ($q, apiConfig, configService, dataService, localStorageService, tmhDynamicLocale, settingsService, $stateParams) {
-                    console.groupCollapsed('loadingSettings');
+                loadSettings: function ($q, apiConfig, configService, dataService, localStorageService, tmhDynamicLocale, settingsService, $stateParams, googleAnalyticsService) {
+                    return new Promise(function (resolve, reject) {
 
-                    var deferred = $q.defer();
+                        var onResolve = function () {
+                            console.groupEnd();
+                            resolve();
+                        }
+
+                        console.groupCollapsed('loadingSettings');
 
                     if (!configService.isInitialized()) {
                         console.log('loading settings');
@@ -346,6 +413,8 @@
 
                             //Temp for testing
                             //localStorageService.remove("ccCache");
+
+                            onResolve();
                         } else {
                             dataService.settings.getSpecificSettings(true, true, true, true, true, true, true, true).then(function (data) {
                                 var Settings = null;
@@ -426,15 +495,12 @@
                                     // Config is initialized.
                                     configService.init(true);
 
-                                    console.groupEnd();
-
-                                    deferred.resolve();
+                                    googleAnalyticsService.load(Settings, onResolve);
                                 });
                             });
                         }
-
-                        return deferred.promise;
                     }
+                    });
                 }
             }
         });
@@ -449,7 +515,7 @@
     });
 
     // Restriction
-    ccApp.run(function ($rootScope, userService, $state) {
+    ccApp.run(function ($rootScope, userService, $state, googleAnalyticsService) {
         // enumerate routes that don't need authentication
         var routesThatDontRequireAuth = ['/login', '/init', '/signup?refid&refkey', '/reminder/:key', '/confirmation?Status&Type&PickupDate&TransactionID&Comment', '/notifications?Id'];
 
@@ -469,6 +535,11 @@
                 ev.preventDefault();
                 $state.go('init', { returnState: to.name });
             }
+        });
+
+        $rootScope.$on('$stateChangeSuccess', function (event, to) {
+            console.log(to);
+            googleAnalyticsService.pageview(to.url);
         });
 
         $rootScope.$on('$routeChangeSuccess', function () {

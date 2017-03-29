@@ -15,6 +15,7 @@
         (function () {
             $scope.configService = configService;
             $scope.requiresPasswordChange = false;
+            $scope.Settings = configService.getProfile();
 
 
             if (localStorageService.get(CustomerConnect.Config.Tenant + '_e') != null) {

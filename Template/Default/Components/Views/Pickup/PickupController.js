@@ -122,7 +122,7 @@
             }
 
             // Initialize variables.
-            $scope.Pickup = { Comments: '', Instructions: '', Date: null, DeliveryDate: null, Visit: 'Pickup', DeliveryComments: '' };
+            $scope.Pickup = { Comments: '', Instructions: '', Date: null, DeliveryDate: null, Visit: 'Pickup', DeliveryComments: '', AcceptTerms: false };
             $scope.pickupTimeSlot = '';
             $scope.deliveryTimeSlot = '';
 
@@ -217,6 +217,10 @@
                         pickup.deliveryStartTime = $scope.deliveryTime.StartTime;
                         pickup.deliveryEndTime = $scope.deliveryTime.EndTime;
                     }
+                }
+
+                if ($scope.Settings.Pickup['Terms and Conditions Acceptance Required'] == 1) {
+                    pickup.acceptTerms = $scope.Pickup.AcceptTerms ? 1 : 0;
                 }
 
                 dataService.route.savePickup(pickup).then(function (data) {

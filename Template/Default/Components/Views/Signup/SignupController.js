@@ -5,7 +5,7 @@
     .module('app')
     .controller('SignupController', SignupController);
 
-    SignupController.$inject = ['$scope','dialogs','blockUI','$state','userService','$stateParams','$rootScope','vcRecaptchaService','dataService','configService'];
+    SignupController.$inject = ['$scope', 'dialogs', 'blockUI', '$state', 'userService', '$stateParams', '$rootScope', 'vcRecaptchaService', 'dataService', 'configService'];
 
     function SignupController($scope, dialogs, blockUI, $state, userService, $stateParams, $rootScope, vcRecaptchaService, dataService, configService) {
         /* jshint validthis:true */
@@ -27,7 +27,8 @@
                 ReferringCustomerKey: $stateParams.refkey,
                 CaptchaValid: userService.getCaptchaValid(),
                 ReferralSource: "",
-                ReferralDetail: ""
+                ReferralDetail: "",
+                AcceptTerms: false
             };
 
             // Init
@@ -46,7 +47,7 @@
             $scope.Customer.Password = { Password: '', PasswordConfirm: '', Valid: false, Done: false };
 
             // if cc shown todo
-            if ($scope.Settings.Signup['Prompt for Credit Card'] == 1){
+            if ($scope.Settings.Signup['Prompt for Credit Card'] == 1) {
                 $scope.Customer.CreditCardsToSave = [{ CardInfo: null, CardExpiration: null }];
             }
 
@@ -155,8 +156,13 @@
                         State: $scope.Customer.State,
                         Zip: $scope.Customer.Zip
                     },
-                    referringCustomerKey: $scope.Customer.ReferringCustomerKey
+                    referringCustomerKey: $scope.Customer.ReferringCustomerKey,
+                    comments: $scope.Customer.Comments
                 };
+
+                if ($scope.Settings.Signup['Terms and Conditions Acceptance Required'] == 1) {
+                    ci.acceptTerms = $scope.Customer.AcceptTerms ? 1 : 0;
+                }
 
                 if ($scope.Customer.CreditCardsToSave) {
                     if ($scope.Customer.CreditCardsToSave[0]) {
@@ -181,6 +187,16 @@
 
             $scope.setWidgetId = function (widgetId) {
                 $scope.CaptchaID = widgetId;
+            };
+            
+            $scope.isSaveDisabled = function () {
+                if (!($scope.Settings.Signup['Terms and Conditions Acceptance Required'] == 1))
+                    return false;
+
+                if ($scope.Customer.AcceptTerms)
+                    return false;
+
+                return true;
             };
         })();
     }

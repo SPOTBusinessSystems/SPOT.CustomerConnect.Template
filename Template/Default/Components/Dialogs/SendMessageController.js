@@ -5,9 +5,9 @@
     .module('app')
     .controller('SendMessageController', SendMessageController);
 
-    SendMessageController.$inject = ['$rootScope', '$scope', 'dialogs', 'blockUI', 'vcRecaptchaService', 'userService', 'settingsService', 'dataService', 'configService', '$ocLazyLoad'];
+    SendMessageController.$inject = ['$rootScope', '$scope', 'dialogs', 'blockUI', 'vcRecaptchaService', 'userService', 'settingsService', 'dataService', 'configService', '$ocLazyLoad', 'googleAnalyticsService'];
 
-    function SendMessageController($rootScope, $scope, dialogs, blockUI, vcRecaptchaService, userService, settingsService, dataService, configService, $ocLazyLoad) {
+    function SendMessageController($rootScope, $scope, dialogs, blockUI, vcRecaptchaService, userService, settingsService, dataService, configService, $ocLazyLoad, googleAnalyticsService) {
         /* jshint validthis:true */
         var vm = this;
         vm.title = 'SendMessageController';
@@ -28,8 +28,11 @@
                     $scope.data.InvoiceId = null;
                 }
 
-                var p = $ocLazyLoad.load(settingsService.path + 'Components/Dialogs/DialogController.js');
+                var p = $ocLazyLoad.load([settingsService.path + 'Components/Dialogs/DialogController.js',
+                                         '//www.google.com/recaptcha/api.js?onload=vcRecaptchaApiLoaded&render=explicit']);
                 p.then(function () {
+                    googleAnalyticsService.pageview('/sendmessage');
+
                     var dlg = dialogs.create(settingsService.path + 'Components/Dialogs/SendMessage.html', 'DialogController', $scope.data);
                     dlg.result.then(function (data) {
                         if (typeof (data) != 'undefined') {

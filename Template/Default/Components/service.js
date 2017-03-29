@@ -267,8 +267,8 @@
                             .then(function (data) {
                                 if (data) {
                                     if (data.getId() && data.getId().length > 0) {
-                                        const basicProfile = data.getBasicProfile();
-                                        const authResponse = data.getAuthResponse();
+                                        var basicProfile = data.getBasicProfile();
+                                        var authResponse = data.getAuthResponse();
 
                                         data.googleId = basicProfile.getId();
                                         data.tokenObj = authResponse;

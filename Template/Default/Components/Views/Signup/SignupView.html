@@ -7,7 +7,7 @@
                 <div class="form-group">
                     <div class="input-group has-feedback" ng-class="{'has-error':!validEmail(), 'has-success':validEmail()}">
                         <span class="input-group-addon"><i class="glyphicon glyphicon-envelope"></i></span>
-                        <input type="email" id="emailAddress" name="email" ng-model="Customer.Email" class="form-control" placeholder="Email Address (Required)" required ng-blur="checkEmail()"/>
+                        <input type="email" id="emailAddress" name="email" ng-model="Customer.Email" class="form-control" placeholder="Email Address (Required)" required ng-blur="checkEmail()" />
                         <span class="glyphicon glyphicon-remove form-control-feedback" aria-hidden="true" ng-if="!validEmail() && (form.email.$dirty || form.email.value.length > 0)"></span>
                         <span class="glyphicon glyphicon-ok form-control-feedback" aria-hidden="true" ng-if="validEmail() && (form.email.$dirty || form.email.value.length > 0)"></span>
                     </div>
@@ -140,6 +140,20 @@
                 </div>
             </form>
         </wz-step>
+        <wz-step wz-title="Note" wz-disabled="{{ Settings.Signup['Comments on Signup'] != 1 }}">
+            <h2>Comments</h2>
+            <!-- Comments -->
+            <form novalidate>
+                <div class="form-group">
+                    <!--<label for="comments" class="control-label">Comments</label>-->
+                    <textarea name="comments" class="form-control" ng-model="Customer.Comments" placeholder="Enter Comments (optional)" title="Please enter a comments" maxlength="255" rows="6"></textarea>
+                </div>
+                <div class="form-group">
+                    <input type="button" class="btn btn-danger" wz-previous value="Go Back" />
+                    <input type="submit" class="btn btn-success" wz-next value="Continue" />
+                </div>
+            </form>
+        </wz-step>
         <wz-step wz-title="Confirm">
             <h2>Confirm</h2>
             <div class="form-group">
@@ -169,13 +183,24 @@
                 </div>
             </div>
 
+            <div class="form-group" ng-if="Settings.Signup['Terms and Conditions Acceptance Required']==1">
+                <div class="input-group terms-input">
+                    <label for="cbAcceptTerms">
+                        <input type="checkbox" id="cbAcceptTerms" ng-model="Customer.AcceptTerms" />
+                        <span>
+                            I have read and accept the company's standard <a target="_blank" href="{{Settings.Signup['Terms and Conditions URL']}}">Terms & Conditions</a> relating to Home/Office collection and delivery services.
+                        </span>
+                    </label>
+                </div>
+            </div>
+
             <form novalidate>
                 <div ng-if="Settings.General['Enable Captcha'] == 1 && !Customer.CaptchaValid" vc-recaptcha key="'6LcFpwUTAAAAADf8OJeuriHgIZiI6Av9hcC3wqok'" on-create="setWidgetId(widgetId)"></div>
             </form>
 
             <div class="form-group">
                 <input type="button" class="btn btn-danger" wz-previous value="Go Back" />
-                <input type="submit" class="btn btn-success" wz-finish value="Save" />
+                <input type="submit" class="btn btn-success" wz-finish value="Save" ng-disabled="isSaveDisabled()" />
             </div>
         </wz-step>
     </wizard>

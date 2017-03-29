@@ -89,7 +89,7 @@
 
                 dataService.ar.savePayment(cc.CardId, cc.CardInfo, cc.CardExpiration, saveCard, $scope.AR.Payment.Amount + '').then(function (data) {
                     if (!data.Failed) {
-                        var dlg = dialogs.notify('Payment submitted', 'Your payment has been submitted and will reflect on your account in up to 24 hours.');
+                        var dlg = dialogs.notify('Payment submitted', 'Your payment has been submitted and will reflect on your account in up to 24 business hours.');
                         dlg.result.then(function () {
                             $state.reload();
                         });

@@ -371,12 +371,12 @@ var CustomerConnect = {
             return new CustomerConnect.Request.CreateRequest('GetStates', null);
         },
 
-        GetTimeSlots: function() {
+        GetTimeSlots: function () {
             return new CustomerConnect.Request.CreateRequest('GetTimeSlots', null);
         },
 
         StoreJSON: function (name, json) {
-            return new CustomerConnect.Request.CreateRequest('StoreJSON', { name: name, json: json});
+            return new CustomerConnect.Request.CreateRequest('StoreJSON', { name: name, json: json });
         },
 
         RetrieveJSON: function (name) {
@@ -557,9 +557,12 @@ var CustomerConnect = {
         Validate: {
             CCExpiration: function (s) {
                 if (/^[0-9]{2}[//][0-9]{2}$/.test(s)) {
-                    if (new Date().getFullYear() <= Number(s.split('/')[1]) + 2000) {
+
+                    var d = new Date(new Date().getFullYear(), new Date().getMonth() + 1, 1);
+                    var expDate = new Date(Number(s.split('/')[1]) + 2000, Number(s.split('/')[0]), 1);
+
+                    if (expDate >= d)
                         return true;
-                    }
                 }
                 return false;
             },

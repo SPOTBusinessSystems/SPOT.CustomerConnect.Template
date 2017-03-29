@@ -4,7 +4,7 @@
     angular.module('app').component('mainMenu', {
         bindings: {
         },
-        controller: function (dataService, userService, configService, $state, localStorageService, dialogs, settingsService, $interval, $ocLazyLoad) {
+        controller: function (dataService, userService, configService, $state, localStorageService, dialogs, settingsService, $interval, $ocLazyLoad, googleAnalyticsService) {
             var ctrl = this;
 
             this.$onInit = function () {
@@ -26,6 +26,7 @@
                     var p = $ocLazyLoad.load(settingsService.path + 'Components/Dialogs/Messages/MessagesController.js');
 
                     p.then(function () {
+                        googleAnalyticsService.pageview('/messages');
                         var dlg = dialogs.create(settingsService.path + 'Components/Dialogs/Messages/Messages.html', 'MessagesController', ctrl.data);
                         dlg.result.then(function (data) {
                             ctrl.unreadMessages = userService.unreadMessageCount();

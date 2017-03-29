@@ -53,7 +53,7 @@
         <input type="submit" style="display: none;" />
     </form>
 
-    <div style="margin-top: 40px;">
+    <div style="margin-top: 40px;" ng-if='Settings.General["Gift Card Balance Check Enabled"] == 1'>
         <div class="input-group">
             <input ng-model="giftCardNumbers" name="giftCardNumbers" id="giftCardNumbers" type="text" class="form-control" placeholder="Enter gift card number(s)" title="Gift card number or numbers separated with comma" />
             <span class="input-group-btn">

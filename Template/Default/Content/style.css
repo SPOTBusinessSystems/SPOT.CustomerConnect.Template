@@ -39,3 +39,15 @@ md-checkbox.md-checked.blue .md-icon {
 .md-errors-spacer {
     display: none;
 }
+
+.terms-input input {
+    margin: 0 15px;
+}
+
+.terms-input span {
+    font-size:15px;
+}
+
+ .has-feedback .ng-empty.form-control {
+    padding-right: 2.5px;
+}

@@ -57,7 +57,7 @@
                 '<md-input-container class="md-icon-float md-block">',
                     '<label>Card Number</label>',
                     '<md-icon md-font-library="material-icons">credit_card</md-icon>',
-                    '<input name="cardNumber" class="md-input" id="creditcardnumber" ng-model="$ctrl.cardInfo.CardInfo" placeholder="Card Number" />',
+                    '<input ng-model="$ctrl.cardInfo.CardInfo" placeholder="Card Number" />',
                 '</md-input-container>',
                 '<md-input-container>',
                     '<label>Month</label>',
