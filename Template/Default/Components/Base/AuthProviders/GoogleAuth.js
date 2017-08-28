@@ -75,19 +75,6 @@
                 });
             };
 
-            this.onSuccessOld = function (gData) {
-                // Prevent loggging when the user is already signed in. Only log on association.
-                if (!ctrl.signedIn) {
-                    //ctrl.onLink(gData);
-                    dataService.user.updateAuthProvider(configService.authProviders.google.spotAuthType, gData.El, gData.hg.id_token)
-                        .then(function (data) {
-                            if (!ctrl.signedIn) {
-                                $state.reload();
-                            }
-                        });
-                }
-            };
-
             // When unlinked, remove from customer/app.
             this.unlink = function () {
                 configService.authProviders.google.unlink();

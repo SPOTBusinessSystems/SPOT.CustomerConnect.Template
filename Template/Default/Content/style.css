@@ -33,7 +33,7 @@
 }
 
 md-checkbox.md-checked.blue .md-icon {
- background-color: #1995dc;
+    background-color: #1995dc;
 }
 
 .md-errors-spacer {
@@ -45,9 +45,14 @@ md-checkbox.md-checked.blue .md-icon {
 }
 
 .terms-input span {
-    font-size:15px;
+    font-size: 15px;
 }
 
- .has-feedback .ng-empty.form-control {
+.has-feedback .ng-empty.form-control {
     padding-right: 2.5px;
+}
+
+
+html, body{
+height:100%;
 }

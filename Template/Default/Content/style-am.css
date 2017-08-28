@@ -2,3 +2,12 @@
 body {
     height: initial;
 }
+
+
+md-input-container.notificationSelect {
+    margin-top: 20px;
+}
+
+    md-input-container.notificationSelect > md-select-header > span {
+        font-weight: 700;
+    }

@@ -2,7 +2,7 @@
     <div ng-if="Customer.loaded">
         <form name="accountForm" novalidate>
             <h3>Modify Notifications for {{EmailAddress}}</h3>
-            <notifications ng-model="Customer.Notifications" />
+            <notifications ng-model="Customer" />
 
             <div class="form-group" style="text-align: center; margin-top: 10px;">
                 <input type="button" class="btn btn-danger" value="Undo Changes" ng-click="UndoChanges(); accountForm.$setPristine();" ng-disabled="!accountForm.$dirty" />

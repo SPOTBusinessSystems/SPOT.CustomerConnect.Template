@@ -6,9 +6,9 @@
 
     <form name="loginForm" ng-submit="loginUser();" novalidate>
         <div class="form-group">
-            <div class="input-group has-feedback" ng-class="{'has-error':!loginForm.loginEmail.$dirty, 'has-success':loginForm.loginEmail.$dirty}">
+            <div class="input-group has-feedback" ng-class="{'has-error':!validEmail(), 'has-success':validEmail()}">
                 <span class="input-group-addon"><i class="glyphicon glyphicon-envelope"></i></span>
-                <input type="text" class="form-control" ng-model="emailAddress" name="loginEmail" placeholder="Email Address or Customer ID" title="Please enter your email address or customer ID." required />
+                <input type="text" class="form-control" ng-model="Login.emailAddress" name="loginEmail" placeholder="Email Address or Customer ID" title="Please enter your email address or customer ID." required />
                 <span class="glyphicon glyphicon-remove form-control-feedback" aria-hidden="true" ng-if="loginForm.loginEmail.$dirty && !validEmail()"></span>
                 <span class="glyphicon glyphicon-ok form-control-feedback" aria-hidden="true" ng-if="loginForm.loginEmail.$dirty && validEmail()"></span>
             </div>
@@ -16,7 +16,7 @@
         <div class="form-group">
             <div class="input-group has-feedback" ng-class="{'has-error':loginForm.loginPassword.$invalid && loginForm.loginPassword.$dirty, 'has-success':loginForm.loginPassword.$valid && loginForm.loginPassword.$dirty}">
                 <span class="input-group-addon"><i class="glyphicon glyphicon-lock"></i></span>
-                <input type="password" class="form-control" ng-model="password" name="loginPassword" placeholder="Password" title="Password must contain 6 to 30 characters with at least 1 capital letter and 1 number." required ng-minlength="4" ng-maxlength="30" />
+                <input type="password" class="form-control" ng-model="Login.password" name="loginPassword" placeholder="Password" title="Password must contain 6 to 30 characters with at least 1 capital letter and 1 number." required ng-minlength="4" ng-maxlength="30" />
                 <span class="glyphicon glyphicon-remove form-control-feedback" aria-hidden="true" ng-if="loginForm.loginPassword.$invalid && loginForm.loginPassword.$dirty"></span>
                 <span class="glyphicon glyphicon-ok form-control-feedback" aria-hidden="true" ng-if="loginForm.loginPassword.$valid && loginForm.loginPassword.$dirty"></span>
             </div>
@@ -24,7 +24,7 @@
         <div class="form-group text-center">
             <div class="checkbox">
                 <label>
-                    <input type="checkbox" ng-model="rememberEmail" />&nbsp;&nbsp;Remember my email address.
+                    <input type="checkbox" ng-model="Login.rememberEmail" />&nbsp;&nbsp;Remember my email address.
                 </label>
             </div>
         </div>
@@ -34,7 +34,7 @@
                 <label class="btn btn-success btn-block col-sm-4" ng-click="loginUser();" ng-disabled="!loginForm.loginEmail.$valid || !loginForm.loginPassword.$valid">Login</label>
             </div>
             <div class="col-sm-4" style="padding: 3px;">
-                <label class="btn btn-danger btn-block" ng-click="forgotPassword();" ng-disabled="!loginForm.loginEmail.$dirty || !validEmail()">Forgot Password</label>
+                <label class="btn btn-danger btn-block" ng-click="forgotPassword();" ng-disabled="!validEmail()">Forgot Password</label>
             </div>
             <div class="col-sm-4" style="padding: 3px;">
                 <label class="btn btn-primary btn-block" ng-click="createAccount();">Create Account</label>
@@ -53,20 +53,20 @@
         <input type="submit" style="display: none;" />
     </form>
 
-    <div style="margin-top: 40px;" ng-if='Settings.General["Gift Card Balance Check Enabled"] == 1'>
-        <div class="input-group">
-            <input ng-model="giftCardNumbers" name="giftCardNumbers" id="giftCardNumbers" type="text" class="form-control" placeholder="Enter gift card number(s)" title="Gift card number or numbers separated with comma" />
-            <span class="input-group-btn">
-                <button class="btn btn-default" type="button" ng-click="getGiftCardsBalances()">Check Balance</button>
-            </span>
-        </div>
-        <div class="alert alert-danger" role="alert" ng-if="checkGiftCardBalanceErrorMessage">
-            {{checkGiftCardBalanceErrorMessage}}
-        </div>
-        <div class="alert alert-info" role="alert" ng-if="checkGiftCardBalanceResult">
-            <div ng-repeat="c in checkGiftCardBalanceResult">
-                {{c.Number}}: {{c.Balance}}
+        <div style="margin-top: 40px;" ng-if='Settings.General["Gift Card Balance Check Enabled"] == 1'>
+            <div class="input-group">
+                <input ng-model="GiftCard.Numbers" name="GiftCard.Numbers" type="text" class="form-control" placeholder="Enter gift card number(s)" title="Gift card number or numbers separated with comma" />
+                <span class="input-group-btn">
+                    <button class="btn btn-default" type="button" ng-click="getGiftCardsBalances()">Check Balance</button>
+                </span>
+            </div>
+            <div class="alert alert-danger" role="alert" ng-if="GiftCard.ErrorMessage">
+                {{GiftCard.ErrorMessage}}
+            </div>
+            <div class="alert alert-info" role="alert" ng-if="GiftCard.BalanceResult">
+                <div ng-repeat="c in GiftCard.BalanceResult">
+                    {{c.Number}}: {{c.Balance}}
+                </div>
             </div>
         </div>
-    </div>
 </div>

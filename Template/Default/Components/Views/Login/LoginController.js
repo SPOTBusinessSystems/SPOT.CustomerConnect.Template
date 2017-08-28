@@ -18,18 +18,21 @@
             $scope.Settings = configService.getProfile();
 
 
+            $scope.Login = { emailAddress: '', password: '', rememberEmail: false };
+
+
             if (localStorageService.get(CustomerConnect.Config.Tenant + '_e') != null) {
                 userService.setEmail(CustomerConnect.Util.base64._decode(localStorageService.get(CustomerConnect.Config.Tenant + '_e')));
             }
 
             if (userService.getEmail() != '' && typeof (userService.getEmail()) != 'undefined') {
-                $scope.emailAddress = userService.getEmail();
-                $scope.rememberEmail = true;
+                $scope.Login.emailAddress = userService.getEmail();
+                $scope.Login.rememberEmail = true;
             }
 
-            if (userService.getPassword() != '') {
-                $scope.password = userService.getPassword();
-            }
+            var p = userService.getPassword();
+            if (p && p.Valid && p.Password)
+                $scope.Login.password = p.Password;
 
             // Return to returnState after login
             if ($stateParams.returnState) {
@@ -37,6 +40,8 @@
             } else {
                 $scope.returnState = null;
             }
+
+
 
             $scope.getCustomer = function () {
                 dataService.customer.getCustomer().then(function (data) {
@@ -64,11 +69,11 @@
             };
 
             $scope.loginUser = function () {
-                if (!$scope.emailAddress || !$scope.password) {
+                if (!$scope.Login.emailAddress || !$scope.Login.password) {
                     return;
                 }
 
-                dataService.user.login($scope.emailAddress, $scope.password).then(function (data) {
+                dataService.user.login($scope.Login.emailAddress, $scope.Login.password).then(function (data) {
                     if (!data.Failed) {
                         apiConfig.setSessionId(data.ReturnObject.SessionID);
                         CustomerConnect.Config.SessionId = data.ReturnObject.SessionID;
@@ -84,8 +89,8 @@
 
                         localStorageService.set(CustomerConnect.Config.Tenant + '_token', data.ReturnObject.SessionID);
 
-                        if ($scope.rememberEmail) {
-                            localStorageService.set(CustomerConnect.Config.Tenant + '_e', CustomerConnect.Util.base64._encode($scope.emailAddress));
+                        if ($scope.Login.rememberEmail) {
+                            localStorageService.set(CustomerConnect.Config.Tenant + '_e', CustomerConnect.Util.base64._encode($scope.Login.emailAddress));
                         } else {
                             localStorageService.remove(CustomerConnect.Config.Tenant + '_e');
                         }
@@ -98,13 +103,13 @@
             };
 
             $scope.createAccount = function () {
-                userService.setEmail($scope.emailAddress);
-                userService.setPassword($scope.password);
+                userService.setEmail($scope.Login.emailAddress);
+                userService.setPassword($scope.Login.password);
                 $state.go('signup');
             };
 
             $scope.sendPasswordEmail = function (templateData) {
-                CustomerConnect.Customer.SendEmail({ ToAddress: $scope.emailAddress, Template: 7, Data: JSON.stringify(templateData) })
+                CustomerConnect.Customer.SendEmail({ ToAddress: $scope.Login.emailAddress, Template: 7, Data: JSON.stringify(templateData) })
                     .done(function () {
                         dialogs.notify('Email Sent', 'A password change email has been sent to your email address.');
                     }).fail(function (emailData) {
@@ -113,13 +118,13 @@
             };
 
             $scope.forgotPassword = function () {
-                if (!$scope.emailAddress) {
+                if (!$scope.Login.emailAddress) {
                     return;
                 }
 
                 var ip = "1.1.1.1";
 
-                dataService.user.passwordReminder({ emailAddress: $scope.emailAddress, ipAddress: ip }).then(function (data) {
+                dataService.user.passwordReminder({ emailAddress: $scope.Login.emailAddress, ipAddress: ip }).then(function (data) {
                     if (!data.Failed) {
                         var templateData = { IPAddress: ip, RememberKey: data.ReturnObject.RememberKey, FinishUrl: $scope.getFinishUrl(data.ReturnObject.RememberKey) };
                         $scope.sendPasswordEmail(templateData);
@@ -141,7 +146,7 @@
             }
 
             if ($stateParams.forgotPasswordEmail) {
-                $scope.emailAddress = $stateParams.forgotPasswordEmail;
+                $scope.Login.emailAddress = $stateParams.forgotPasswordEmail;
                 $scope.forgotPassword();
             }
 
@@ -165,22 +170,20 @@
             //};
 
             $scope.validEmail = function () {
-                return CustomerConnect.Util.Validate.EmailAddress($scope.emailAddress);
+                return CustomerConnect.Util.Validate.EmailAddress($scope.Login.emailAddress);
             };
 
-            $scope.giftCardNumbers = '';
-            $scope.checkGiftCardBalanceErrorMessage = '';
-            $scope.checkGiftCardBalanceResult = null;
+            $scope.GiftCard = { Numbers: '', ErrorMessage: '', BalanceResult: null };
 
             $scope.getGiftCardsBalances = function () {
-                var numbers = $scope.giftCardNumbers.split(',');
+                var numbers = $scope.GiftCard.Numbers.split(',');
                 dataService.customer.retrieveGiftCardsBalances(numbers).then(function (d) {
                     if (d.Failed) {
-                        $scope.checkGiftCardBalanceErrorMessage = d.Message;
-                        $scope.checkGiftCardBalanceResult = null;
+                        $scope.GiftCard.ErrorMessage = d.Message;
+                        $scope.GiftCard.BalanceResult = null;
                     } else {
-                        $scope.checkGiftCardBalanceErrorMessage = '';
-                        $scope.checkGiftCardBalanceResult = d.ReturnObject;
+                        $scope.GiftCard.ErrorMessage = '';
+                        $scope.GiftCard.BalanceResult = d.ReturnObject;
                     }
                 });
             };

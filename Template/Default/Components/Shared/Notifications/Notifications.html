@@ -1,5 +1,12 @@
 <div ng-repeat="notification in notifications track by notification.name">
-    <label class="form-label">{{ notification.description }}</label>
-    <select ng-model="notification.selectedMethod" ng-options="method.description for method in notification.methods track by method.name" class="form-control">
-    </select>
+    <md-input-container class="md-block notificationSelect" md-no-float>
+        <md-select-header>
+            <span> {{notification.description}}</span>
+        </md-select-header>
+        <md-select ng-model="notification.selectedMethod" md-selected-text="getSelectedText(notification.selectedMethod)" aria-label="{{notification.description}}" ng-change="updateModel()">
+            <md-optgroup>
+                <md-option ng-value="item" ng-repeat="item in notification.methods">{{getOptionText(item.name)}}</md-option>
+            </md-optgroup>
+        </md-select>
+    </md-input-container>
 </div>

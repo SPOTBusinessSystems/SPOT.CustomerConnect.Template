@@ -4,7 +4,7 @@
     angular.module('app').component('siteHeader', {
         bindings: {
         },
-        controller: function (dataService, userService, configService, $state, localStorageService, dialogs, settingsService, $interval) {
+        controller: function (dataService, userService, configService, $state, dialogs, settingsService, $interval) {
             var ctrl = this;
 
             this.$onInit = function () {
@@ -14,15 +14,17 @@
 
                 //console.log(ctrl.settings);
 
-                if (ctrl.settings.getProfile()) {
-                    if (ctrl.settings.getProfile().General['Show Header'] == "1") {
-                        dataService.util.getFileResource("header.htm").then(function (template) {
-                            if (template != "File does not exist.") {
-                                ctrl.header = { template: template, tokens: ctrl.tokens };
-                            }
-                        });
+                setTimeout(function () {
+                    if (ctrl.settings.getProfile()) {
+                        if (ctrl.settings.getProfile().General['Show Header'] == "1") {
+                            dataService.util.getFileResource("header.htm").then(function (template) {
+                                if (template != "File does not exist.") {
+                                    ctrl.header = { template: template, tokens: ctrl.tokens };
+                                }
+                            });
+                        }
                     }
-                }
+                }, 0);
             };
         },
         template: [

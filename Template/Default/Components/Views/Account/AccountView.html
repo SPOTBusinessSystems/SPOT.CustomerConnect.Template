@@ -11,31 +11,31 @@
         </div>
         <h3>Basic</h3>
         <div class="form-group">
-            <div class="input-group" ng-class="{'has-error':!validEmail() && basicForm.email.$dirty, 'has-success':validEmail() && basicForm.email.$dirty}">
+            <div class="input-group" ng-class="{'has-error':!validEmail() && accountForm.email.$dirty, 'has-success':validEmail() && accountForm.email.$dirty}">
                 <span class="input-group-addon"><i class="glyphicon glyphicon-envelope"></i></span>
                 <input type="email" id="emailAddress" name="email" ng-model="Customer.EmailAddress" class="form-control" placeholder="Email Address (Required)" required />
-                <span class="glyphicon glyphicon-remove form-control-feedback" aria-hidden="true" ng-if="!validEmail() && basicForm.email.$dirty"></span>
-                <span class="glyphicon glyphicon-ok form-control-feedback" aria-hidden="true" ng-if="validEmail() && basicForm.email.$dirty"></span>
+                <span class="glyphicon glyphicon-remove form-control-feedback" aria-hidden="true" ng-if="!validEmail() && accountForm.email.$dirty"></span>
+                <span class="glyphicon glyphicon-ok form-control-feedback" aria-hidden="true" ng-if="validEmail() && accountForm.email.$dirty"></span>
             </div>
 
-            <div class="input-group has-feedback" ng-class="{'has-error':basicForm.firstname.$invalid && basicForm.firstname.$dirty, 'has-success':basicForm.firstname.$valid && basicForm.firstname.$dirty}" ng-if="isFirstLastName()">
+            <div class="input-group has-feedback" ng-class="{'has-error':accountForm.firstname.$invalid && accountForm.firstname.$dirty, 'has-success':accountForm.firstname.$valid && accountForm.firstname.$dirty}" ng-if="isFirstLastName()">
                 <span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span>
                 <input id="firstName" name="firstname" ng-model="Customer.FirstName" class="form-control" placeholder="First Name (Required)" required />
-                <span class="glyphicon glyphicon-remove form-control-feedback" aria-hidden="true" ng-if="basicForm.firstname.$invalid && basicForm.firstname.$dirty"></span>
-                <span class="glyphicon glyphicon-ok form-control-feedback" aria-hidden="true" ng-if="basicForm.firstname.$valid && basicForm.firstname.$dirty"></span>
+                <span class="glyphicon glyphicon-remove form-control-feedback" aria-hidden="true" ng-if="accountForm.firstname.$invalid && accountForm.firstname.$dirty"></span>
+                <span class="glyphicon glyphicon-ok form-control-feedback" aria-hidden="true" ng-if="accountForm.firstname.$valid && accountForm.firstname.$dirty"></span>
             </div>
-            <div class="input-group has-feedback" ng-class="{'has-error':basicForm.lastname.$invalid && basicForm.lastname.$dirty, 'has-success':basicForm.lastname.$valid && basicForm.lastname.$dirty}" ng-if="isFirstLastName()">
+            <div class="input-group has-feedback" ng-class="{'has-error':accountForm.lastname.$invalid && accountForm.lastname.$dirty, 'has-success':accountForm.lastname.$valid && accountForm.lastname.$dirty}" ng-if="isFirstLastName()">
                 <span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span>
                 <input id="lastName" name="lastname" ng-model="Customer.LastName" class="form-control" placeholder="Last Name (Required)" required />
-                <span class="glyphicon glyphicon-remove form-control-feedback" aria-hidden="true" ng-if="basicForm.lastname.$invalid && basicForm.lastname.$dirty"></span>
-                <span class="glyphicon glyphicon-ok form-control-feedback" aria-hidden="true" ng-if="basicForm.lastname.$valid && basicForm.lastname.$dirty"></span>
+                <span class="glyphicon glyphicon-remove form-control-feedback" aria-hidden="true" ng-if="accountForm.lastname.$invalid && accountForm.lastname.$dirty"></span>
+                <span class="glyphicon glyphicon-ok form-control-feedback" aria-hidden="true" ng-if="accountForm.lastname.$valid && accountForm.lastname.$dirty"></span>
             </div>
 
-            <div class="input-group has-feedback" ng-class="{'has-error':basicForm.name.$invalid && basicForm.name.$dirty, 'has-success':basicForm.name.$valid && basicForm.name.$dirty}" ng-if="isName()">
+            <div class="input-group has-feedback" ng-class="{'has-error':accountForm.name.$invalid && accountForm.name.$dirty, 'has-success':accountForm.name.$valid && accountForm.name.$dirty}" ng-if="isName()">
                 <span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span>
                 <input id="Name" name="name" ng-model="Customer.Name" class="form-control" placeholder="Name (Required)" required />
-                <span class="glyphicon glyphicon-remove form-control-feedback" aria-hidden="true" ng-if="basicForm.name.$invalid && basicForm.name.$dirty"></span>
-                <span class="glyphicon glyphicon-ok form-control-feedback" aria-hidden="true" ng-if="basicForm.name.$valid && basicForm.name.$dirty"></span>
+                <span class="glyphicon glyphicon-remove form-control-feedback" aria-hidden="true" ng-if="accountForm.name.$invalid && accountForm.name.$dirty"></span>
+                <span class="glyphicon glyphicon-ok form-control-feedback" aria-hidden="true" ng-if="accountForm.name.$valid && accountForm.name.$dirty"></span>
             </div>
 
             <div class="form-group" style="display:table-row;">
@@ -174,12 +174,17 @@
 
         <div ng-if="Settings.Notifications">
             <h3>Notifications</h3>
-            <notifications ng-model="Customer.Notifications" />
+            <notifications ng-model="Customer" />
         </div>
 
         <div ng-if="Settings.Preferences">
             <h3>Preferences</h3>
             <preferences ng-model="Customer.Preferences" />
+        </div>
+
+        <div>
+            <h3>Special Instructions</h3>
+            <special-instructions />
         </div>
 
         <div ng-if="configService.authProviders.anyEnabled()">
@@ -189,8 +194,8 @@
         </div>
 
         <div class="form-group" style="text-align: center; margin-top: 10px;">
-            <input type="button" class="btn btn-danger" value="Undo Changes" ng-click="UndoChanges(); accountForm.$setPristine();" ng-disabled="!accountForm.$dirty" />
-            <input type="submit" class="btn btn-success" value="Save" ng-click="SaveAccount();" ng-disabled="!accountForm.$dirty" />
+            <input type="button" class="btn btn-danger" value="Undo Changes" ng-click="UndoChanges();" ng-disabled="!accountForm.$dirty" />
+            <input type="submit" class="btn btn-success" value="Save" ng-click="SaveAccount();" ng-disabled="!accountForm.$valid ||!accountForm.$dirty || !primaryAddressValid()" />
         </div>
     </form>
 </div>

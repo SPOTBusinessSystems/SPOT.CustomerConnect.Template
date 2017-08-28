@@ -29,7 +29,7 @@
             };
 
             $scope.sendReply = function () {
-                dataService.user.sendMessage('RE: ' + $scope.Message.Subject, $scope.messageBody + '\n\r-----------------\n\r' + $scope.Message.Message, null).then(function (data) {
+                dataService.user.sendMessage('RE: ' + $scope.Message.Subject, $scope.messageBody + '\r\n-----------------\r\n' + $scope.Message.Message, null).then(function (data) {
                     if (data.Failed == false) {
                         $scope.messageBody = null;
                         $scope.Reply = false;

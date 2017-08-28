@@ -22,6 +22,44 @@
                     });
                 };
 
+                // HELP Modal Functionality
+                
+                ctrl.HelpCache = {};
+
+                ctrl.Help = function () {
+                    var p = $ocLazyLoad.load(settingsService.path + 'Components/Dialogs/DialogController.js');                  
+                    var hashPage = location.hash.replace('#', '');
+                    if (hashPage == null) {hashPage = '/blank'};
+                    googleAnalyticsService.pageview('/help');
+
+                    p.then(function () {
+                        var dlg = dialogs.create(settingsService.path + 'Components/Dialogs/Help' + hashPage + '.html', 'DialogController', {}, { size: 'md', windowClass: 'modal fade' });
+                    });
+                };
+                
+                
+                ctrl.hashPageExists = function () {
+                    var hashPage = location.hash.replace('#', '');
+                    hashPage = hashPage.split("?")[0];
+
+                    if (ctrl.HelpCache[hashPage] != undefined)
+                        return ctrl.HelpCache[hashPage];
+
+                    return new Promise(function (resolve, reject) {
+                        var req = new XMLHttpRequest();
+                        req.open('GET', settingsService.path + 'Components/Dialogs/Help' + hashPage + '.html', false);
+                        req.send();
+
+                        var res = req.status == 200;
+                        ctrl.HelpCache[hashPage] = res;
+                        return resolve(res);
+                    });
+                };             
+                
+                //NAVBAR Code to test for file '<li role="presentation" ui-sref-active="active" ng-show="$ctrl.hashPageExists()"><a href="" ng-click="$ctrl.Help(); $ctrl.isCollapsed = true"><span class="glyphicon glyphicon-info-sign"></span>  Help</a></li>',
+                                
+                //END HELP Modal Functionality
+                
                 ctrl.openMessages = function () {
                     var p = $ocLazyLoad.load(settingsService.path + 'Components/Dialogs/Messages/MessagesController.js');
 
@@ -80,7 +118,10 @@
                     '<ul class="nav navbar-nav">',
                         '<li role="presentation" ui-sref-active="active"><a href="" ui-sref="login" ng-click="$ctrl.isCollapsed = true">Login</a></li>',
                         '<li role="presentation" ui-sref-active="active"><a href="" ui-sref="signup" ng-click="$ctrl.isCollapsed = true">{{ $ctrl.settings.getProfile().Signup[\'Menu Synonym\'] }}</a></li>',
-                        '<li role="presentation" ng-click="$ctrl.isCollapsed = true"><a href="" ng-controller="SendMessageController" ng-click="open();">Contact</a></li>',
+                        '<li role="presentation" ng-click="$ctrl.isCollapsed = true"><a href="" ng-show="$ctrl.settings.getProfile().General[\'Enable Contact\'] != 0" ng-controller="SendMessageController" ng-click="open();">Contact</a></li>',
+                    '</ul>',
+                    '<ul class="nav navbar-nav navbar-right">',
+                        '<li role="presentation" ui-sref-active="active" ng-show="$ctrl.hashPageExists()"><a href="" ng-click="$ctrl.Help(); $ctrl.isCollapsed = true"><span class="glyphicon glyphicon-info-sign"></span>  Help</a></li>',
                     '</ul>',
                 '</div>',
             '</div>',
@@ -107,9 +148,12 @@
                         '<li role="presentation" ui-sref-active="active" ng-show="$ctrl.user.getCustomer().RouteName && $ctrl.settings.getProfile().General[\'Route Scheduling\'] == 1 && $ctrl.settings.getProfile().Cancellation[\'Menu Synonym\']"><a href="" ui-sref="suspend" ng-click="$ctrl.isCollapsed = true">{{$ctrl.settings.getProfile().Cancellation[\'Menu Synonym\']}}</a></li>',
                         '<li role="presentation" ui-sref-active="active" ng-show="$ctrl.user.getCustomer().IsAR == true"><a href="" ui-sref="statements" ng-click="$ctrl.isCollapsed = true">Statements</a></li>',
                         '<li role="presentation" ui-sref-active="active" ng-show="$ctrl.user.getCustomer().IsAR == true"><a href="" ui-sref="payment" ng-click="$ctrl.isCollapsed = true">Make Payment</a></li>',
-                        '<li role="presentation" ui-sref-active="active"><a href="" ng-click="$ctrl.isCollapsed = true; $ctrl.openMessages();"><span class="glyphicon glyphicon-envelope"></span>  Messages  <span class="badge" ng-show="unreadMessages > 0">{{$ctrl.unreadMessages}}</span></a></li>',
+                        '<li role="presentation" ui-sref-active="active"><a href="" ng-show="$ctrl.settings.getProfile().General[\'Enable Messages\'] != 0" ng-click="$ctrl.isCollapsed = true; $ctrl.openMessages();"><span class="glyphicon glyphicon-envelope"></span>  Messages  <span class="badge" ng-show="unreadMessages > 0">{{$ctrl.unreadMessages}}</span></a></li>',
                         '<li role="presentation" ng-show="$ctrl.settings.getProfile().General[\'Enable Two-Way Messaging\'] == 1"><a href="" ng-controller="SendMessageController" ng-click="$ctrl.isCollapsed = true; open();"><span class="glyphicon glyphicon-question-sign"></span>  Have a question?</a></li>',
                         '<li role="presentation" ng-click="$ctrl.isCollapsed = true"><a href="" ng-click="$ctrl.LogOut(); $ctrl.isCollapsed = true">Logout</a></li>',
+                    '</ul>',
+                    '<ul class="nav navbar-nav navbar-right">',
+                        '<li role="presentation" ui-sref-active="active" ng-show="$ctrl.hashPageExists()"><a href="" ng-click="$ctrl.Help(); $ctrl.isCollapsed = true"><span class="glyphicon glyphicon-info-sign"></span>  Help</a></li>',
                     '</ul>',
                 '</div>',
             '</div>',

@@ -1,10 +1,10 @@
 (function () {
     'use strict';
 
-    angular.module('app').directive('notifications', notifications);
-    notifications.$inject = ['settingsService', 'configService', '$filter'];
+    angular.module('app').directive('notifications', notificationsDirective);
+    notificationsDirective.$inject = ['settingsService', 'configService', '$filter'];
 
-    function notifications(settingsService, configService, $filter) {
+    function notificationsDirective(settingsService, configService, $filter) {
         var directive = {
             controller: controller,
             link: link,
@@ -18,44 +18,45 @@
         return directive;
 
         function link(scope, iElement, iAttrs, ngModel) {
+
             if (!ngModel) {
                 return;
             }
 
-            iElement.bind('change', function () {
-                scope.$apply(function () {
-                    var model = ngModel.$viewValue;
+            scope.updateModel = function () {
 
-                    for (var x = 0; x < scope.notifications.length; x++) {
-                        if (scope.notifications[x].selectedMethod != null) {
-                            var updated = false;
+                var model = ngModel.$viewValue.Notifications;
+                var nn = scope.notifications;
 
-                            for (var y = 0; y < model.length; y++) {
-                                // Change model.
-                                if (model[y].NotificationTypeName == scope.notifications[x].name) {
-                                    model[y].NotificationMethodName = scope.notifications[x].selectedMethod.name;
-                                    model[y].NotificationMethodDescription = scope.notifications[x].selectedMethod.description;
-                                    model[y].NotificationValue = true;
-                                    updated = true;
-                                }
-                            }
+                for (var x = 0; x < nn.length; x++) {
+                    if (nn[x].selectedMethod != null) {
+                        var updated = false;
 
-                            if (!updated) {
-                                // Was not in the original data set.
-                                model.push({
-                                    NotificationMethodDescription: scope.notifications[x].selectedMethod.description,
-                                    NotificationMethodName: scope.notifications[x].selectedMethod.name,
-                                    NotificationTypeDescription: scope.notifications[x].description,
-                                    NotificationTypeName: scope.notifications[x].name,
-                                    NotificationValue: true
-                                })
+                        for (var y = 0; y < model.length; y++) {
+                            // Change model.
+                            if (model[y].NotificationTypeName == nn[x].name) {
+                                model[y].NotificationMethodName = nn[x].selectedMethod.name;
+                                model[y].NotificationMethodDescription = nn[x].selectedMethod.description;
+                                model[y].NotificationValue = true;
+                                updated = true;
                             }
                         }
-                    }
 
-                    ngModel.$setViewValue(model);
-                });
-            });
+                        if (!updated) {
+                            // Was not in the original data set.
+                            model.push({
+                                NotificationMethodDescription: nn[x].selectedMethod.description,
+                                NotificationMethodName: nn[x].selectedMethod.name,
+                                NotificationTypeDescription: nn[x].description,
+                                NotificationTypeName: nn[x].name,
+                                NotificationValue: true
+                            })
+                        }
+                    }
+                }
+
+                ngModel.$setViewValue(ngModel.$viewValue);
+            }
         }
 
         function controller($scope) {
@@ -71,13 +72,15 @@
 
             $scope.notifications = [];
 
-            if (configService.profile != null)
-            {
+            if (configService.profile != null) {
                 var notifications = configService.getProfile().Notifications;
 
                 for (var x = 0; x < notifications.length; x++) {
                     var y = findInArray($scope.notifications, notifications[x].TypeID);
                     var z = notifications[x];
+
+                    if (!z.DisplayOnWeb)
+                        continue;
 
                     if (z.MethodDescription == '') {
                         z.MethodDescription = z.MethodName;
@@ -112,7 +115,7 @@
                 $scope.notifications = $filter('orderBy')($scope.notifications, ['Description', 'MethodName'], false);
 
                 // Set customer defaults
-                var model = $scope.ngModel;
+                var model = $scope.ngModel.Notifications;
 
                 for (var x = 0; x < model.length; x++) {
                     for (var y = 0; y < $scope.notifications.length; y++) {
@@ -127,9 +130,68 @@
                         }
                     }
                 }
-
-                console.log(model);
             }
+
+
+            $scope.getPhone = function (name) {
+                var pL = $scope.ngModel.Phones;
+
+                for (var i = 0; i < pL.length; i++) {
+                    if (pL[i].PhoneType == name)
+                        return pL[i].Number;
+                }
+
+                return "";
+            }
+
+
+            $scope.getNotificationValue = function (name) {
+                switch (name) {
+                    case "Email1": return $scope.ngModel.EmailAddress;
+                    case "Email2": return $scope.ngModel.EmailAddress2;
+                    case "Email3": return $scope.ngModel.EmailAddress3;
+                    case "Email4": return $scope.ngModel.EmailAddress4;
+
+
+                    case "PhoneCell": return $scope.getPhone("Cell/Mobile");
+                    case "PhoneHome": return $scope.getPhone("Home");
+                    case "PhoneOther": return $scope.getPhone("Other");
+
+                    case "PhonePrimary": return $scope.getPhone("Principal");
+                    case "PhoneSMS": return $scope.getPhone("Cell/Mobile");
+                    case "PhoneWork": return $scope.getPhone("Work");
+
+
+                    default:
+                    case "Disabled": return "";
+                }
+
+                return name + name;
+            }
+
+            $scope.getSelectedText = function (item) {
+                if (item !== undefined) {
+                    var x = $scope.getNotificationValue(item.name);
+                    if (x)
+                        x = " - " + x;
+
+                    return item.name + " <span class='notificationValue'>" + x + "</span>";
+                } else {
+                    return "Please select an item";
+                }
+            };
+
+            $scope.getOptionText = function (name) {
+                if (name !== undefined) {
+                    var x = $scope.getNotificationValue(name);
+                    if (x)
+                        x = " - " + x;
+
+                    return name + x;
+                } else {
+                    return "";
+                }
+            };
         }
     }
 })();

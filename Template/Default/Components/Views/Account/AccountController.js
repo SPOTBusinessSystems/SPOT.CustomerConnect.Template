@@ -17,6 +17,7 @@ var authProvider;
         activate();
 
         function activate() {
+
             $scope.Customer = angular.copy(userService.getCustomer());
             $scope.Settings = configService.getProfile();
             $scope.configService = configService;
@@ -27,8 +28,6 @@ var authProvider;
             } else {
                 $scope.requirePasswordChange = false;
             }
-
-            //console.log($scope.Settings);
 
             $scope.Customer.Notifications = $filter('orderBy')($scope.Customer.Notifications, 'NotificationTypeDescription', false);
             $scope.Settings.Notifications = $filter('orderBy')($scope.Settings.Notifications, ['Description', 'MethodName'], false);
@@ -65,6 +64,18 @@ var authProvider;
                 return CustomerConnect.Util.Validate.EmailAddress($scope.Customer.EmailAddress);
             }
 
+            $scope.primaryAddressValid = function () {
+                if (!$scope.Customer.RouteName)//Required if relivery enabled only
+                    return true;
+
+                return $scope.primaryAddressValidInternal();
+            };
+
+            $scope.primaryAddressValidInternal = function () {
+                var a = $scope.Customer.PrimaryAddress;
+                return (a.Address1 && a.City && a.State && a.Zip);
+            };
+
             $scope.isFirstLastName = function () {
                 return !$scope.isName();
             }
@@ -77,30 +88,38 @@ var authProvider;
             $scope.SaveAccount = function () {
                 var ci = $scope.Customer;
 
-                if ($scope.birthMonth) {
+                if ($scope.birthMonth)
                     ci.Birthdate = new Date(Date.UTC(2012, $scope.birthMonth - 1, $scope.birthDate));
-                }
 
-                if ($scope.Customer.CreditCards.length > 0) {
+                var ccArray = $scope.Customer.CreditCards;
+
+                if (ccArray.length > 0) {
                     $scope.Customer.CreditCardSaveMode = 2;
-                    var ccArray = $scope.Customer.CreditCards;
+
+                    if (!$scope.Customer.CreditCardsToSave)
+                        $scope.Customer.CreditCardsToSave = [];
+                    var ccSave = $scope.Customer.CreditCardsToSave;
+
+                    var GetCard = function (cc) {
+                        return { number: cc.CardInfo, type: CustomerConnect.Util.Validate.GetCCType(cc.CardInfo), expiration: cc.CardExpiration, SetPrimary: cc.SetPrimary, MarkDeleted: cc.MarkDeleted };
+                    };
 
                     // Loop checking for changes.
-                    for (var index = 0; index < ccArray.length; index++) {
-                        var ccIndex = ccArray[index];
+                    //for (var index = 0; index < ccArray.length; index++) {
+                    for (var index = ccArray.length - 1; index >= 0; index--) {
+                        var cc = ccArray[index];
 
-                        if (ccIndex.CardId.startsWith('New_')) {
-                            //console.log('new card')
+                        if (cc.CardId.startsWith('New_')) {
                             // New credit card, move to new credit cards save.
 
                             // Empty card added but removed
-                            if (ccIndex.MarkDeleted) {
-                                $scope.Customer.CreditCards.remove(ccIndex);
+                            if (cc.MarkDeleted) {
+                                ccArray.remove(cc);
                                 continue;
                             }
 
                             // validate card info
-                            if (!CustomerConnect.Util.Validate.CCNumber(ccIndex.CardInfo)) {
+                            if (!CustomerConnect.Util.Validate.CCNumber(cc.CardInfo)) {
                                 swal({
                                     type: 'error',
                                     title: 'Unable to add new credit card',
@@ -109,30 +128,25 @@ var authProvider;
                                 return;
                             }
 
-                            if (!$scope.Customer.CreditCardsToSave) {
-                                $scope.Customer.CreditCardsToSave = [];
-                            }
-
                             // Verify card isn't already listed.
                             var alreadyExists = false;
 
-                            for (var subIndex = 0; subIndex < $scope.Customer.CreditCardsToSave; subIndex++) {
-                                if ($scope.Customer.CreditCardsToSave[subIndex].CardInfo == ccIndex.CardInfo && $scope.Customer.CreditCardsToSave[subIndex].CardExpiration == ccIndex.CardExpiration) {
+                            for (var subIndex = 0; subIndex < ccSave.length; subIndex++) {
+                                if (ccSave[subIndex].CardInfo == cc.CardInfo && ccSave[subIndex].CardExpiration == cc.CardExpiration) {
                                     alreadyExists = true;
                                     break;
                                 }
                             }
 
                             if (!alreadyExists) {
-                                $scope.Customer.CreditCardsToSave.push({ number: ccIndex.CardInfo, type: CustomerConnect.Util.Validate.GetCCType(ccIndex.CardInfo), expiration: ccIndex.CardExpiration, SetPrimary: ccIndex.SetPrimary, MarkDeleted: ccIndex.MarkDeleted });
-                                $scope.Customer.CreditCards.remove(ccIndex);
+                                ccSave.push(GetCard(cc));
+                                ccArray.remove(cc);
                             }
+
                         } else {
                             //console.log('existing card');
-                            if (ccIndex.CardInfo != userService.getCustomer().CreditCards[index].CardInfo || ccIndex.CardExpiration != moment(userService.getCustomer().CreditCards[index].CardExpiration).format("MM/YY")) {
-                                if (!CustomerConnect.Util.Validate.CCNumber(ccIndex.CardInfo)) {
-                                    //console.log('error');
-                                    //console.log(ccIndex);
+                            if (cc.CardInfo != userService.getCustomer().CreditCards[index].CardInfo || cc.CardExpiration != moment(userService.getCustomer().CreditCards[index].CardExpiration).format("MM/YY")) {
+                                if (!CustomerConnect.Util.Validate.CCNumber(cc.CardInfo)) {
                                     swal({
                                         type: 'error',
                                         title: 'Credit Card Update',
@@ -140,20 +154,13 @@ var authProvider;
                                     });
                                     return;
                                 } else {
-                                    // Delete, re-add with new CC Info and expiration
-                                    $scope.Customer.CreditCards[index].MarkDeleted = true;
-                                    $scope.Customer.creditCardsToSave = [{ number: ccIndex.CardInfo, type: CustomerConnect.Util.Validate.GetCCType(ccIndex.CardInfo), expiration: ccIndex.CardExpiration, SetPrimary: ccIndex.SetPrimary, MarkDeleted: ccIndex.MarkDeleted }];
+                                    // Card Updated. Mark deleted, re-add with new CC Info and expiration
+                                    ccSave.push(GetCard(cc));
+                                    cc.MarkDeleted = true;
                                 }
                             }
                         }
                     }
-
-                    //console.log('save');
-                    //console.log($scope.Customer.CreditCardsToSave);
-                    //console.log($scope.Customer.CreditCards);
-
-                    // temp
-                    //return;
                 }
 
                 dataService.customer.saveCustomer(ci).then(function (data) {
@@ -163,7 +170,6 @@ var authProvider;
                             title: 'Update submitted',
                             text: $scope.Settings['Account Update']['Submitted Message']
                         }).then(function () {
-                            $scope.accountForm.$setPristine();
 
                             dataService.customer.getCustomer().then(function (data) {
                                 if (!data.Failed) {
@@ -230,6 +236,16 @@ var authProvider;
             };
 
             $scope.convertToRoute = function () {
+                if ($scope.accountForm.$dirty) {
+                    dialogs.error('Delivery Signup', 'You have unsaved changes to account. Please save account options first.');
+                    return;
+                }
+
+                if (!$scope.primaryAddressValidInternal()) {
+                    dialogs.error('Delivery Signup', 'Invalid Primary address. Please set valid primary address and save it.');
+                    return;
+                }
+
                 dataService.customer.convertToDelivery().then(function (data) {
                     if (!data.Failed) {
                         dialogs.notify('Delivery Signup', 'You have been converted to a delivery account.')

@@ -18,6 +18,7 @@
             $scope.data = data;
             $scope.opened = false;
             $scope.Customer = angular.copy(userService.getCustomer());
+            $scope.Settings = configService.getProfile();
 
             $scope.open = function ($event) {
                 $event.preventDefault();
@@ -53,7 +54,7 @@
                     if (typeof (data) == 'undefined')
                         return;
 
-                    var body = 
+                    var body =
                     {
                         ReferralCode: $scope.Customer.ReferralCode,
                         EmailAddress: data.emailAddress,
@@ -77,6 +78,26 @@
 
                 });
             };
+
+
+            var defaultMessage =
+                ["Share MyDryCleaner with your friends and you both receive $10.00",
+                 "Simply share your personal referral code and receive credit when your friend uses us for the first time"];
+
+            var s = $scope.Settings["General"];
+            if (s && s.Refer && s.Refer.Message) {
+                var a = s.Refer.Message
+                if (typeof a === 'string') {
+                    $scope.Message = [a];
+                }
+                else {
+                    if (a.length && (a.length != 1 || a[0])) {
+                        $scope.Message = a;
+                    }
+                }
+            }
+            if (!$scope.Message)
+                $scope.Message = defaultMessage;
         }
     }
 })();

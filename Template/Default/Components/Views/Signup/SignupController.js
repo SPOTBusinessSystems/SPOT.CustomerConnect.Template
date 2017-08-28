@@ -5,9 +5,9 @@
     .module('app')
     .controller('SignupController', SignupController);
 
-    SignupController.$inject = ['$scope', 'dialogs', 'blockUI', '$state', 'userService', '$stateParams', '$rootScope', 'vcRecaptchaService', 'dataService', 'configService'];
+    SignupController.$inject = ['$scope', 'dialogs', 'blockUI', '$state', 'userService', '$stateParams', '$rootScope', 'vcRecaptchaService', 'dataService', 'configService', '$window'];
 
-    function SignupController($scope, dialogs, blockUI, $state, userService, $stateParams, $rootScope, vcRecaptchaService, dataService, configService) {
+    function SignupController($scope, dialogs, blockUI, $state, userService, $stateParams, $rootScope, vcRecaptchaService, dataService, configService, $window) {
         /* jshint validthis:true */
         var vm = this;
         vm.title = 'SignupController';
@@ -121,14 +121,9 @@
                 $scope.checkEmail();
             }
 
-            $scope.storePass = function (pass) {
-                console.log('storepass');
-                console.log($scope.Customer);
-                console.log(pass);
-            };
+
 
             $scope.SaveCustomer = function () {
-                console.log($scope.Customer);
 
                 var ci = {
                     clientAccountID: '',
@@ -164,16 +159,26 @@
                     ci.acceptTerms = $scope.Customer.AcceptTerms ? 1 : 0;
                 }
 
-                if ($scope.Customer.CreditCardsToSave) {
-                    if ($scope.Customer.CreditCardsToSave[0]) {
+                if ($scope.isCardAvailable()) {
                         ci.CreditCardsToSave = [{ Number: $scope.Customer.CreditCardsToSave[0].CardInfo, Expiration: $scope.Customer.CreditCardsToSave[0].CardExpiration }];
-                    }
                 }
-
-                console.log(ci);
 
                 dataService.customer.signupCustomer(ci).then(function (data) {
                     if (!data.Failed) {
+
+                        //adwords tracking
+                        if ($scope.Settings.General && $scope.Settings.General["Google Adwords"]) {
+
+                            var conversionID = $scope.Settings.General["Google Adwords"]["Conversion ID"];
+
+                            if ((conversionID == '1') && $window.google_trackConversion) {
+                                $window.google_trackConversion({
+                                    google_conversion_id: conversionID,
+                                    google_remarketing_only: false
+                                });
+                            }
+                        }
+
                         dialogs.notify('Signup submitted', $scope.Settings.Signup['Submitted Message']);
                         userService.setEmail($scope.Customer.Email);
                         userService.setPassword($scope.Customer.Password);
@@ -188,7 +193,7 @@
             $scope.setWidgetId = function (widgetId) {
                 $scope.CaptchaID = widgetId;
             };
-            
+
             $scope.isSaveDisabled = function () {
                 if (!($scope.Settings.Signup['Terms and Conditions Acceptance Required'] == 1))
                     return false;
@@ -198,6 +203,37 @@
 
                 return true;
             };
+
+            $scope.isAddressValid = function () {
+                if ($scope.Customer.Type != 'DELIVERY')//No delivery, no address testing required
+                    return true;
+
+                if ($scope.Settings.General && $scope.Settings.General["Geocoding"]) {
+                    var geocodingEnabled = $scope.Settings.General && $scope.Settings.General["Geocoding"]["Enabled"];
+
+                    if (geocodingEnabled != "1")
+                        return true;
+                }
+                else
+                    return true;
+
+                return new Promise(function (resolve, reject) {
+                    //Send address to server for Route validation
+                    dataService.customer.checkAddress($scope.Customer).then(function (data) {
+                        if (data.Failed) {
+                            dialogs.error('Address validation failed.', data.Message);
+                            resolve(false);
+                        } else {
+                            resolve(true);
+                        }
+                    });
+                });
+            };
+
+            $scope.isCardAvailable = function () {
+                return $scope.Customer.CreditCardsToSave && $scope.Customer.CreditCardsToSave[0] && $scope.Customer.CreditCardsToSave[0].CardInfo != null;
+            };
+
         })();
     }
 })();

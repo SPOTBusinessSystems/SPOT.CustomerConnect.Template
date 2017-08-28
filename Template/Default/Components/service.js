@@ -12,7 +12,7 @@
     userService.$inject = [];
     apiConfig.$inject = [];
     dataService.$inject = ['$http', '$q', 'apiConfig'];
-    configService.$inject = ['dataService', '$q', '$ocLazyLoad'];
+    configService.$inject = ['dataService', '$q', '$window'];
 
     function apiConfig() {
         this.setURL = function (url) {
@@ -50,9 +50,18 @@
         this.getFileResourceUrl = function (fileName) {
             return this.getURL().replace('/q', '/g') + '?Id=' + this.getPublishableId() + '&Action=GetFileResource&Name=' + fileName;
         };
+
+        this.ApplyConfig = function (config) {
+            this.setURL(config.URL);
+            this.setAccountKey(config.AccountKey);
+            this.setSessionId(config.SessionId);
+            this.setPublishableId(config.PublishableId);
+        };
+
+
     }
 
-    function configService(dataService, $q) {
+    function configService(dataService, $q, $window) {
         var parent = this;
 
         this.authProviders = {
@@ -82,38 +91,70 @@
                 spotAuthType: "facebook",
 
                 init: function () {
-                    console.log('facebook init');
-                    if (parent.getProfile() !== null) {
-                        var g = parent.getProfile().General['Authentication Providers'].Facebook;
+                    var that = this;
+                    var promise = new Promise(function (resolve, reject) {
 
-                        if (g !== null) {
-                            if (g.Enabled === "1") {
-                                if (g.AppID.length > 0 && typeof (FB) !== "undefined") {
-                                    this.enabled = true;
-                                    this.appId = g.AppID;
+                        if (parent.getProfile() !== null) {
+                            var g = parent.getProfile().General['Authentication Providers'].Facebook;
 
-                                    // Facebook API
-                                    try {
-                                        FB.init({
-                                            appId: g.AppID,
-                                            status: true,
-                                            cookie: true,
-                                            xfbml: true,
-                                            version: 'v2.5'
-                                        });
+                            if (g !== null && g.Enabled === "1") {
+                                if (g.AppID.length > 0) {
 
-                                        console.log('Facebook set up.');
+                                    var f = function () {
+                                        if (typeof (FB) !== "undefined") {
+                                            that.enabled = true;
+                                            that.appId = g.AppID;
+
+                                            // Facebook API
+                                            try {
+                                                FB.init({
+                                                    appId: g.AppID,
+                                                    status: true,
+                                                    cookie: true,
+                                                    xfbml: true,
+                                                    version: 'v2.5'
+                                                });
+                                            }
+                                            catch (err) {
+                                                that.enabled = false;
+                                                console.log('Unable to initialize Facebook SDK.');
+                                            }
+
+                                        }
+                                        else {
+                                            console.log("AuthProvider Error: Facebook is not loaded. Leaving it disabled.");
+                                        }
+                                        resolve();
+                                    };
+
+                                    if (typeof (FB) !== "undefined") {
+                                        f();
                                     }
-                                    catch (err) {
-                                        this.enabled = false;
-                                        console.log('Unable to initialize Facebook SDK.');
+                                    else //wait for facebook loaded
+                                    {
+                                        var fr = resolve;
+                                        var t = setTimeout(function () {
+                                            console.log("AuthProvider Error: Facebook load timeout.");
+                                            if (fr) fr();
+                                        }, 7000);//Wait 7 seconds for file load
+
+                                        $window.fbAsyncInit = function () {
+                                            clearTimeout(t);
+                                            fr = null;
+                                            f();
+                                        };
                                     }
+                                    return;
                                 } else {
                                     console.log("AuthProvider Error: Facebook is enabled but AppID is not set. Leaving it disabled.");
                                 }
                             }
                         }
-                    }
+
+                        resolve();
+                    });
+
+                    return promise;
                 },
 
                 isSignedIn: function () {
@@ -187,49 +228,66 @@
                 authResponse: null,
 
                 init: function () {
-                    var deferred = $q.defer();
+                    var that = this;
+                    var promise = new Promise(function (resolve, reject) {
+                        if (parent.getProfile() !== null) {
+                            // Start Google
+                            var g = parent.getProfile().General['Authentication Providers'].Google;
+                            if (g !== null && g.Enabled === "1") {
+                                if (g.ClientID.length > 0) {
 
-                    console.log('in google init');
-                    if (parent.getProfile() !== null) {
-                        // Start Google
-                        var g = parent.getProfile().General['Authentication Providers'].Google;
+                                    var f = function () {
+                                        if (typeof (gapi) !== "undefined") {
+                                            that.enabled = true;
+                                            that.clientid = g.ClientID;
 
-                        if (g !== null) {
-                            if (g.Enabled === "1") {
-                                if (g.ClientID.length > 0 && typeof (gapi) !== "undefined") {
-                                    this.enabled = true;
-                                    this.clientid = g.ClientID;
+                                            try {
+                                                // Google API
+                                                gapi.load('auth2', function () {
+                                                    gapi.auth2.init({
+                                                        client_id: g.ClientID
+                                                    });
+                                                });
+                                            }
+                                            catch (err) {
+                                                that.enabled = false;
+                                                console.log('Google SDK failed to initialize.');
+                                            }
 
-                                    try {
-                                        // Google API
-                                        gapi.load('auth2', function () {
-                                            gapi.auth2.init({
-                                                client_id: g.ClientID
-                                            });
-                                        });
-
-                                        console.log('Google set up.');
+                                        }
+                                        else {
+                                            console.log("AuthProvider Error: Google API is not loaded. Leaving it disabled.");
+                                        }
+                                        resolve();
                                     }
-                                    catch (err) {
-                                        this.enabled = false;
-                                        console.log('Google SDK failed to initialize.');
+
+                                    if (typeof (gapi) !== "undefined") {
+                                        f();
                                     }
-                                    deferred.resolve();
+                                    else //need to wait  when gapi is loaded
+                                    {
+                                        var fr = resolve;
+                                        var t = setTimeout(function () {
+                                            console.log("AuthProvider Error: Google API load timeout.");
+                                            if (fr) fr();
+                                        }, 7000);//Wait 7 seconds for file load
+
+                                        $window.appGoogleAuthLoaded = function () {
+                                            clearTimeout(t);
+                                            fr = null;
+                                            f();
+                                        };
+                                    }
+                                    return;
+
                                 } else {
                                     console.log("AuthProvider Error: Google is enabled but ClientID is not set. Leaving it disabled.");
-                                    deferred.resolve();
                                 }
-                            } else {
-                                deferred.resolve();
                             }
-                        } else {
-                            deferred.resolve();
                         }
-                    } else {
-                        deferred.resolve();
-                    }
-
-                    return deferred.promise;
+                        resolve();
+                    });
+                    return promise;
                 },
 
                 isSignedIn: function () {
@@ -487,6 +545,11 @@
 
             inviteFriend: function (body) {
                 return createRequest('CreateReferralRequest', body).then(handleSuccess, handleError);
+            },
+
+            checkAddress: function (customer) {
+                var p = { Address1: customer.Address1, Address2: customer.Address2, City: customer.City, State: customer.State, Zip: customer.Zip };
+                return createRequest('CheckAddress', p).then(handleSuccess, handleError);
             }
         };
 
@@ -666,8 +729,7 @@
                 data: '{"RequestType":"' + requestType + '","AccountKey":"' + apiConfig.getAccountKey() + '","SessionID":"' + apiConfig.getSessionId() + '","Body":"' + CustomerConnect.Util.base64._encode(JSON.stringify(body)) + '","UserAgent":"' + navigator.userAgent.toString() + '"}',
                 async: true,
                 contentType: "application/json",
-                dataType: "json",
-                headers: { 'Content-Type': null }
+                dataType: "json"
             });
         }
 

@@ -66,14 +66,14 @@
                         <referral-sources referral-source="Customer.ReferralSource" referral-detail="Customer.ReferralDetail"></referral-sources>
                     </div>
 
-                    <div class="form-group">
+                    <div class="form-group" ng-if="Settings.Signup['Allow Promo Code'] != 0">
                         <label class="cotnrol-label">Promo Code</label>
                         <input class="form-control" type="text" ng-model="Customer.AwardId" placeholder="Promo Code" />
                     </div>
                 </div>
 
                 <div class="form-group center">
-                    <input type="submit" class="btn btn-success" wz-next ng-disabled="!form.$valid || Customer.PasswordField.PasswordConfirm != Customer.PasswordField.Password || !validEmail()" ng-click="storePass(data.Password)" value="Continue" />
+                    <input type="submit" class="btn btn-success" wz-next  ng-disabled="!form.$valid || Customer.PasswordField.PasswordConfirm != Customer.PasswordField.Password || !validEmail()" value="Continue" />
                 </div>
             </ng-form>
         </wz-step>
@@ -92,7 +92,7 @@
                 </div>
             </form>
         </wz-step>
-        <wz-step wz-title="Address">
+        <wz-step wz-title="Address" canexit="isAddressValid">
             <h2>Address<span ng-if="Customer.Type == 'DELIVERY'"> - Required</span></h2>
             <!-- Address -->
             <form name="addressForm" novalidate>
@@ -176,7 +176,7 @@
                     <label class="control-label">{{ Customer.Zip }}</label><br />
                 </div>
 
-                <div ng-if="Customer.CreditCardsToSave && Customer.CreditCardsToSave[0]">
+                <div ng-if="isCardAvailable()">
                     <h3>Credit Card</h3>
                     {{ "*" + Customer.CreditCardsToSave[0].CardNumber.substring(Customer.CreditCardsToSave[0].CardNumber - 4)}}<br />
                     {{ Customer.CreditCardsToSave[0].CardExpiration }}<br />

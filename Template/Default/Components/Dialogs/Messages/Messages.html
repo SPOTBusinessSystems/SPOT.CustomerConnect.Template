@@ -30,7 +30,7 @@
 <div class="modal-footer">
     <div class="row">
         <div class="col-sm-4" style="padding: 3px;">
-            <button class="btn btn-warning btn-block" ng-controller="SendMessageController" ng-click="open()"><span class="glyphicon glyphicon-question-sign"></span>  Have a question?</button>
+            <button class="btn btn-warning btn-block" ng-show="$ctrl.settings.getProfile().General['Enable Messages'] != 0" ng-controller="SendMessageController" ng-click="open()"><span class="glyphicon glyphicon-question-sign"></span>  Have a question?</button>
         </div>
         <div class="col-sm-4" style="padding: 3px;">
             <button class="btn btn-info btn-block" ng-click="refresh()">Refresh</button>

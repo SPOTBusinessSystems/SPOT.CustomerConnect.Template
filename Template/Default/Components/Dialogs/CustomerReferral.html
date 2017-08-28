@@ -9,12 +9,9 @@
         {{ data.Store.PhysicalAddress.Phone }}<br />
         {{ data.Store.HoursOfOperation }}
     </div>
-    <div class="form-group">
-	<hr/>
-	Share MyDryCleaner with your friends and you both receive $10.00
-    </div>
-    <div class="form-group">
-	Simply share your personal referral code and receive credit when your friend uses us for the first time
+    <hr />
+    <div ng-repeat="m in Message" class="form-group">
+        {{m}}
     </div>
     <div class="form-group">
 	<span class="btn btn-success" ng-click="inviteFriend()" role="button" tabindex="0">Invite Friends</span>

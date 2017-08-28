@@ -28,7 +28,6 @@
     'use strict';
     var ccApp = angular.module('app', [
                 'ui.router',
-                'ngTouch',
                 'ngAnimate',
                 'ui.bootstrap',
                 'dialogs.main',
@@ -112,9 +111,8 @@
                     return;
 
                 var p = url.toLowerCase();
-                if (p != '/init') {//ignore this state
-                    $window.ga('send', 'pageview', p);
-                }
+                $window.ga('send', 'pageview', p);
+
                 console.log('Google Analytics pageview ' + p);
             }
 
@@ -140,6 +138,14 @@
         } else {
             settingsServiceProvider.setPath('/' + CustomerConnect.Config.Tenant + '/Template/' + CustomerConnect.Config.Layout + '/');
         }
+
+        $urlRouterProvider.otherwise('/login');
+
+        //Local storage
+        localStorageServiceProvider.setPrefix('app').setStorageType('localStorage');
+
+        tmhDynamicLocaleProvider.localeLocationPattern(settingsServiceProvider.getPath() + 'Scripts/angular/i18n/angular-locale_{{locale}}.js');
+
 
         function loadFiles(stateName) {
             return ['$ocLazyLoad', function ($ocLazyLoad) {
@@ -168,17 +174,47 @@
         }
 
 
+        var loadRecaptcha = function ($ocLazyLoad, $window) {
+            return new Promise(function (resolve, reject) {
+                resolve();//don't block load process
+                var f = function () {
+                    if ($window.vcRecaptchaApiLoaded) { //is vcRecaptcha loaded?
+                        $ocLazyLoad.load('recaptcha');
+                    }
+                    else {
+                        setTimeout(f, 1000);
+                    }
+                }
+                f();
+            });
+        };
+
+
         //Config For ocLazyLoading
         $ocLazyLoadProvider.config({
             //'debug': true, // For debugging 'true/false'
             'events': true, // For Event 'true/false'
             'modules': [
                 {
+                    name: 'authGoogle',
+                    files: [
+                            '//apis.google.com/js/client:platform.js?onload=appGoogleAuthLoaded',
+                            componentPath('Base/AuthProviders/GoogleAuth.js')
+                    ]
+                },
+                {
+                    name: 'authFacebook',
+                    files: [
+                            '//connect.facebook.net/en_US/sdk.js',
+                            componentPath('Base/AuthProviders/FacebookAuth.js')
+                    ]
+                },
+                {
                     name: 'login',
                     files: [
-                            componentPath('Base/AuthProviders/GoogleAuth.js'),
-                            componentPath('Base/AuthProviders/FacebookAuth.js'),
-                            controllerPath('Login')
+                            controllerPath('Login'),
+                            cssPath('styles-material-bundle.min.css'),
+                            scriptPath('angular-material-bundle.min.js?v=1.0.0')
                     ]
                 },
                 {
@@ -193,6 +229,7 @@
                             componentPath('Shared/Preferences/Preferences.js'),
                             componentPath('Shared/Notifications/Notifications.js'),
                             componentPath('Shared/States/States.js'),
+                            componentPath('Shared/SpecialInstructions/SpecialInstructions.js'),
 
                             componentPath('Base/AuthProviders/GoogleAuth.js'),
                             componentPath('Base/AuthProviders/FacebookAuth.js'),
@@ -202,7 +239,6 @@
                 {
                     name: 'signup',
                     files: [
-                            '//www.google.com/recaptcha/api.js?onload=vcRecaptchaApiLoaded&render=explicit',
                             scriptPath('angular-material-bundle.min.js?v=1.0.0'),
                             cssPath('styles-material-bundle.min.css'),
 
@@ -211,6 +247,16 @@
                             componentPath('Shared/PasswordIndicator/PasswordIndicatorDirective.js'),
                             componentPath('Shared/States/States.js'),
                             controllerPath('Signup')
+                    ]
+                },
+                {
+                    name: 'adwords',
+                    files: ['//www.googleadservices.com/pagead/conversion_async.js'
+                    ]
+                },
+                {
+                    name: 'recaptcha',
+                    files: ['//www.google.com/recaptcha/api.js?onload=vcRecaptchaApiLoaded&render=explicit'
                     ]
                 },
                 {
@@ -224,48 +270,51 @@
                     ]
                 },
 
+                {
+                    name: 'orders',
+                    files: [controllerPath('Orders')
+                    ]
+                },
                  {
-                     name: 'orders',
-                     files: [controllerPath('Orders')
+                     name: 'pickup',
+                     files: [controllerPath('Pickup')
                      ]
                  },
-                  {
-                      name: 'pickup',
-                      files: [controllerPath('Pickup')
-                      ]
-                  },
-                   {
-                       name: 'suspend',
-                       files: [controllerPath('Suspend')
-                       ]
-                   },
-                    {
-                        name: 'kiosk',
-                        files: [controllerPath('Kiosk')
-                        ]
-                    },
+                 {
+                     name: 'suspend',
+                     files: [controllerPath('Suspend')
+                     ]
+                 },
+                 {
+                     name: 'kiosk',
+                     files: [controllerPath('Kiosk')
+                     ]
+                 },
 
-                     {
-                         name: 'statements',
-                         files: [controllerPath('Statements')
-                         ]
-                     },
-                      {
-                          name: 'reminder',
-                          files: [componentPath('Shared/PasswordIndicator/PasswordIndicatorDirective.js'), controllerPath('Reminder')
-                          ]
-                      },
-                       {
-                           name: 'confirmation',
-                           files: [controllerPath('Confirmation')
-                           ]
-                       },
-                        {
-                            name: 'notifications',
-                            files: [componentPath('Shared/Notifications/Notifications.js'),
-                                    controllerPath('Notifications')
-                            ]
-                        },
+                 {
+                     name: 'statements',
+                     files: [controllerPath('Statements')
+                     ]
+                 },
+                 {
+                     name: 'reminder',
+                     files: [componentPath('Shared/PasswordIndicator/PasswordIndicatorDirective.js'), controllerPath('Reminder')
+                     ]
+                 },
+                 {
+                     name: 'confirmation',
+                     files: [controllerPath('Confirmation')
+                     ]
+                 },
+                 {
+                     name: 'notifications',
+                     files: [cssPath('styles-material-bundle.min.css'),
+                            scriptPath('angular-material-bundle.min.js?v=1.0.0'),
+
+                            componentPath('Shared/Notifications/Notifications.js'),
+                            controllerPath('Notifications')
+                     ]
+                 },
                  {
                      name: 'googleAnalytics',
                      files: ['https://www.google-analytics.com/analytics.js'
@@ -284,13 +333,7 @@
             resolve: { load: loadFiles('login') }
         })
         // Views
-        $stateProvider.state('init', {
-            url: '/init',
-            parent: 'globaldependencies',
-            template: ' ',
-            params: { forgotPasswordEmail: null, returnState: null },
-            controller: 'InitController'
-        })
+        $stateProvider
         .state('signup', {
             url: '/signup?refid&refkey',
             parent: 'globaldependencies',
@@ -301,7 +344,20 @@
                     squash: true
                 }
             },
-            resolve: { load: loadFiles('signup') }
+            resolve: {
+                load: loadFiles('signup'),
+                adwords: ['$ocLazyLoad', function ($ocLazyLoad) {
+                    return new Promise(function (resolve, reject) {
+
+                        $ocLazyLoad.load('adwords').then(function () { resolve(); })
+                            .catch(function () {
+                                resolve(); //adwords load failed. Private mode? Just skip it.
+                            });
+                    });
+                }],
+
+                recaptcha: ['$ocLazyLoad', '$window', loadRecaptcha]
+            }
         })
         .state('payment', {
             url: '/payment',
@@ -389,135 +445,114 @@
                 '<site-footer></site-footer>'
             ].join(''),
             resolve: {
-                loadSettings: function ($q, apiConfig, configService, dataService, localStorageService, tmhDynamicLocale, settingsService, $stateParams, googleAnalyticsService) {
-                    return new Promise(function (resolve, reject) {
+                loadSettings: function (apiConfig, configService, dataService, localStorageService, tmhDynamicLocale, settingsService, $stateParams, googleAnalyticsService, $ocLazyLoad) {
 
-                        var onResolve = function () {
-                            console.groupEnd();
-                            resolve();
-                        }
+                    var loadTheme = function (configService, $stateParams, tmhDynamicLocale, settingsService) {
+                        var Themes = [
+                            { Name: 'Default', File: 'bootstrap-default.min.css' },
+                            { Name: 'Cerulean', File: 'bootstrap-cerulean.min.css' },
+                            { Name: 'Cosmo', File: 'bootstrap-cosmo.min.css' },
+                            { Name: 'Cyborg', File: 'bootstrap-cyborg.min.css' },
+                            { Name: 'Darkly', File: 'bootstrap-darkly.min.css' },
+                            { Name: 'Flatly', File: 'bootstrap-flatly.min.css' },
+                            { Name: 'Journal', File: 'bootstrap-journal.min.css' },
+                            { Name: 'Lumen', File: 'bootstrap-lumen.min.css' },
 
-                        console.groupCollapsed('loadingSettings');
+                            { Name: 'Paper', File: 'bootstrap-paper.min.css' },
+                            { Name: 'Readable', File: 'bootstrap-readable.min.css' },
+                            { Name: 'Sandstone', File: 'bootstrap-sandstone.min.css' },
+                            { Name: 'Simplex', File: 'bootstrap-simplex.min.css' },
+                            { Name: 'Slate', File: 'bootstrap-slate.min.css' },
+                            { Name: 'Spacelab', File: 'bootstrap-spacelab.min.css' },
+                            { Name: 'Superhero', File: 'bootstrap-superhero.min.css' },
+                            { Name: 'United', File: 'bootstrap-united.min.css' },
+                            { Name: 'Yeti', File: 'bootstrap-yeti.min.css' }
+                        ];
 
-                    if (!configService.isInitialized()) {
-                        console.log('loading settings');
+                        SetCssUrl = function (cssId, url) {
+                            if (!document.getElementById(cssId)) {
+                                var head = document.getElementsByTagName('head')[0];
+                                var link = document.createElement('link');
+                                link.id = cssId;
+                                link.rel = 'stylesheet';
+                                link.type = 'text/css';
+                                link.href = url;
+                                link.media = 'all';
+                                head.appendChild(link);
+                            }
+                            else
+                                $("#" + cssId).attr("href", url);
+                        };
 
-                        apiConfig.setURL(CustomerConnect.Config.URL);
-                        apiConfig.setAccountKey(CustomerConnect.Config.AccountKey);
-                        apiConfig.setSessionId(CustomerConnect.Config.SessionId);
-                        apiConfig.setPublishableId(CustomerConnect.Config.PublishableId);
+                        SetThemeCss = function (url) {
+                            SetCssUrl('themeCss', url);
+                        };
 
-                        if (localStorageService.get(CustomerConnect.Config.Tenant + '_ccCache') !== null) {
-                            configService.setProfile(JSON.parse(CustomerConnect.Util.base64._decode(localStorageService.get(CustomerConnect.Config.Tenant + '_ccCache'))));
-                            configService.authProviders.setup();
+                        SetAdditionalCss = function (url) {
+                            SetCssUrl('additionalCss', url);
+                        };
 
-                            //Temp for testing
-                            //localStorageService.remove("ccCache");
+                        var Settings = configService.getProfile();
 
-                            onResolve();
-                        } else {
-                            dataService.settings.getSpecificSettings(true, true, true, true, true, true, true, true).then(function (data) {
-                                var Settings = null;
+                        if (Settings) {
+                            if (Settings.General !== null) {
+                                // Put into setting dynamic language
+                                tmhDynamicLocale.set(Settings.General['Data Formats']['Language Tag']);
+                                moment.locale(Settings.General['Data Formats']['Language Tag']);
 
-                                if (!data.Failed) {
-                                    Settings = data.ReturnObject.CustomerConnectSettings;
+                                if (Settings.General.Theme !== 'Custom') {
+                                    for (var x = 0; x < Themes.length; x++) {
+                                        if (Themes[x].Name === Settings.General.Theme) {
+                                            configService.setCSSPath(settingsService.path + 'Content/bootstrap/' + Themes[x].File);
+                                            SetThemeCss(configService.getCSSPath());
+                                        }
+                                    }
                                 } else {
-                                    Settings = { Notifications: null, Preferences: null, Stores: null, States: null };
+                                    SetThemeCss(Settings.General['Theme Custom URL']);
                                 }
 
-                                configService.setProfile(Settings);
-
-                                console.log('auth setup');
-                                configService.authProviders.setup().then(function () {
-                                    //console.log(Settings);
-
-                                    var Themes = [
-                                        { Name: 'Default', File: 'bootstrap-default.min.css' },
-                                        { Name: 'Cerulean', File: 'bootstrap-cerulean.min.css' },
-                                        { Name: 'Cosmo', File: 'bootstrap-cosmo.min.css' },
-                                        { Name: 'Cyborg', File: 'bootstrap-cyborg.min.css' },
-                                        { Name: 'Darkly', File: 'bootstrap-darkly.min.css' },
-                                        { Name: 'Flatly', File: 'bootstrap-flatly.min.css' },
-                                        { Name: 'Journal', File: 'bootstrap-journal.min.css' },
-                                        { Name: 'Lumen', File: 'bootstrap-lumen.min.css' },
-                                        { Name: 'Paper', File: 'bootstrap-paper.min.css' },
-                                        { Name: 'Readable', File: 'bootstrap-readable.min.css' },
-                                        { Name: 'Sandstone', File: 'bootstrap-sandstone.min.css' },
-                                        { Name: 'Simplex', File: 'bootstrap-simplex.min.css' },
-                                        { Name: 'Slate', File: 'bootstrap-slate.min.css' },
-                                        { Name: 'Spacelab', File: 'bootstrap-spacelab.min.css' },
-                                        { Name: 'Superhero', File: 'bootstrap-superhero.min.css' },
-                                        { Name: 'United', File: 'bootstrap-united.min.css' },
-                                        { Name: 'Yeti', File: 'bootstrap-yeti.min.css' }
-                                    ];
-
-                                    if (Settings) {
-                                        if (Settings.General !== null) {
-                                            // Put into setting dynamic language
-                                            tmhDynamicLocale.set(Settings.General['Data Formats']['Language Tag']);
-                                            moment.locale(Settings.General['Data Formats']['Language Tag']);
-
-                                            if (Settings.General.Theme !== 'Custom') {
-                                                for (var x = 0; x < Themes.length; x++) {
-                                                    if (Themes[x].Name === Settings.General.Theme) {
-                                                        configService.setCSSPath(settingsService.path + 'Content/bootstrap/' + Themes[x].File);
-                                                        $("#themeCss").attr("href", configService.getCSSPath());
-                                                    }
-                                                }
-                                            } else {
-                                                $("#themeCss").attr("href", Settings.General['Theme Custom URL']);
-                                            }
-
-                                            if (Settings.General['Additional CSS URL']) {
-                                                $("#additionalCss").attr("href", Settings.General['Additional CSS URL']);
-                                            }
-                                        }
-                                    }
-
-                                    // Preview themes using &theme= or &themeurl=
-                                    if ($stateParams.theme) {
-                                        for (var y = 0; y < Themes.length; y++) {
-                                            if (Themes[y].Name.toLowerCase() === $stateParams.theme.toLowerCase()) {
-                                                configService.setCSSPath(settingsService.path + 'Content/bootstrap/' + Themes[y].File);
-                                                $("#themeCss").attr("href", configService.getCSSPath());
-                                            }
-                                        }
-                                    }
-
-                                    if ($stateParams.themeurl) {
-                                        $("#themeCss").attr("href", $stateParams.themeurl);
-                                    }
-
-                                    if ($stateParams.cssurl) {
-                                        $("#additionalCss").attr("href", $stateParams.cssurl);
-                                    }
-
-                                    // Config is initialized.
-                                    configService.init(true);
-
-                                    googleAnalyticsService.load(Settings, onResolve);
-                                });
-                            });
+                                if (Settings.General['Additional CSS URL']) {
+                                    SetAdditionalCss(Settings.General['Additional CSS URL']);
+                                }
+                            }
                         }
-                    }
+
+                        
+                        // Preview themes using &theme= or &themeurl=
+                        if ($stateParams.theme) {
+                            for (var y = 0; y < Themes.length; y++) {
+                                if (Themes[y].Name.toLowerCase() === $stateParams.theme.toLowerCase()) {
+                                    configService.setCSSPath(settingsService.path + 'Content/bootstrap/' + Themes[y].File);
+                                    SetThemeCss(configService.getCSSPath());
+                                }
+                            }
+                        }
+
+                        if ($stateParams.themeurl) {
+                            SetThemeCss($stateParams.themeurl);
+                        }
+
+                        if ($stateParams.cssurl) {
+                            SetAdditionalCss($stateParams.cssurl);
+                        }
+                    };
+
+                    return new Promise(function (resolve, reject) {
+                        loadTheme(configService, $stateParams, tmhDynamicLocale, settingsService);
+                        resolve();
                     });
+                    
                 }
             }
         });
 
-        $urlRouterProvider.otherwise('/login');
-
-        //Local storage
-        localStorageServiceProvider
-            .setPrefix('app').setStorageType('localStorage');
-
-        tmhDynamicLocaleProvider.localeLocationPattern(settingsServiceProvider.getPath() + 'Scripts/angular/i18n/angular-locale_{{locale}}.js');
-    });
+    });//ccApp.config
 
     // Restriction
-    ccApp.run(function ($rootScope, userService, $state, googleAnalyticsService) {
+    ccApp.run(function ($rootScope, userService, $state, googleAnalyticsService, apiConfig, configService, dataService, localStorageService, tmhDynamicLocale, settingsService, $stateParams, $ocLazyLoad) {
+
         // enumerate routes that don't need authentication
-        var routesThatDontRequireAuth = ['/login', '/init', '/signup?refid&refkey', '/reminder/:key', '/confirmation?Status&Type&PickupDate&TransactionID&Comment', '/notifications?Id'];
+        var routesThatDontRequireAuth = ['/login', '/signup?refid&refkey', '/reminder/:key', '/confirmation?Status&Type&PickupDate&TransactionID&Comment', '/notifications?Id'];
 
         // check if current location matches route
         var routeClean = function (route) {
@@ -529,12 +564,131 @@
             console.log(ev);
             console.log(to);
 
-            // if route requires auth and user is not logged in
-            if (routeClean(to.url) === -1 && !userService.getCustomer()) {
-                // redirect back to login
-                ev.preventDefault();
-                $state.go('init', { returnState: to.name });
+            var initConfigService = function (apiConfig, CustomerConnect, localStorageService, configService, onResolve, dataService, tmhDynamicLocale, moment, $stateParams, configService, googleAnalyticsService, settingsService, $ocLazyLoad) {
+                apiConfig.ApplyConfig(CustomerConnect.Config);
+
+                dataService.settings.getSpecificSettings(true, true, true, true, true, true, true, true).then(function (data) {
+
+                    var Settings = null;
+                    if (!data.Failed)
+                        Settings = data.ReturnObject.CustomerConnectSettings;
+                    else
+                        Settings = { Notifications: null, Preferences: null, Stores: null, States: null, General: null };
+
+                    configService.setProfile(Settings);
+
+
+                    var a = [];
+                    var ap = Settings.General['Authentication Providers'];
+
+                    if (ap != null) {
+                        var g = ap.Google;
+                        if (g != null && g.Enabled === "1")
+                            a.push(
+                                new Promise(function (resolve, reject) { $ocLazyLoad.load('authGoogle').then(resolve, resolve); })
+                                );
+
+                        var g = ap.Facebook;
+                        if (g != null && g.Enabled === "1")
+                            a.push(
+                                new Promise(function (resolve, reject) { $ocLazyLoad.load('authFacebook').then(resolve, resolve); })
+                                );
+                    }
+                    var authLoad = Promise.all(a);
+
+                    var pAuth = new Promise(function (resolve, reject) {
+                        configService.authProviders.setup().then(function () {
+                            configService.init(true);
+                            resolve();
+                        });
+                    });
+
+                    Promise.all([
+                                authLoad.then(pAuth),
+                                googleAnalyticsService.load(Settings)
+                    ]).then(onResolve);
+                });
             }
+
+
+
+            var loadSettings = function (apiConfig, configService, dataService, localStorageService, tmhDynamicLocale, settingsService, $stateParams, googleAnalyticsService, $ocLazyLoad) {
+                return new Promise(function (resolve, reject) {
+
+                    var onResolve = function () {
+                        console.groupEnd();
+                        resolve();
+                    }
+
+                    console.groupCollapsed('loadingSettings');
+
+                    if (!configService.isInitialized()) {
+                        console.log('loading settings');
+
+                        initConfigService(apiConfig, CustomerConnect, localStorageService, configService, onResolve, dataService, tmhDynamicLocale, moment, $stateParams, configService, googleAnalyticsService, settingsService, $ocLazyLoad);
+                    }
+                    else
+                        onResolve();
+
+                });
+            }
+
+            var InitCustomer = function (returnState) {
+                if (localStorageService.get(CustomerConnect.Config.Tenant + '_token') == null) {
+                    $state.go('login', { returnState: returnState });
+                    return;
+                }
+
+                CustomerConnect.Config.SessionId = localStorageService.get(CustomerConnect.Config.Tenant + '_token');
+                apiConfig.setSessionId(CustomerConnect.Config.SessionId);
+
+
+
+                var promiseC = dataService.customer.getCustomer();
+                var promiseM = dataService.user.getMessages();
+
+                Promise.all([promiseC, promiseM]).then(function (values) {
+                    var vc = values[0];
+
+                    if (vc.Failed) {
+                        localStorageService.remove(CustomerConnect.Config.Tenant + '_token');
+                        $state.go('login');
+                        return;
+                    }
+                    userService.setCustomer(vc.ReturnObject);
+
+                    var vm = values[1];
+                    if (vm.Failed)
+                        dialogs.error('Messages Error', 'Unable to load messages.');
+                    else
+                        userService.setMessages(vm.ReturnObject);
+
+                    if (returnState)
+                        $state.go(returnState);
+                    else
+                        $state.go('account');
+                });
+            };
+
+            var isNeedInitCustomer = routeClean(to.url) === -1 && !userService.getCustomer();
+
+            // if route requires auth and user is not logged in
+            if (isNeedInitCustomer) {
+                ev.preventDefault();//customer missing, stop load state.
+            }
+
+            return new Promise(function (resolve, reject) {
+
+                var ls = loadSettings(apiConfig, configService, dataService, localStorageService, tmhDynamicLocale, settingsService, $stateParams, googleAnalyticsService, $ocLazyLoad);
+
+                ls.then(function () {
+                    if (isNeedInitCustomer) {
+                        InitCustomer(to.name);
+                    }
+                    resolve();
+                });
+
+            });
         });
 
         $rootScope.$on('$stateChangeSuccess', function (event, to) {

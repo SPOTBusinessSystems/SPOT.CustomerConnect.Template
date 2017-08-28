@@ -8,15 +8,13 @@
     <title>CustomerConnect</title>
 
     <!-- Dependencies -->
-    <link id="bootstrapCss" rel="stylesheet" type="text/css" href="/@TENANT/Template/Default/Content/bootstrap/bootstrap.min.css?v=3.3.7" />
-    <link id="themeCss" rel="stylesheet" type="text/css" href="/@TENANT/Template/Default/Content/bootstrap/bootstrap.default.min.css?v=3.3.7" />
-    <link id="additionalCss" rel="stylesheet" type="text/css" href="" />
-    <link rel="stylesheet" href="/@TENANT/Template/Default/Content/css/styles-bundle.min.css?v=1.0.0" />
+    <link id="bootstrapCss" rel="stylesheet" type="text/css" href="/@TENANT/Template/Default/Content/bootstrap/bootstrap.min.css?v=3.3.7" defer />
+    <link rel="stylesheet" href="/@TENANT/Template/Default/Content/css/styles-bundle.min.css?v=1.0.0" defer />
 
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" async >
 
     <script src="/@TENANT/Template/Default/Scripts/extras-bundle.min.js?v=1.0.0"></script>
-    <script src="/@TENANT/Template/Default/Scripts/bootstrap-bundle.min.js?v=1.0.0"></script>
+    <script src="/@TENANT/Template/Default/Scripts/bootstrap-bundle.min.js?v=1.0.0" async></script>
     <script src="/@TENANT/Template/Default/Scripts/angular-bundle.min.js?v=1.0.0"></script>
 
     <!-- SPOT API -->
@@ -27,29 +25,18 @@
     <script src="/@TENANT/Template/Default/Components/service.js"></script>
 
     <!-- Directives -->
-    <script src="/@TENANT/Template/Default/Components/Shared/DynamicContent/DynamicContent.js"></script>
-
-    <!-- Components - Base -->
-    <!--<script src="/@TENANT/Template/Default/Components/Base/AuthProviders/GoogleAuth.js"></script>
-    <script src="/@TENANT/Template/Default/Components/Base/AuthProviders/FacebookAuth.js"></script>-->
+    <script src="/@TENANT/Template/Default/Components/Shared/DynamicContent/DynamicContent.js" async ></script>
 
     <!-- Components - Controls -->
-    <script src="/@TENANT/Template/Default/Components/Controls/MainMenu.js"></script>
-    <script src="/@TENANT/Template/Default/Components/Controls/SiteHeader.js"></script>
-    <script src="/@TENANT/Template/Default/Components/Controls/SiteFooter.js"></script>
+    <script src="/@TENANT/Template/Default/Components/Controls/MainMenu.js" async ></script>
+    <script src="/@TENANT/Template/Default/Components/Controls/SiteHeader.js" async ></script>
+    <script src="/@TENANT/Template/Default/Components/Controls/SiteFooter.js" async ></script>
 
 
     <!-- View Components -->
     <!-- View Controllers - Anonymous -->
-    <script src="/@TENANT/Template/Default/Components/Views/Init/InitController.js"></script>
-    <script src="/@TENANT/Template/Default/Components/Dialogs/SendMessageController.js"></script>
+    <script src="/@TENANT/Template/Default/Components/Dialogs/SendMessageController.js" async ></script>
 
-    <!-- Captcha -->
-    <!--<script src='//www.google.com/recaptcha/api.js?onload=vcRecaptchaApiLoaded&render=explicit' async defer></script>-->
-
-    <!-- Auth Providers -->
-    <script src="//apis.google.com/js/client:platform.js" async defer></script>
-    <script src="//connect.facebook.net/en_US/sdk.js"></script>
 </head>
 <body ng-cloak>
     <div>
