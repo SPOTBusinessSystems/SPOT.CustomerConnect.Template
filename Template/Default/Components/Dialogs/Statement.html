@@ -1,17 +1,17 @@
 <div class="modal-header">
-    <h4 class="modal-title">{{Statement.StatementDate | date:'shortDate'}}<span class="pull-right glyphicon glyphicon-remove" ng-click="close()"></span></h4>
+    <h4 class="modal-title">{{Statement.StatementDate | localizedDate:'shortDate'}}<span class="pull-right glyphicon glyphicon-remove" ng-click="close()"></span></h4>
 </div>
 <div class="modal-body">
     <div class="form-group">
         <div class="form-group">
-            <span class="input-group">Due Date: {{Statement.DueDate | date:'shortDate'}}</span>
-            <span class="input-group">Closing Date: {{Statement.ClosingDate | date:'shortDate'}}</span>
+            <span class="input-group">Due Date: {{Statement.DueDate | localizedDate:'shortDate'}}</span>
+            <span class="input-group">Closing Date: {{Statement.ClosingDate | localizedDate:'shortDate'}}</span>
         </div>
         <div class="form-group">
-            <span class="input-group">Previous Balance: {{Statement.BalancePrevious | currency}}</span>
-            <span class="input-group">Total Charges: {{Statement.TotalCharges | currency}}</span>
-            <span class="input-group">Total Payments: {{Statement.TotalPayments | currency}}</span>
-            <span class="input-group">Statement Balance: {{Statement.Balance | currency}}</span>
+            <span class="input-group">Previous Balance: {{Statement.BalancePrevious | localizedCurrency}}</span>
+            <span class="input-group">Total Charges: {{Statement.TotalCharges | localizedCurrency}}</span>
+            <span class="input-group">Total Payments: {{Statement.TotalPayments | localizedCurrency}}</span>
+            <span class="input-group">Statement Balance: {{Statement.Balance | localizedCurrency}}</span>
         </div>
     </div>
 
@@ -27,11 +27,11 @@
             </thead>
             <tbody>
                 <tr ng-repeat="item in filteredItems">
-                    <td>{{item.ActivityDateTime | date:'shortDate'}}</td>
+                    <td>{{item.ActivityDateTime | localizedDate:'shortDate'}}</td>
                     <td class="hidden-xs"><a href="" ng-click="ShowOrder(item.InvoiceID, Orders)">{{item.InvoiceKey}}</a></td>
                     <td ng-if="item.InvoiceKey != ''"><a href="" ng-click="ShowOrder(item.InvoiceID, Orders)">{{item.Description}}</a></td>
                     <td ng-if="item.InvoiceKey == ''">{{item.Description}}</td>
-                    <td>{{item.Amount | currency}}</td>
+                    <td>{{item.Amount | localizedCurrency}}</td>
                 </tr>
             </tbody>
             <tfoot>

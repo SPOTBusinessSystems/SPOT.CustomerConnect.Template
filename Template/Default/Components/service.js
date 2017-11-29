@@ -376,6 +376,10 @@
         };
 
         this.getProfile = function () {
+            if (!this.profile) {
+                console.log("Settings are empty!!!!");
+            }
+
             return this.profile;
         };
 
@@ -641,6 +645,10 @@
 
             validateCaptcha: function (response) {
                 return createRequest('ValidateCaptcha', { response: response }).then(handleSuccess, handleError);
+            },
+
+            getLocalitySettings: function () {
+                return createRequest('GetLocalitySettings').then(handleSuccess, handleError);
             }
         };
 

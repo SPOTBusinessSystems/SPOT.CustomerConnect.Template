@@ -22,6 +22,13 @@
                 return;
             }
 
+            var Settings = configService.getProfile();
+            if (Settings != null) {
+                var stateTitle = "Select " + Settings.LocalitySettings.Level2Name;
+                var a = iElement.find('option:first');
+                a.text(stateTitle);
+            }
+
             // Initial value
             scope.$watch(ngModel, function () {
                 if (ngModel.$viewValue != null) {

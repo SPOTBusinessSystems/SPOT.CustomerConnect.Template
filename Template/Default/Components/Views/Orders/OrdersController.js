@@ -129,6 +129,47 @@
                 });
             };
 
+            $scope.hasOrdersStatusLabel = function () {
+                switch ($scope.Filters.Status) {
+                    case '128':
+                    case '129':
+                    case '130': return true;
+                }
+
+                return false;
+            };
+
+            $scope.getOrdersStatusLabel = function () {
+
+                if($scope.Orders)
+                {
+                    var x = $scope.Orders[0];
+
+                    if (x && x.StatusDisplayLabel)
+                        return x.StatusDisplayLabel;
+                }
+
+                switch($scope.Filters.Status)
+                {
+                    case '128': return "Dropoff Date";
+                    case '129': return "Ready Date";
+                    case '130': return "Sold Date";
+                }
+
+                return "";
+            };
+
+            $scope.getReadyOrdersStatusLabel = function () {
+                if ($scope.ReadyOrders) {
+                    var x = $scope.Orders[0];
+
+                    if (x && x.StatusDisplayLabel)
+                        return x.StatusDisplayLabel;
+                }
+
+                return "Ready Date";
+            };
+
             // Get first data.
             $scope.LoadOrders();
         };

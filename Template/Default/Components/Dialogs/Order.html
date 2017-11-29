@@ -2,15 +2,18 @@
     <h4 class="modal-title">{{SingleOrder.InvoiceKey}}<span class="pull-right glyphicon glyphicon-remove" ng-click="close()"></span></h4>
 </div>
 <div class="modal-body">
+    <h4 ng-if="SingleOrder.HotelRoomNumber">Guest Room #:&nbsp;&nbsp;{{SingleOrder.HotelRoomNumber}}</h4>
+    <h4 ng-if="SingleOrder.HotelGuestName">Guest Name:&nbsp;&nbsp;{{SingleOrder.HotelGuestName}}</h4>
+
     <h4>{{SingleOrder.DepartmentGroupName}}</h4>
-    <h5 ng-if="showPromisedDate(SingleOrder.PromisedDate)">Promised:&nbsp;&nbsp;{{SingleOrder.PromisedDate | date:'short'}}</h5>
+    <h5 ng-if="showPromisedDate(SingleOrder.PromisedDate)">Promised:&nbsp;&nbsp;{{SingleOrder.PromisedDate | localizedDate:'short'}}</h5>
 
     <div class="form-group" ng-repeat="Item in SingleOrder.Items">
         {{Item.Quantity}} - {{Item.CategoryName}} - {{Item.ItemName}}<span class="pull-right" ng-hide="hidePricing">{{Item.Amount}}</span>
 
         <div style="margin-left: 20px;">
             <span ng-repeat="Detail in Item.Details">
-                {{Detail.Name}} <span ng-if="Detail.Price != '0.00'" ng-hide="hidePricing">{{Detail.Price | currency}}</span><span ng-if="!$last">,</span>
+                {{Detail.Name}} <span ng-if="Detail.Price != '0.00'" ng-hide="hidePricing">{{Detail.Price | localizedCurrency}}</span><span ng-if="!$last">,</span>
             </span>
         </div>
 
@@ -64,12 +67,12 @@
 
     <div class="form-group" ng-hide="hidePricing">
         <div ng-repeat="Payment in SingleOrder.Payments">
-            {{Payment.StatusDateTime | date:'short'}} - {{Payment.TenderTypeToken}}<span class="pull-right">{{Payment.AppliedAmount}}</span>
+            {{Payment.StatusDateTime | localizedDate:'short'}} - {{Payment.TenderTypeToken}}<span class="pull-right">{{Payment.AppliedAmount}}</span>
         </div>
     </div>
 
     <div class="form-group" ng-hide="hidePricing">
-        <span class="pull-right">Balance:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{SingleOrder.Balance | currency}}</span><br />
+        <span class="pull-right">Balance:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{SingleOrder.Balance | localizedCurrency}}</span><br />
     </div>
 
     <div class="form-group text-center">

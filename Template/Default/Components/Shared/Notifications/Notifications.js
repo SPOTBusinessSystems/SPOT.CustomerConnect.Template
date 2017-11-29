@@ -17,121 +17,151 @@
         };
         return directive;
 
-        function link(scope, iElement, iAttrs, ngModel) {
 
-            if (!ngModel) {
-                return;
+
+
+
+        function findInArray(arr, x, field) {
+            for (var y = 0; y < arr.length; y++) {
+                if (arr[y][field] == x) {
+                    return y;
+                }
             }
 
-            scope.updateModel = function () {
+            return -1;
+        }
 
-                var model = ngModel.$viewValue.Notifications;
-                var nn = scope.notifications;
+        function setMethods(n, methods) {
+            n.methods = [];
 
-                for (var x = 0; x < nn.length; x++) {
-                    if (nn[x].selectedMethod != null) {
-                        var updated = false;
-
-                        for (var y = 0; y < model.length; y++) {
-                            // Change model.
-                            if (model[y].NotificationTypeName == nn[x].name) {
-                                model[y].NotificationMethodName = nn[x].selectedMethod.name;
-                                model[y].NotificationMethodDescription = nn[x].selectedMethod.description;
-                                model[y].NotificationValue = true;
-                                updated = true;
-                            }
-                        }
-
-                        if (!updated) {
-                            // Was not in the original data set.
-                            model.push({
-                                NotificationMethodDescription: nn[x].selectedMethod.description,
-                                NotificationMethodName: nn[x].selectedMethod.name,
-                                NotificationTypeDescription: nn[x].description,
-                                NotificationTypeName: nn[x].name,
-                                NotificationValue: true
-                            })
-                        }
-                    }
-                }
-
-                ngModel.$setViewValue(ngModel.$viewValue);
+            for (var i = 0; i < n.AllowedMethods.length; i++) {
+                var j = findInArray(methods, n.AllowedMethods[i], 'Name');
+                if (j != -1)
+                    n.methods.push(methods[j]);
             }
         }
 
+        function loadOptions(options) {
+            var res = [];
+            if (options == null || options.NotificationTypes == null || options.NotificationTypes.length == 0)
+                return res;
+
+
+            for (var i = 0; i < options.NotificationTypes.length; i++) {
+                var z = options.NotificationTypes[i];
+
+                if (!z.DisplayOnWeb)
+                    continue;
+
+                if (z.AllowedMethods.length == 0)
+                    continue;
+
+                if (z.Description == '') {
+                    z.Description = z.Name;
+                }
+
+                var j = findInArray(res, z.ID, 'ID');
+                if (j == -1) {
+                    z.selectedMethod = [];
+                    res.push(z);
+                }
+
+                setMethods(z, options.NotificationMethods);
+            }
+
+            // Sort
+            res = $filter('orderBy')(res, ['Description', 'Name'], false);
+
+            return res;
+        }
+
+        function loadDefaults(notifications, methods) {
+            for (var i = 0; i < notifications.length; i++) {
+                //load default here
+                var z = notifications[i];
+                for (var j = 0; j < z.DefaultMethods; j++) {
+                    var k = findInArray(methods, z.DefaultMethods[j], 'Name');
+                    if (k != -1)
+                        z.selectedMethod.push(methods[k]);
+                }
+            }
+        }
+
+        function loadSelected(value, notifications, methods, outer) {
+
+            if (!value || value.length == 0) {
+                loadDefaults(notifications, methods);
+                return;
+            }
+
+            for (var i = 0; i < value.length; i++) {
+                var typeName = value[i].NotificationTypeName;
+                var methodName = value[i].NotificationMethodName;
+
+                var j = findInArray(notifications, typeName, 'Name');
+                var k = findInArray(methods, methodName, 'Name');
+
+                if (j != -1) {
+                    var z = notifications[j];
+
+                    if (k != -1)
+                        z.selectedMethod.push(methods[k]);
+                }
+                else {
+                    if (k != -1)
+                        outer.push(value[i]);
+                }
+            }
+        }
+
+        function saveSelected(n, outer) {
+            var res = angular.copy(outer);
+
+            for (var i = 0; i < n.length; i++) {
+                var z = n[i];
+
+                var d = findInArray(z.selectedMethod, 'Disabled', 'Name');
+                if (d != -1) {
+                    res.push({
+                        NotificationTypeDescription: z.Description,
+                        NotificationTypeName: z.Name,
+                        NotificationMethodDescription:  z.selectedMethod[d].Description,
+                        NotificationMethodName: z.selectedMethod[d].Name,
+                        
+                        NotificationValue: true
+                    });
+                    continue;
+                }
+
+                for (var j = 0; j < z.selectedMethod.length; j++) {
+                    res.push({
+                        NotificationTypeDescription: z.Description,
+                        NotificationTypeName: z.Name,
+                        NotificationMethodDescription: z.selectedMethod[j].Description,
+                        NotificationMethodName: z.selectedMethod[j].Name,
+
+                        NotificationValue: true
+                    });
+                }
+            }
+
+            return res;
+        }
+
         function controller($scope) {
-            function findInArray(arr, x) {
-                for (var y = 0; y < arr.length; y++) {
-                    if (arr[y].typeId == x) {
-                        return y;
-                    }
-                }
 
-                return -1;
-            }
+            var options = null;
+            if (configService.profile != null)
+                options = configService.getProfile().NotificationsV2;
 
-            $scope.notifications = [];
+            $scope.notifications = loadOptions(options);
 
-            if (configService.profile != null) {
-                var notifications = configService.getProfile().Notifications;
+            $scope.notificationsOuter = []
 
-                for (var x = 0; x < notifications.length; x++) {
-                    var y = findInArray($scope.notifications, notifications[x].TypeID);
-                    var z = notifications[x];
-
-                    if (!z.DisplayOnWeb)
-                        continue;
-
-                    if (z.MethodDescription == '') {
-                        z.MethodDescription = z.MethodName;
-                    }
-
-                    if (y == -1) {
-                        $scope.notifications.push({
-                            typeId: z.TypeID,
-                            name: z.Name,
-                            description: z.Description,
-                            abbr: z.Abbreviation,
-                            methods: [{
-                                methodId: z.MethodID,
-                                name: z.MethodName,
-                                description: z.MethodDescription,
-                                abbr: z.MethodAbbreviation,
-                                default: z.DefaultValue
-                            }]
-                        });
-                    } else {
-                        $scope.notifications[y].methods.push({
-                            methodId: z.MethodID,
-                            name: z.MethodName,
-                            description: z.MethodDescription,
-                            abbr: z.MethodAbbreviation,
-                            default: z.DefaultValue
-                        });
-                    }
-                }
-
-                // Sort
-                $scope.notifications = $filter('orderBy')($scope.notifications, ['Description', 'MethodName'], false);
-
-                // Set customer defaults
+            if (options != null) {
                 var model = $scope.ngModel.Notifications;
-
-                for (var x = 0; x < model.length; x++) {
-                    for (var y = 0; y < $scope.notifications.length; y++) {
-                        if (model[x].NotificationTypeName == $scope.notifications[y].name) {
-                            // Found, get method.
-                            for (var z = 0; z < $scope.notifications[y].methods.length; z++) {
-                                if (model[x].NotificationMethodName == $scope.notifications[y].methods[z].name) {
-                                    // Set as selected.
-                                    $scope.notifications[y].selectedMethod = $scope.notifications[y].methods[z];
-                                }
-                            }
-                        }
-                    }
-                }
+                loadSelected(model, $scope.notifications, options.NotificationMethods, $scope.notificationsOuter);
             }
-
 
             $scope.getPhone = function (name) {
                 var pL = $scope.ngModel.Phones;
@@ -166,18 +196,32 @@
                     case "Disabled": return "";
                 }
 
-                return name + name;
+                return name;
             }
 
             $scope.getSelectedText = function (item) {
-                if (item !== undefined) {
-                    var x = $scope.getNotificationValue(item.name);
-                    if (x)
-                        x = " - " + x;
 
-                    return item.name + " <span class='notificationValue'>" + x + "</span>";
+                if (item !== undefined && item.length) {
+                    var s = '';
+
+                    for (var i = 0; i < item.length; i++) {
+                        if (i > 0)
+                            s += ', ';
+
+                        var name = item[i].Name;
+
+                        if (name == "Disabled")
+                            return "Disabled";
+
+                        var x = $scope.getNotificationValue(name);
+                        if (x)
+                            x = " - " + x;
+
+                        s += name + " <span class='notificationValue'>" + x + "</span>";
+                    }
+                    return s;
                 } else {
-                    return "Please select an item";
+                    return "Please select notification method";
                 }
             };
 
@@ -192,6 +236,20 @@
                     return "";
                 }
             };
+        }
+
+
+        function link(scope, iElement, iAttrs, ngModel) {
+
+            if (!ngModel) {
+                return;
+            }
+
+            scope.updateModel = function () {
+                var nn = scope.notifications;
+                ngModel.$viewValue.Notifications = saveSelected(nn, scope.notificationsOuter);
+                ngModel.$setViewValue(ngModel.$viewValue);
+            }
         }
     }
 })();

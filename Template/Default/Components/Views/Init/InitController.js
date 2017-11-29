@@ -10,15 +10,18 @@
 
     function InitController($state, $stateParams, $scope, localStorageService, userService, dataService, dialogs, apiConfig) {
 
-        if (localStorageService.get(CustomerConnect.Config.Tenant + '_token') == null) {
-            $state.go('login', { returnState: $stateParams.returnState });
-            return;
+        if (CustomerConnect.Config.SessionLoggedIn) {
+            localStorageService.set(CustomerConnect.Config.Tenant + '_token', CustomerConnect.Config.SessionId)
         }
-
-        CustomerConnect.Config.SessionId = localStorageService.get(CustomerConnect.Config.Tenant + '_token');
+        else {
+            if (localStorageService.get(CustomerConnect.Config.Tenant + '_token') == null) {
+                $state.go('login', { returnState: $stateParams.returnState });
+                return;
+            }
+            CustomerConnect.Config.SessionId = localStorageService.get(CustomerConnect.Config.Tenant + '_token');
+        }
+        
         apiConfig.setSessionId(CustomerConnect.Config.SessionId);
-
-
 
         var promiseC = dataService.customer.getCustomer();
         var promiseM = dataService.user.getMessages();
@@ -43,7 +46,7 @@
                 $state.go($stateParams.returnState);
             else
                 $state.go('account');
-
+        
         });
     };
 

@@ -1,0 +1,16 @@
+
+<div class="form-group" ng-if="IsPickupInstructions()">
+    <label for="comments" class="control-label">Pickup instructions</label>
+    <textarea name="comments" class="form-control" ng-model="Customer.CustomerRouteInfo.PickupInstructions" title="Pickup instructions" rows="2"></textarea>
+</div>
+
+<div class="form-group" ng-if="IsPickupInstructions()">
+    <label for="comments" class="control-label">Delivery instructions</label>
+    <textarea name="comments" class="form-control" ng-model="Customer.CustomerRouteInfo.DeliveryInstructions" title="Delivery instructions" rows="2"></textarea>
+</div>
+
+<div class="form-group" >
+    <label for="comments" class="control-label">Cleaning instructions</label>
+    <textarea name="comments" class="form-control" ng-model="Customer.CleaningInstructions" title="Cleaning instructions" rows="2"></textarea>
+</div>
+

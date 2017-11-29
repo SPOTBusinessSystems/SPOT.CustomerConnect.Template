@@ -35,7 +35,7 @@
         </div>
 
         <div ng-show="Route.SameDayCutoffTime != ''">
-            <span>Same day pickup must be scheduled before {{cutoffTime}}</span>
+            <span>Standard pickups must be scheduled by {{cutoffTime}}</span>
         </div>
     </div>
 
@@ -45,7 +45,7 @@
                 <div ng-class="{'col-sm-6':Settings.Pickup['Allow Delivery Date Selection'] == '1', 'col-sm-12':Settings.Pickup['Allow Delivery Date Selection'] == '0'}">
                     <div class="input-group center">
                         <label class="control-label">Pickup Date</label><br />
-                        {{Pickup.Date | date:'fullDate' }}
+                        {{Pickup.Date | localizedDate:'fullDate' }}
                         <uib-datepicker ng-model="Pickup.Date" class="well well-sm" datepicker-options="pickupDateOptions" ng-required="true" ng-change="pickupDateChange()" required></uib-datepicker>
 
                         <div ng-if="Settings.Pickup['Allow Time Selection'] == '1'">
@@ -58,7 +58,7 @@
                 <div ng-if="Settings.Pickup['Allow Delivery Date Selection'] == '1'" class="col-sm-6">
                     <div class="input-group center">
                         <label class="control-label">Delivery Date</label><br />
-                        {{Pickup.DeliveryDate | date:'fullDate' }}
+                        {{Pickup.DeliveryDate | localizedDate:'fullDate' }}
                         <uib-datepicker ng-model="Pickup.DeliveryDate" class="well well-sm" datepicker-options="deliveryDateOptions" ng-required="true" required></uib-datepicker>
 
                         <div ng-if="Settings.Pickup['Allow Time Selection'] == '1' && Settings.Pickup['Allow Delivery Date Selection'] == '1'">

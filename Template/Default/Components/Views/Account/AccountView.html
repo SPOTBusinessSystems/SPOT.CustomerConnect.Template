@@ -7,7 +7,7 @@
         <div class="form-group">
             <change-password require="requirePasswordChange"></change-password>
             <label class="btn btn-default" ng-click="customerReferral()" ng-show="Settings.General['Customer Referral']['Enable Customer Referral'] == 1 && Customer.ShowReferral">Refer a friend</label>
-            <label class="btn btn-default" ng-click="convertToRoute()" ng-if="Customer.RouteName == '' && Settings.General['Route Scheduling'] == 1">Enable delivery</label>
+            <label class="btn btn-default" ng-click="convertToRoute()" ng-if="isEnableDeliveryVisible()">Enable delivery</label>
         </div>
         <h3>Basic</h3>
         <div class="form-group">
@@ -55,7 +55,7 @@
                 <br />
             </div>
             <div ng-show="Settings['Account Update']['Show Cash Credit'] == 1">
-                <label class="control-label">Available Cash Credit:&nbsp;&nbsp;</label>{{ Customer.CashCreditBalance | currency}}
+                <label class="control-label">Available Cash Credit:&nbsp;&nbsp;</label>{{ Customer.CashCreditBalance | localizedCurrency}}
                 <br />
             </div>
             <div ng-show="Customer.LockerPIN">
@@ -68,7 +68,7 @@
             <h3>Phones</h3>
             <div class="form-group" ng-repeat="phone in Customer.Phones" style="display:table-row;">
                 <span class="input-group-addon" style="display:table-cell"><label class="glyphicon glyphicon-phone"></label></span>
-                <input id="phoneNumber" name="phonenumber" ng-model="phone.Number" class="form-control" placeholder="{{ Settings.General['Data Formats']['Phone Mask'] }}" tooltip="{{ Settings.General['Data Formats']['Phone Mask'] }}" tooltip-trigger="focus" required type="tel" />
+                <input id="phoneNumber" name="phonenumber" ng-model="phone.Number" class="form-control" placeholder="{{ Settings.LocalitySettings.PhoneMask[0] }}" tooltip="{{ Settings.LocalitySettings.PhoneMask[0] }}" tooltip-trigger="focus" required type="tel" />
                 <select ng-model="phone.PhoneType" class="form-control">
                     <option>Home</option>
                     <option value="Cell/Mobile">Mobile</option>
@@ -111,7 +111,7 @@
 
                 <div class="input-group">
                     <span class="input-group-addon"><i class="glyphicon glyphicon-pencil"></i></span>
-                    <input id="zip" ng-model="Customer.PrimaryAddress.Zip" class="form-control" placeholder="Postal Code" />
+                    <input id="zip" ng-model="Customer.PrimaryAddress.Zip" class="form-control" placeholder="{{Settings.LocalitySettings.PostalCodeName}}" />
                     <span class="glyphicon form-control-feedback" aria-hidden="true"></span>
                 </div>
             </div>
@@ -137,7 +137,7 @@
 
                 <div class="input-group">
                     <span class="input-group-addon"><i class="glyphicon glyphicon-pencil"></i></span>
-                    <input id="zip" ng-model="Customer.DeliveryAddress.Zip" class="form-control" placeholder="Postal Code" />
+                    <input id="zip" ng-model="Customer.DeliveryAddress.Zip" class="form-control" placeholder="{{Settings.LocalitySettings.PostalCodeName}}" />
                     <span class="glyphicon form-control-feedback" aria-hidden="true"></span>
                 </div>
             </div>
@@ -163,7 +163,7 @@
 
                 <div class="input-group">
                     <span class="input-group-addon"><i class="glyphicon glyphicon-pencil"></i></span>
-                    <input id="zip" ng-model="Customer.BillingAddress.Zip" class="form-control" placeholder="Postal Code" />
+                    <input id="zip" ng-model="Customer.BillingAddress.Zip" class="form-control" placeholder="{{Settings.LocalitySettings.PostalCodeName}}" />
                     <span class="glyphicon form-control-feedback" aria-hidden="true"></span>
                 </div>
             </div>
@@ -195,7 +195,7 @@
 
         <div class="form-group" style="text-align: center; margin-top: 10px;">
             <input type="button" class="btn btn-danger" value="Undo Changes" ng-click="UndoChanges();" ng-disabled="!accountForm.$dirty" />
-            <input type="submit" class="btn btn-success" value="Save" ng-click="SaveAccount();" ng-disabled="!accountForm.$valid ||!accountForm.$dirty || !primaryAddressValid()" />
+            <input type="button" class="btn btn-success" value="Save" ng-click="SaveAccount();" ng-disabled="!accountForm.$valid ||!accountForm.$dirty || !primaryAddressValid()" />
         </div>
     </form>
 </div>

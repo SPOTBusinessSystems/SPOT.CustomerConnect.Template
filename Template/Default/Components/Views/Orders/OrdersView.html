@@ -19,14 +19,14 @@
             <div class="col-sm-6">
                 <div class="input-group center">
                     <label class="control-label">Start Date</label><br />
-                    {{Filters.StartDate | date:'fullDate' }}
+                    {{Filters.StartDate | localizedDate:'fullDate' }}
                     <uib-datepicker ng-model="Filters.StartDate" class="well well-sm" datepicker-options="dateOptions" ng-required="true" ng-change="LoadOrders()" required></uib-datepicker>
                 </div>
             </div>
             <div class="col-sm-6">
                 <div class="input-group center">
                     <label class="control-label">End Date</label><br />
-                    {{Filters.EndDate | date:'fullDate' }}
+                    {{Filters.EndDate | localizedDate:'fullDate' }}
                     <uib-datepicker ng-model="Filters.EndDate" class="well well-sm" datepicker-options="dateOptions" ng-required="true" ng-change="LoadOrders()" required></uib-datepicker>
                 </div>
             </div>
@@ -37,9 +37,7 @@
         <table class="table table-condensed table-hover table-striped">
             <thead>
                 <tr>
-                    <th ng-if="Filters.Status == 128">Dropoff Date</th>
-                    <th ng-if="Filters.Status == 129">Ready Date</th>
-                    <th ng-if="Filters.Status == 130">Sold Date</th>
+                    <th ng-if="hasOrdersStatusLabel()">{{getOrdersStatusLabel()}}</th>
                     <th>Invoice</th>
                     <th class="hidden-xs">Department</th>
                     <th>Balance</th>
@@ -48,12 +46,12 @@
             <tbody>
                 <tr ng-if="filteredOrders.length == 0"><td colspan="4">No orders found</td></tr>
                 <tr ng-repeat="order in filteredOrders">
-                    <td ng-if="Filters.Status == 128">{{order.DropoffDateTime | date:'short'}}</td>
-                    <td ng-if="Filters.Status == 129">{{order.ReadyDateTime | date:'short'}}</td>
-                    <td ng-if="Filters.Status == 130">{{order.SoldDateTime | date:'short'}}</td>
+                    <td ng-if="Filters.Status == 128">{{order.DropoffDateTime | localizedDate:'short'}}</td>
+                    <td ng-if="Filters.Status == 129">{{order.ReadyDateTime | localizedDate:'short'}}</td>
+                    <td ng-if="Filters.Status == 130">{{order.SoldDateTime | localizedDate:'short'}}</td>
                     <td><a href="" ng-click="ShowOrder(order.InvoiceID, Orders)">{{order.InvoiceKey}}</a></td>
                     <td class="hidden-xs">{{order.DepartmentGroupName}}</td>
-                    <td>{{order.Balance | currency}}</td>
+                    <td>{{order.Balance | localizedCurrency}}</td>
                 </tr>
             </tbody>
         </table>
@@ -66,7 +64,7 @@
         <table class="table table-condensed table-hover table-striped">
             <thead>
                 <tr>
-                    <th>Ready Date</th>
+                    <th>{{getReadyOrdersStatusLabel()}}</th>
                     <th>Invoice</th>
                     <th class="hidden-xs">Department</th>
                     <th>Balance</th>
@@ -75,10 +73,10 @@
             <tbody>
                 <tr ng-if="filteredReadyOrders.length == 0"><td colspan="4">No orders found</td></tr>
                 <tr ng-repeat="readyOrder in filteredReadyOrders">
-                    <td>{{readyOrder.ReadyDateTime | date:'short'}}</td>
+                    <td>{{readyOrder.ReadyDateTime | localizedDate:'short'}}</td>
                     <td><a href="" ng-click="ShowOrder(readyOrder.InvoiceID, ReadyOrders)">{{readyOrder.InvoiceKey}}</a></td>
                     <td class="hidden-xs">{{readyOrder.DepartmentGroupName}}</td>
-                    <td>{{readyOrder.Balance | currency}}</td>
+                    <td>{{readyOrder.Balance | localizedCurrency}}</td>
                 </tr>
             </tbody>
         </table>

@@ -1,11 +1,11 @@
-<div ng-repeat="notification in notifications track by notification.name">
+<div ng-repeat="notification in notifications track by notification.Name">
     <md-input-container class="md-block notificationSelect" md-no-float>
         <md-select-header>
-            <span> {{notification.description}}</span>
+            <span> {{notification.Description}}</span>
         </md-select-header>
-        <md-select ng-model="notification.selectedMethod" md-selected-text="getSelectedText(notification.selectedMethod)" aria-label="{{notification.description}}" ng-change="updateModel()">
+        <md-select ng-model="notification.selectedMethod" md-selected-text="getSelectedText(notification.selectedMethod)" aria-label="{{notification.Description}}" ng-change="updateModel()" multiple>
             <md-optgroup>
-                <md-option ng-value="item" ng-repeat="item in notification.methods">{{getOptionText(item.name)}}</md-option>
+                <md-option ng-value="item" ng-repeat="item in notification.methods">{{getOptionText(item.Name)}}</md-option>
             </md-optgroup>
         </md-select>
     </md-input-container>

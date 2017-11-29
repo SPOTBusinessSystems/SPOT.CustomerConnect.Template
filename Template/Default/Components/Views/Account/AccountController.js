@@ -7,9 +7,9 @@ var authProvider;
     .module('app')
     .controller('accountcontroller', accountcontroller);
 
-    accountcontroller.$inject = ['$scope', 'dialogs', '$rootScope', '$filter', 'settingsService', '$state', 'dataService', 'userService', 'configService', '$compile', '$stateParams', '$ocLazyLoad'];
+    accountcontroller.$inject = ['$scope', 'dialogs', '$rootScope', '$filter', 'settingsService', '$state', 'dataService', 'userService', 'configService', '$compile', '$stateParams', '$ocLazyLoad', 'CheckStateChangeService'];
 
-    function accountcontroller($scope, dialogs, $rootScope, $filter, settingsService, $state, dataService, userService, configService, $compile, $stateParams, $ocLazyLoad) {
+    function accountcontroller($scope, dialogs, $rootScope, $filter, settingsService, $state, dataService, userService, configService, $compile, $stateParams, $ocLazyLoad, CheckStateChangeService) {
         /* jshint validthis:true */
         var vm = this;
         vm.title = 'accountcontroller';
@@ -86,19 +86,20 @@ var authProvider;
 
             // Save Records
             $scope.SaveAccount = function () {
-                var ci = $scope.Customer;
+                var ci = angular.copy($scope.Customer);
 
                 if ($scope.birthMonth)
                     ci.Birthdate = new Date(Date.UTC(2012, $scope.birthMonth - 1, $scope.birthDate));
 
-                var ccArray = $scope.Customer.CreditCards;
+                var ccArray = ci.CreditCards;
 
                 if (ccArray.length > 0) {
-                    $scope.Customer.CreditCardSaveMode = 2;
 
-                    if (!$scope.Customer.CreditCardsToSave)
-                        $scope.Customer.CreditCardsToSave = [];
-                    var ccSave = $scope.Customer.CreditCardsToSave;
+                    ci.CreditCardSaveMode = 2;
+
+                    if (!ci.CreditCardsToSave)
+                        ci.CreditCardsToSave = [];
+                    var ccSave = ci.CreditCardsToSave;
 
                     var GetCard = function (cc) {
                         return { number: cc.CardInfo, type: CustomerConnect.Util.Validate.GetCCType(cc.CardInfo), expiration: cc.CardExpiration, SetPrimary: cc.SetPrimary, MarkDeleted: cc.MarkDeleted };
@@ -125,6 +126,7 @@ var authProvider;
                                     title: 'Unable to add new credit card',
                                     text: "A valid credit card number is required."
                                 });
+
                                 return;
                             }
 
@@ -145,13 +147,16 @@ var authProvider;
 
                         } else {
                             //console.log('existing card');
-                            if (cc.CardInfo != userService.getCustomer().CreditCards[index].CardInfo || cc.CardExpiration != moment(userService.getCustomer().CreditCards[index].CardExpiration).format("MM/YY")) {
+                            var cL = userService.getCustomer().CreditCards;
+                            //index >= cL.length ||
+                            if (cc.CardInfo != cL[index].CardInfo || cc.CardExpiration != moment(cL[index].CardExpiration).format("MM/YY")) {
                                 if (!CustomerConnect.Util.Validate.CCNumber(cc.CardInfo)) {
                                     swal({
                                         type: 'error',
                                         title: 'Credit Card Update',
                                         text: 'When updating your credit card, please re-enter your full credit card number and expiration.'
                                     });
+
                                     return;
                                 } else {
                                     // Card Updated. Mark deleted, re-add with new CC Info and expiration
@@ -174,9 +179,18 @@ var authProvider;
                             dataService.customer.getCustomer().then(function (data) {
                                 if (!data.Failed) {
                                     userService.setCustomer(data.ReturnObject);
+                                    //$scope.Customer = angular.copy(userService.getCustomer());
                                 }
 
-                                $state.reload();
+                                $scope.accountForm.$setPristine();
+                                $scope.accountForm.$setUntouched();
+                                //$state.reload();
+                                $state.reload($state.current.name);
+
+                                $stateParams.reload = !$stateParams.reload;
+                                $state.transitionTo($state.current, $stateParams, {
+                                    reload: true, inherit: false, notify: true
+                                });
                             });
                         });
                     } else {
@@ -214,7 +228,7 @@ var authProvider;
             // Additional Phones
             $scope.AddPhone = function () {
                 if ($scope.Customer.Phones.length < 5) {
-                    $scope.Customer.Phones.push({ Extension: "", Number: "", PhoneMask: $scope.Settings.General['Data Formats']['Phone Mask'], PhoneType: "Home" });
+                    $scope.Customer.Phones.push({ Extension: "", Number: "", PhoneMask: $scope.Settings.LocalitySettings.PhoneMask[0], PhoneType: "Home" });
                 }
             };
 
@@ -251,11 +265,12 @@ var authProvider;
                         dialogs.notify('Delivery Signup', 'You have been converted to a delivery account.')
 
                         dataService.customer.getCustomer().then(function (cdata) {
-                            if (!data.Failed) {
+                            if (!cdata.Failed) {
                                 userService.setCustomer(cdata.ReturnObject);
+                                $scope.Customer = angular.copy(userService.getCustomer());
                                 $state.reload();
                             } else {
-                                dialogs.error('Retrieval failed.', data.Message);
+                                dialogs.error('Retrieval failed.', cdata.Message);
                             }
                         });
                     } else {
@@ -263,6 +278,43 @@ var authProvider;
                     }
                 });
             };
+
+            $scope.isEnableDeliveryVisible = function () {
+
+                var g = $scope.Settings.General;
+                if ($scope.Customer.RouteName == '' && g['Route Scheduling'] == 1) {
+                    var x = g["Show Enable Delivery Button"];
+                    if ((!x) || x == 1)
+                        return true;
+                }
+
+                return false;
+            };
+
+
+            var validateStateChange = function (continueNavigation) {
+
+                if (!$scope.accountForm.$dirty) {
+                    continueNavigation();
+                    return;
+                }
+
+                swal({
+                    title: 'Are you sure?',
+                    text: "The form has changed, do you want to continue without saving?",
+                    type: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#008cba',
+                    cancelButtonColor: '#5cb85c',
+                    confirmButtonText: 'Yes, discard changes',
+                    cancelButtonText: 'Cancel'
+                }).then(function () {
+                    continueNavigation();
+                }).catch(function () { });
+
+            };
+
+            CheckStateChangeService.checkFormOnStateChange($scope, validateStateChange);
 
             // Initialize Customer
             $scope.initCustomer();

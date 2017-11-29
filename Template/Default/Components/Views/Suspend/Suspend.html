@@ -1,4 +1,4 @@
-<div ng-controller="SuspendController" class="medPage">
+﻿<div ng-controller="SuspendController" class="medPage">
     <div class="text-center">
         <h2>Suspend Service</h2>
         <br />
@@ -9,7 +9,7 @@
                 <div class="col-sm-6">
                     <div class="input-group center">
                         <label class="control-label">Start Date</label><br />
-                        {{Cancellation.FromDate | date:'fullDate' }}
+                        {{Cancellation.FromDate | localizedDate:'fullDate' }}
                         <uib-datepicker ng-model="Cancellation.FromDate" class="well well-sm" datepicker-options="dateOptions" ng-required="true" required></uib-datepicker>
                     </div>
                 </div>
@@ -17,7 +17,7 @@
                 <div class="col-sm-6">
                     <div class="input-group center">
                         <label class="control-label">End Date</label><br />
-                        {{Cancellation.ToDate | date:'fullDate' }}
+                        {{Cancellation.ToDate | localizedDate:'fullDate' }}
                         <uib-datepicker ng-model="Cancellation.ToDate" class="well well-sm" datepicker-options="dateOptions" ng-required="true" required></uib-datepicker>
                     </div>
                 </div>

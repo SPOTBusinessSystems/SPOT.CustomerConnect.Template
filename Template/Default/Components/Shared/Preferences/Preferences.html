@@ -1,4 +1,4 @@
-<div ng-repeat="preference in preferences track by preference.description">
+﻿<div ng-repeat="preference in preferences track by preference.name">
     <label class="form-label">{{ preference.description }}</label>
     <select ng-model="preference.selectedValue" ng-options="value for value in preference.values" class="form-control"></select>
 </div>

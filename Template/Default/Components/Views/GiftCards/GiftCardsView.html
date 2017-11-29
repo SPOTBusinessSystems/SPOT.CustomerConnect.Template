@@ -1,4 +1,4 @@
-<div ng-controller="GiftCardsController" class="smallPage">
+﻿<div ng-controller="GiftCardsController" class="smallPage">
     <div class="text-center">
         <h2>Gift Cards</h2>
         <br />
@@ -6,12 +6,12 @@
     <uib-accordion close-others="true">
         <uib-accordion-group ng-repeat="giftcard in GiftCards">
             <uib-accordion-heading>
-                <h4 class="text-center">Card:&nbsp;{{giftcard.AccountInfo}}&nbsp;&nbsp;&nbsp;Balance:&nbsp;{{giftcard.Balance | currency}}<i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': status.open, 'glyphicon-chevron-right': !status.open}"></i></h4>
+                <h4 class="text-center">Card:&nbsp;{{giftcard.AccountInfo}}&nbsp;&nbsp;&nbsp;Balance:&nbsp;{{giftcard.Balance | localizedCurrency}}<i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': status.open, 'glyphicon-chevron-right': !status.open}"></i></h4>
             </uib-accordion-heading>
             <div class="text-center">
                 <label class="control-label">Number:&nbsp</label>{{giftcard.AccountInfo}}<br />
-                <label class="control-label">Balance: &nbsp</label>{{giftcard.Balance | currency}}<br />
-                <label class="control-label">Activated:&nbsp</label>{{giftcard.ActivationDateTime | date:'short'}}<br />
+                <label class="control-label">Balance: &nbsp</label>{{giftcard.Balance | localizedCurrency}}<br />
+                <label class="control-label">Activated:&nbsp</label>{{giftcard.ActivationDateTime | localizedDate:'short'}}<br />
 
                 <img ng-src="{{giftcard.GiftCardBarcode}}" />
             </div>

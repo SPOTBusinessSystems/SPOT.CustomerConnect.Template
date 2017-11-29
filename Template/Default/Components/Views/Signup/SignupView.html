@@ -37,16 +37,11 @@
                         <span class="glyphicon glyphicon-ok form-control-feedback" aria-hidden="true" ng-if="form.lastname.$valid && form.lastname.$dirty"></span>
                     </div>
 
+                    <label class="control-label" style="margin-top:15px;">Mobile Phone</label>
                     <div class="form-group" style="display:table-row;" ng-class="{'has-error':form.phonenumber.$invalid && form.phonenumber.$dirty && form.phonetype.value == 'Choose Type', 'has-success':form.phonenumber.$valid && form.phonenumber.$dirty && form.phonetype.value != 'Choose Type'}">
                         <span class="input-group-addon" style="display:table-cell"><label class="glyphicon glyphicon-phone"></label></span>
-                        <input id="phoneNumber" name="phonenumber" ng-model="Customer.PhoneNumber" class="form-control" placeholder="{{ Settings.General['Data Formats']['Phone Mask'] }}" tooltip="{{ Settings.General['Data Formats']['Phone Mask'] }}" tooltip-trigger="focus" required type="tel" />
-                        <select id="phonetype" ng-model="Customer.PhoneType" class="form-control" required>
-                            <option>Home</option>
-                            <option value="Cell/Mobile">Mobile</option>
-                            <option>Work</option>
-                            <option>Other</option>
-                            <option>Principal</option>
-                        </select>
+                        <input id="phoneNumber" name="phonenumber" ng-model="Customer.PhoneNumber" class="form-control" placeholder="{{ Settings.LocalitySettings.PhoneMask[0] }}" tooltip="{{ Settings.LocalitySettings.PhoneMask[0] }}" tooltip-trigger="focus" required type="tel" />
+
                     </div>
 
                     <div class="form-group" ng-show="Settings.General['Customer Referral']['Enable Customer Referral'] == 1">
@@ -73,25 +68,45 @@
                 </div>
 
                 <div class="form-group center">
-                    <input type="submit" class="btn btn-success" wz-next  ng-disabled="!form.$valid || Customer.PasswordField.PasswordConfirm != Customer.PasswordField.Password || !validEmail()" value="Continue" />
+                    <input type="submit" class="btn btn-success" wz-next ng-disabled="!form.$valid || Customer.PasswordField.PasswordConfirm != Customer.PasswordField.Password || !validEmail()" value="Continue" />
                 </div>
             </ng-form>
         </wz-step>
         <wz-step wz-title="Type">
-            <h2>Delivery?</h2>
+            <h2>Delivery</h2>
             <!-- Route or Counter -->
             <form novalidate>
                 <div class="form-group text-center">
-                    <label class="control-label">Would you like to sign up for delivery?</label><br />
-                    <input type="button" class="btn btn-info" wz-next value="No" ng-click="Customer.Type = 'RETAIL'" />
-                    <input type="submit" class="btn btn-success" wz-next value="Yes" ng-click="Customer.Type = 'DELIVERY'" />
+                    <label class="control-label">How would you like us to service your cleaning needs?</label><br /><br />
+                    <input type="button" class="btn btn-success" style="width:100%;" value="Our Stores" ng-click="setCustomerType('RETAIL');" />
+                    <br /><br />
+                    <input type="submit" class="btn btn-success" style="width:100%;" value="Free Home/Office Pickup & Delivery" ng-click="setCustomerType('DELIVERY');" />
+                    <!--<br /><br />
+                    <input type="button" class="btn btn-success" style="width:100%;" value="Lockers" ng-click="setCustomerType('LOCKER');" />-->
                 </div>
-
+                <div ng-show="Params.HasPickupType">
+                    <label class="control-label" style="margin-top:15px;">Pickup Type</label>
+                    <md-radio-group ng-model="Customer.CustomerRouteInfo.PickupType" class="md-primary">
+                        <md-radio-button value="0">Scheduled</md-radio-button>
+                        <md-radio-button value="1">On Demand</md-radio-button>
+                    </md-radio-group>
+                    <span ng-if="Params.RoutePickupTypeDescription" class="serviceTypeDescription">{{Params.RoutePickupTypeDescription}}</span>
+                </div>
+                <div ng-show="Params.HasDeliveryType">
+                    <label class="control-label" style="margin-top:15px;">Delivery Type</label>
+                    <md-radio-group ng-model="Customer.CustomerRouteInfo.DeliveryType" class="md-primary">
+                        <md-radio-button value="0">Scheduled</md-radio-button>
+                        <md-radio-button value="1">On Demand</md-radio-button>
+                    </md-radio-group>
+                    <span ng-if="Params.RouteDeliveryTypeDescription" class="serviceTypeDescription">{{Params.RouteDeliveryTypeDescription}}</span>
+                </div>
                 <div class="form-group">
                     <input type="button" class="btn btn-danger" wz-previous value="Go Back" />
+                    <input type="submit" class="btn btn-success" wz-next value="Continue" ng-show="Params.HasPickupType ||Params.HasDeliveryType" />
                 </div>
             </form>
         </wz-step>
+
         <wz-step wz-title="Address" canexit="isAddressValid">
             <h2>Address<span ng-if="Customer.Type == 'DELIVERY'"> - Required</span></h2>
             <!-- Address -->
@@ -117,7 +132,7 @@
 
                     <div class="input-group">
                         <span class="input-group-addon"><i class="glyphicon glyphicon-pencil"></i></span>
-                        <input id="zip" ng-model="Customer.Zip" class="form-control" placeholder="Postal Code" ng-required="Customer.Type == 'DELIVERY'" />
+                        <input id="zip" ng-model="Customer.Zip" class="form-control" placeholder="{{Settings.LocalitySettings.PostalCodeName}}" ng-required="Customer.Type == 'DELIVERY'" />
                         <span class="glyphicon form-control-feedback" aria-hidden="true"></span>
                     </div>
                 </div>
@@ -195,7 +210,7 @@
             </div>
 
             <form novalidate>
-                <div ng-if="Settings.General['Enable Captcha'] == 1 && !Customer.CaptchaValid" vc-recaptcha key="'6LcFpwUTAAAAADf8OJeuriHgIZiI6Av9hcC3wqok'" on-create="setWidgetId(widgetId)"></div>
+                <div ng-if="Settings.General['Enable Captcha'] == 1 && !Customer.CaptchaValid" vc-recaptcha key="Settings.General.Recaptcha['Site Key']" on-create="setWidgetId(widgetId)"></div>
             </form>
 
             <div class="form-group">

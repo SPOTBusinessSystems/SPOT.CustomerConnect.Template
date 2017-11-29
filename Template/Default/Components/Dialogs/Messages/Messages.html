@@ -15,7 +15,7 @@
             <tbody>
                 <tr ng-if="filteredMessages.length == 0"><td colspan="4">No messages found.</td></tr>
                 <tr ng-repeat="message in filteredMessages" ng-class="{'boldText': filteredMessages[$index].ReadDateTime == null}" ng-dblclick="selectedMessage = $index; open($index);">
-                    <td style="width: 130px;">{{message.CreatedDateTime | date:'short'}}</td>
+                    <td style="width: 130px;">{{message.CreatedDateTime | localizedDate:'short'}}</td>
                     <td style="width: 70px;"><a href="" ng-click="open($index);">Open</a></td>
                     <td>{{message.Subject}}</td>
                 </tr>

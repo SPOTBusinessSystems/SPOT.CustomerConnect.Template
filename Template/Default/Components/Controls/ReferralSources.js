@@ -7,7 +7,7 @@
             referralSource: '=',
             referralDetail: '='
         },
-        require: ['^form','ngModel'],
+        require: ['^form', 'ngModel'],
         controller: function (configService) {
             var ctrl = this;
             ctrl.configService = configService;

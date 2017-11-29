@@ -21,9 +21,6 @@
 
             $scope.DaysAfterPickup = Number($scope.Settings.Pickup["Minimum Days After Pickup"]);
 
-            console.log($scope.Customer);
-            console.log($scope.Settings);
-
             // The number of days after the pickup date. Default is 2 days.
             if (Number($scope.Settings.Pickup["Minimum Days After Pickup"]) != 'NaN') {
                 $scope.DaysAfterPickup = Number($scope.Settings.Pickup["Minimum Days After Pickup"]);

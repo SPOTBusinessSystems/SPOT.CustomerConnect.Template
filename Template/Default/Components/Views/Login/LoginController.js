@@ -109,7 +109,7 @@
             };
 
             $scope.sendPasswordEmail = function (templateData) {
-                CustomerConnect.Customer.SendEmail({ ToAddress: $scope.Login.emailAddress, Template: 7, Data: JSON.stringify(templateData) })
+                dataService.customer.sendEmail({ ToAddress: $scope.Login.emailAddress, Template: 7, Data: JSON.stringify(templateData) })
                     .done(function () {
                         dialogs.notify('Email Sent', 'A password change email has been sent to your email address.');
                     }).fail(function (emailData) {

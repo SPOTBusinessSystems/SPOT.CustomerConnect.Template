@@ -4,7 +4,7 @@
     angular.module('app').component('mainMenu', {
         bindings: {
         },
-        controller: function (dataService, userService, configService, $state, localStorageService, dialogs, settingsService, $interval, $ocLazyLoad, googleAnalyticsService) {
+        controller: function (dataService, userService, configService, $state, localStorageService, dialogs, settingsService, $interval, $ocLazyLoad, googleAnalyticsService, $http) {
             var ctrl = this;
 
             this.$onInit = function () {
@@ -23,43 +23,57 @@
                 };
 
                 // HELP Modal Functionality
-                
+
                 ctrl.HelpCache = {};
 
                 ctrl.Help = function () {
-                    var p = $ocLazyLoad.load(settingsService.path + 'Components/Dialogs/DialogController.js');                  
+                    var p = $ocLazyLoad.load(settingsService.path + 'Components/Dialogs/DialogController.js');
                     var hashPage = location.hash.replace('#', '');
-                    if (hashPage == null) {hashPage = '/blank'};
+                    if (hashPage == null) { hashPage = '/blank' };
                     googleAnalyticsService.pageview('/help');
 
                     p.then(function () {
                         var dlg = dialogs.create(settingsService.path + 'Components/Dialogs/Help' + hashPage + '.html', 'DialogController', {}, { size: 'md', windowClass: 'modal fade' });
                     });
                 };
-                
-                
+
+
                 ctrl.hashPageExists = function () {
+
                     var hashPage = location.hash.replace('#', '');
                     hashPage = hashPage.split("?")[0];
 
                     if (ctrl.HelpCache[hashPage] != undefined)
                         return ctrl.HelpCache[hashPage];
 
-                    return new Promise(function (resolve, reject) {
-                        var req = new XMLHttpRequest();
-                        req.open('GET', settingsService.path + 'Components/Dialogs/Help' + hashPage + '.html', false);
-                        req.send();
-
-                        var res = req.status == 200;
-                        ctrl.HelpCache[hashPage] = res;
-                        return resolve(res);
+                    var req = $http({
+                        method: 'get',
+                        url: settingsService.path + 'Components/Dialogs/Help' + hashPage + '.html',
+                        async: true
                     });
-                };             
-                
+
+                    req.then(
+                        function () {
+                            var res = true;
+                            ctrl.HelpCache[hashPage] = res;
+                        }
+                        ).catch(
+                        function () {
+                            var res = false;
+                            ctrl.HelpCache[hashPage] = res;
+                        }
+                        );
+
+
+                    var res = false;
+                    ctrl.HelpCache[hashPage] = res;
+                    return res;
+                };
+
                 //NAVBAR Code to test for file '<li role="presentation" ui-sref-active="active" ng-show="$ctrl.hashPageExists()"><a href="" ng-click="$ctrl.Help(); $ctrl.isCollapsed = true"><span class="glyphicon glyphicon-info-sign"></span>  Help</a></li>',
-                                
+
                 //END HELP Modal Functionality
-                
+
                 ctrl.openMessages = function () {
                     var p = $ocLazyLoad.load(settingsService.path + 'Components/Dialogs/Messages/MessagesController.js');
 

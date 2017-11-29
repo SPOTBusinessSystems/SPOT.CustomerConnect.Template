@@ -24,6 +24,12 @@
                     CaptchaValid: userService.getCaptchaValid()
                 };
 
+
+                //Stub in case Recaptcha Site Key is not specified
+                if (!$scope.data.Settings.General.Recaptcha) {
+                    $scope.data.Settings.General.Recaptcha = { 'Site Key': '6Lcyri4UAAAAAK6q_INYjvBlZZQkISIpren9LNgX' };
+                }
+
                 if (typeof (invoiceId) == 'undefined') {
                     $scope.data.InvoiceId = null;
                 }

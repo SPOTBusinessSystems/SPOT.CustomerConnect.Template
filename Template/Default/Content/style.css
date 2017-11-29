@@ -53,6 +53,25 @@ md-checkbox.md-checked.blue .md-icon {
 }
 
 
-html, body{
-height:100%;
+html, body {
+    height: 100%;
+}
+
+.versionInfo {
+    margin: 0 20px;
+    float: right;
+    font-size: 10px;
+}
+
+.stateControl option[value=""][disabled] {
+    display: none;
+}
+
+.block-ui-non-transparent .block-ui-overlay {
+    opacity: 1;
+}
+
+.serviceTypeDescription {
+    margin-bottom: 30px;
+    display: block;
 }

@@ -1,8 +1,8 @@
-<div class="modal-header">
+﻿<div class="modal-header">
     <h4 class="modal-title"><span class="glyphicon glyphicon-question-sign"></span>  Send Message</h4>
 </div>
 <div class="modal-body">
-    <div ng-if="data.Settings.General['Enable Captcha'] == 1 && !data.CaptchaValid && !data.LoggedIn" vc-recaptcha key="'6LcFpwUTAAAAADf8OJeuriHgIZiI6Av9hcC3wqok'" theme="light" size="normal" on-create="setWidgetId(widgetid)"></div>
+    <div ng-if="data.Settings.General['Enable Captcha'] == 1 && !data.CaptchaValid && !data.LoggedIn" vc-recaptcha key="data.Settings.General.Recaptcha['Site Key']" theme="light" size="normal" on-create="setWidgetId(widgetid)"></div>
 
     <div ng-if="data.InvoiceId" class="form-group">
         Invoice Number: {{data.InvoiceKey}}

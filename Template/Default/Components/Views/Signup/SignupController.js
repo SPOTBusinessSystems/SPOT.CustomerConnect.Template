@@ -5,9 +5,9 @@
     .module('app')
     .controller('SignupController', SignupController);
 
-    SignupController.$inject = ['$scope', 'dialogs', 'blockUI', '$state', 'userService', '$stateParams', '$rootScope', 'vcRecaptchaService', 'dataService', 'configService', '$window'];
+    SignupController.$inject = ['$scope', 'dialogs', 'blockUI', '$state', 'userService', '$stateParams', '$rootScope', 'vcRecaptchaService', 'dataService', 'configService', '$window', 'WizardHandler'];
 
-    function SignupController($scope, dialogs, blockUI, $state, userService, $stateParams, $rootScope, vcRecaptchaService, dataService, configService, $window) {
+    function SignupController($scope, dialogs, blockUI, $state, userService, $stateParams, $rootScope, vcRecaptchaService, dataService, configService, $window, WizardHandler) {
         /* jshint validthis:true */
         var vm = this;
         vm.title = 'SignupController';
@@ -20,15 +20,24 @@
                 $state.go('login');
             }
 
+            ////Stub in case Recaptcha Site Key is not specified
+            //if (!$scope.Settings.General.Recaptcha) {
+            //    $scope.Settings.General.Recaptcha = { 'Site Key': '6Lcyri4UAAAAAK6q_INYjvBlZZQkISIpren9LNgX' };
+            //}
+
             $scope.Customer = {
                 Type: "DELIVERY",
                 Email: userService.getEmail(),
-                PhoneType: 'Choose Type',
+                PhoneType: 'Cell/Mobile',// 'Choose Type',
                 ReferringCustomerKey: $stateParams.refkey,
                 CaptchaValid: userService.getCaptchaValid(),
                 ReferralSource: "",
                 ReferralDetail: "",
-                AcceptTerms: false
+                AcceptTerms: false,
+                CustomerRouteInfo: {
+                    PickupType: null,
+                    DeliveryType: null
+                }
             };
 
             // Init
@@ -121,7 +130,22 @@
                 $scope.checkEmail();
             }
 
+            $scope.Params = {
+                HasPickupType: false,
+                HasDeliveryType: false,
+                RoutePickupTypeDescription: null,
+                RouteDeliveryTypeDescription: null
+            };
 
+            //!!Debug stub!!! Remove it!!!
+            //$scope.Settings.Signup['Route Pickup Type Description'] = "Pickup type desctription";
+            //$scope.Settings.Signup['Route Delivery Type Description'] = "Delivery type description";
+
+            if ($scope.Settings.Signup['Route Pickup Type Description'])
+                $scope.Params.RoutePickupTypeDescription = $scope.Settings.Signup['Route Pickup Type Description'];
+
+            if ($scope.Settings.Signup['Route Delivery Type Description'])
+                $scope.Params.RouteDeliveryTypeDescription = $scope.Settings.Signup['Route Delivery Type Description'];
 
             $scope.SaveCustomer = function () {
 
@@ -141,7 +165,7 @@
                         {
                             number: $scope.Customer.PhoneNumber,
                             phoneType: $scope.Customer.PhoneType,
-                            phoneMask: $scope.Settings.General['Phone Mask']
+                            phoneMask: $scope.Settings.LocalitySettings.PhoneMask[0]
                         }],
 
                     primaryAddress: {
@@ -160,7 +184,14 @@
                 }
 
                 if ($scope.isCardAvailable()) {
-                        ci.CreditCardsToSave = [{ Number: $scope.Customer.CreditCardsToSave[0].CardInfo, Expiration: $scope.Customer.CreditCardsToSave[0].CardExpiration }];
+                    ci.CreditCardsToSave = [{ Number: $scope.Customer.CreditCardsToSave[0].CardInfo, Expiration: $scope.Customer.CreditCardsToSave[0].CardExpiration }];
+                }
+
+                if ($scope.Customer.CustomerRouteInfo.PickupType != null || $scope.Customer.CustomerRouteInfo.DeliveryType != null) {
+                    ci.CustomerRouteInfo = {
+                        PickupType: $scope.Customer.CustomerRouteInfo.PickupType,
+                        DeliveryType: $scope.Customer.CustomerRouteInfo.DeliveryType
+                    }
                 }
 
                 dataService.customer.signupCustomer(ci).then(function (data) {
@@ -171,7 +202,8 @@
 
                             var conversionID = $scope.Settings.General["Google Adwords"]["Conversion ID"];
 
-                            if ((conversionID == '1') && $window.google_trackConversion) {
+                            if (conversionID && $window.google_trackConversion) {
+                                console.log("google adwords tracking");
                                 $window.google_trackConversion({
                                     google_conversion_id: conversionID,
                                     google_remarketing_only: false
@@ -232,6 +264,51 @@
 
             $scope.isCardAvailable = function () {
                 return $scope.Customer.CreditCardsToSave && $scope.Customer.CreditCardsToSave[0] && $scope.Customer.CreditCardsToSave[0].CardInfo != null;
+            };
+
+            $scope.setPin = function () {
+                if ($scope.Customer.Type == 'LOCKER') {
+                    $scope.Customer.Locker = "Y";
+                    var onlyNumbers = $scope.Customer.PhoneNumber.replace(/\D/g, '');
+                    $scope.Customer.LockerPIN = onlyNumbers.substring(onlyNumbers.length - 4);
+                }
+                else {
+                    $scope.Customer.Locker = undefined;
+                    $scope.Customer.LockerPIN = undefined;
+                }
+            };
+
+            $scope.setCustomerType = function (customerType) {
+                //RETAIL, DELIVERY
+
+                //!!Debug stub!!! Remove it!!!
+                //$scope.Settings.Signup['Allow Choose Route Pickup Type'] = 1;
+                //$scope.Settings.Signup['Allow Choose Route Delivery Type'] = 1;
+
+                if (customerType == 'DELIVERY' && ($scope.Settings.Signup['Allow Choose Route Pickup Type'] == 1 || $scope.Settings.Signup['Allow Choose Route Delivery Type'] == 1)) {
+
+                    $scope.Customer.Type = customerType;
+
+                    $scope.Params.HasPickupType = $scope.Settings.Signup['Allow Choose Route Pickup Type'] == 1;
+                    $scope.Params.HasDeliveryType = $scope.Settings.Signup['Allow Choose Route Delivery Type'] == 1;
+
+                    console.log('delivery');
+                    console.log($scope.Params);
+
+                    return;
+                }
+                else {
+                    $scope.Customer.Type = customerType;
+                    $scope.setPin();
+
+                    $scope.Params.HasPickupType = false;
+                    $scope.Params.HasDeliveryType = false;
+
+                    $scope.Customer.CustomerRouteInfo.PickupType = null;
+                    $scope.Customer.CustomerRouteInfo.DeliveryType = null;
+
+                    WizardHandler.wizard('SignupWizard').next();
+                }
             };
 
         })();

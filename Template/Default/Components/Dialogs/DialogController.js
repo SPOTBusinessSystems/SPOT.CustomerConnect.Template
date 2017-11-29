@@ -92,7 +92,10 @@
                 }
                 else {
                     if (a.length && (a.length != 1 || a[0])) {
-                        $scope.Message = a;
+                        var messageLines = [];
+                        for (var i = 0; i < a.length; i++)
+                            messageLines[i] = Object.keys(a[i])[0];
+                        $scope.Message = messageLines;
                     }
                 }
             }

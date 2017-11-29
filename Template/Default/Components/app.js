@@ -43,7 +43,7 @@
                 'oc.lazyLoad'
     ]);
 
-    ccApp.provider('settingsService', function settingsServiceProvider() {
+    ccApp.provider('settingsService', function () {
         var path = '';
 
         this.setPath = function (value) {
@@ -94,8 +94,6 @@
                         else
                             $window.ga('create', key, 'auto');
 
-
-                        console.log('Google Analytics loaded');
                         isLoaded = true;
                         if (onCompleted)
                             onCompleted();
@@ -107,15 +105,170 @@
             },
 
             pageview: function (url) {
-                if (!isLoaded || !$window.ga)
-                    return;
 
                 var p = url.toLowerCase();
-                $window.ga('send', 'pageview', p);
+                console.log('pageview ' + p);
 
-                console.log('Google Analytics pageview ' + p);
+                if (!isLoaded || !$window.ga)
+                    return;
+                $window.ga('send', 'pageview', p);
             }
 
+        }
+    }]);
+
+
+    ccApp.factory('CheckStateChangeService', function ($rootScope, $state) {
+
+        var addCheck = function ($scope, validateStateChangeFunction) {
+
+            var eventListener = $rootScope.$on('$stateChangeStart'
+                , function (event, toState, toParams, fromState, fromParams) {
+
+                    if (fromParams.skipSomeAsync) {
+                        return;
+                    }
+
+                    event.preventDefault();
+
+                    function continueNavigation() {
+                        fromParams.skipSomeAsync = true;
+                        $state.go(toState.name, toParams);
+                    }
+
+                    validateStateChangeFunction(continueNavigation);
+                });
+
+            $scope.$on("$destroy", eventListener);
+        };
+
+        return { checkFormOnStateChange: addCheck };
+    });
+
+
+    ccApp.provider('themeService', [function () {
+        var Themes = [
+            { Name: 'Default', File: 'bootstrap-default.min.css' },
+            { Name: 'Cerulean', File: 'bootstrap-cerulean.min.css' },
+            { Name: 'Cosmo', File: 'bootstrap-cosmo.min.css' },
+            { Name: 'Cyborg', File: 'bootstrap-cyborg.min.css' },
+            { Name: 'Darkly', File: 'bootstrap-darkly.min.css' },
+            { Name: 'Flatly', File: 'bootstrap-flatly.min.css' },
+            { Name: 'Journal', File: 'bootstrap-journal.min.css' },
+            { Name: 'Lumen', File: 'bootstrap-lumen.min.css' },
+            { Name: 'Paper', File: 'bootstrap-paper.min.css' },
+            { Name: 'Readable', File: 'bootstrap-readable.min.css' },
+            { Name: 'Sandstone', File: 'bootstrap-sandstone.min.css' },
+            { Name: 'Simplex', File: 'bootstrap-simplex.min.css' },
+            { Name: 'Slate', File: 'bootstrap-slate.min.css' },
+            { Name: 'Spacelab', File: 'bootstrap-spacelab.min.css' },
+            { Name: 'Superhero', File: 'bootstrap-superhero.min.css' },
+            { Name: 'United', File: 'bootstrap-united.min.css' },
+            { Name: 'Yeti', File: 'bootstrap-yeti.min.css' }
+        ];
+
+        function setCssUrl(cssId, url) {
+            if (!document.getElementById(cssId)) {
+                var head = document.getElementsByTagName('head')[0];
+                var link = document.createElement('link');
+                link.id = cssId;
+                link.rel = 'stylesheet';
+                link.type = 'text/css';
+                link.href = url;
+                link.media = 'all';
+                head.appendChild(link);
+            }
+            else
+                $("#" + cssId).attr("href", url);
+        };
+
+        var that = this;
+        that.Data = {
+            theme: null,
+            themeurl: null,
+            cssurl: null
+        };
+
+        that.getThemeCssUrl = function (name, configService, settingsService) {
+            for (var x = 0; x < Themes.length; x++) {
+                if (Themes[x].Name.toLowerCase() === name.toLowerCase()) {
+                    configService.setCSSPath(settingsService.path + 'Content/bootstrap/' + Themes[x].File);
+                    return configService.getCSSPath();
+                }
+            }
+            return '';
+        };
+
+        that.setThemeCss = function (url) {
+            setCssUrl('themeCss', url);
+        };
+        that.setAdditionalCss = function (url) {
+            setCssUrl('additionalCss', url);
+        };
+
+        that.setTheme = function (name, configService, settingsService) {
+            that.setThemeCss(that.getThemeCssUrl(name, configService, settingsService));
+        }
+
+        that.setupTheme = function (name, configService, settingsService) {
+            that.data.themeurl = that.getThemeCssUrl(name, configService, settingsService);
+        }
+
+        that.setupThemePreview = function (configService, settingsService, $stateParams) {
+
+            console.log('setupThemePreview');
+
+            // Preview themes using &theme= or &themeurl=
+            if ($stateParams.theme) {
+                that.Data.theme = $stateParams.theme;
+                that.setTheme($stateParams.theme, configService, settingsService);
+            }
+            if ($stateParams.themeurl) {
+                that.Data.themeurl = $stateParams.themeurl;
+                that.setThemeCss($stateParams.themeurl);
+            }
+            if ($stateParams.cssurl) {
+                that.Data.cssurl = $stateParams.cssurl;
+                that.setAdditionalCss($stateParams.cssurl);
+            }
+        }
+
+        function Item() {
+            return {
+                Data: that.Data,
+                setThemeCss: that.setThemeCss,
+                setAdditionalCss: that.setAdditionalCss,
+                setTheme: that.setTheme,
+                getThemeCssUrl: that.getThemeCssUrl,
+                setupThemePreview: that.setupThemePreview
+            }
+        }
+
+        this.$get = [function () {
+            return new Item();
+        }];
+    }]);
+
+    ccApp.factory('blindService', ['blockUI', 'blockUIConfig', function (blockUI, blockUIConfig) {
+        var hideCounter = 0;
+        return {
+            hide: function (n) {
+                hideCounter = n;
+                blockUIConfig.cssClass = 'block-ui-non-transparent';
+                blockUI.start();
+                //console.log('hide');
+            },
+
+            show: function () {
+                //console.log('show');
+                hideCounter--;
+
+                if (hideCounter <= 0) {
+                    blockUI.stop();
+                    $('.block-ui-non-transparent').removeClass('block-ui-non-transparent');
+                    //console.log('show time');
+                }
+            }
         }
     }]);
 
@@ -123,7 +276,7 @@
     ccApp.config(function ($stateProvider, $urlRouterProvider, $urlMatcherFactoryProvider,
         $httpProvider, dialogsProvider, localStorageServiceProvider, tmhDynamicLocaleProvider,
         settingsServiceProvider
-        , $controllerProvider, $compileProvider, $filterProvider, $provide, $ocLazyLoadProvider
+        , $controllerProvider, $compileProvider, $filterProvider, $provide, $ocLazyLoadProvider, themeServiceProvider
         ) {
 
         $urlMatcherFactoryProvider.caseInsensitive(true); // Allow any case.
@@ -174,7 +327,7 @@
         }
 
 
-        var loadRecaptcha = function ($ocLazyLoad, $window) {
+        function loadRecaptcha($ocLazyLoad, $window) {
             return new Promise(function (resolve, reject) {
                 resolve();//don't block load process
                 var f = function () {
@@ -324,19 +477,47 @@
         });
 
 
+        function resolveTemplate($stateParams, settingsService, configService) {
+            var res =
+            [
+                '<site-header></site-header>',
+                '<main-menu></main-menu>',
+                '<div class="container">',
+                '<ui-view></ui-view>',
+                '</div>',
+                '<site-footer></site-footer>'
+            ].join('');
+
+            return res;
+        }
+
+        function resolveTemplateLogin($stateParams, settingsService, configService) {
+            var res =
+            [
+                '<site-header></site-header>',
+                '<main-menu></main-menu>',
+                '<ui-view></ui-view>',
+                '<site-footer></site-footer>'
+            ].join('');
+
+            return res;
+        }
+
         // Views
         $stateProvider.state('login', {
             url: '/login',
-            parent: 'globaldependencies',
+            parent: 'globaldependenciesLogin',
             templateUrl: viewPath('Login'),
             params: { forgotPasswordEmail: null, returnState: null },
-            resolve: { load: loadFiles('login') }
+            resolve: {
+                load: loadFiles('login')
+            }
         })
         // Views
         $stateProvider
         .state('signup', {
             url: '/signup?refid&refkey',
-            parent: 'globaldependencies',
+            parent: 'globaldependenciesanonymous',
             templateUrl: viewPath('Signup'),
             params: {
                 key: {
@@ -369,7 +550,7 @@
             url: '/account',
             parent: 'globaldependencies',
             templateUrl: viewPath('Account'),
-            params: { requirePasswordChange: null },
+            params: { requirePasswordChange: null, reload: false },
             resolve: { load: loadFiles('account') }
         })
         .state('giftcards', {
@@ -411,7 +592,7 @@
         })
         .state('reminder', {
             url: '/reminder/:key',
-            parent: 'globaldependencies',
+            parent: 'globaldependenciesanonymous',
             templateUrl: viewPath('Reminder'),
             params: {
                 key: {
@@ -423,160 +604,185 @@
         })
         .state('confirmation', {
             url: '/confirmation?Status&Type&PickupDate&TransactionID&Comment',
-            parent: 'globaldependencies',
+            parent: 'globaldependenciesanonymous',
             templateUrl: viewPath('Confirmation'),
             resolve: { load: loadFiles('confirmation') }
         })
         .state('notifications', {
             url: '/notifications?Id',
-            parent: 'globaldependencies',
+            parent: 'globaldependenciesanonymous',
             templateUrl: viewPath('Notifications'),
             resolve: { load: loadFiles('notifications') }
+        })
+        .state('globaldependenciesLogin', {
+            abstract: true,
+            url: '?theme&themeurl&cssurl', // for previewing themes.
+            template: resolveTemplateLogin,
+            resolve: {
+                setupThemePreview: themeServiceProvider.setupThemePreview,
+                config: loadConfig
+            }
+        })
+        .state('globaldependenciesanonymous', {
+            abstract: true,
+            url: '?theme&themeurl&cssurl', // for previewing themes.
+            template: resolveTemplate,
+            resolve: {
+                //setupThemePreview: themeServiceProvider.setupThemePreview,
+                config: loadConfig
+            }
         })
         .state('globaldependencies', {
             abstract: true,
             url: '?theme&themeurl&cssurl', // for previewing themes.
-            template: [
-                '<site-header></site-header>',
-                '<main-menu></main-menu>',
-                '<div class="container">',
-                '<ui-view></ui-view>',
-                '</div>',
-                '<site-footer></site-footer>'
-            ].join(''),
+            template: resolveTemplate,
             resolve: {
-                loadSettings: function (apiConfig, configService, dataService, localStorageService, tmhDynamicLocale, settingsService, $stateParams, googleAnalyticsService, $ocLazyLoad) {
-
-                    var loadTheme = function (configService, $stateParams, tmhDynamicLocale, settingsService) {
-                        var Themes = [
-                            { Name: 'Default', File: 'bootstrap-default.min.css' },
-                            { Name: 'Cerulean', File: 'bootstrap-cerulean.min.css' },
-                            { Name: 'Cosmo', File: 'bootstrap-cosmo.min.css' },
-                            { Name: 'Cyborg', File: 'bootstrap-cyborg.min.css' },
-                            { Name: 'Darkly', File: 'bootstrap-darkly.min.css' },
-                            { Name: 'Flatly', File: 'bootstrap-flatly.min.css' },
-                            { Name: 'Journal', File: 'bootstrap-journal.min.css' },
-                            { Name: 'Lumen', File: 'bootstrap-lumen.min.css' },
-
-                            { Name: 'Paper', File: 'bootstrap-paper.min.css' },
-                            { Name: 'Readable', File: 'bootstrap-readable.min.css' },
-                            { Name: 'Sandstone', File: 'bootstrap-sandstone.min.css' },
-                            { Name: 'Simplex', File: 'bootstrap-simplex.min.css' },
-                            { Name: 'Slate', File: 'bootstrap-slate.min.css' },
-                            { Name: 'Spacelab', File: 'bootstrap-spacelab.min.css' },
-                            { Name: 'Superhero', File: 'bootstrap-superhero.min.css' },
-                            { Name: 'United', File: 'bootstrap-united.min.css' },
-                            { Name: 'Yeti', File: 'bootstrap-yeti.min.css' }
-                        ];
-
-                        SetCssUrl = function (cssId, url) {
-                            if (!document.getElementById(cssId)) {
-                                var head = document.getElementsByTagName('head')[0];
-                                var link = document.createElement('link');
-                                link.id = cssId;
-                                link.rel = 'stylesheet';
-                                link.type = 'text/css';
-                                link.href = url;
-                                link.media = 'all';
-                                head.appendChild(link);
-                            }
-                            else
-                                $("#" + cssId).attr("href", url);
-                        };
-
-                        SetThemeCss = function (url) {
-                            SetCssUrl('themeCss', url);
-                        };
-
-                        SetAdditionalCss = function (url) {
-                            SetCssUrl('additionalCss', url);
-                        };
-
-                        var Settings = configService.getProfile();
-
-                        if (Settings) {
-                            if (Settings.General !== null) {
-                                // Put into setting dynamic language
-                                tmhDynamicLocale.set(Settings.General['Data Formats']['Language Tag']);
-                                moment.locale(Settings.General['Data Formats']['Language Tag']);
-
-                                if (Settings.General.Theme !== 'Custom') {
-                                    for (var x = 0; x < Themes.length; x++) {
-                                        if (Themes[x].Name === Settings.General.Theme) {
-                                            configService.setCSSPath(settingsService.path + 'Content/bootstrap/' + Themes[x].File);
-                                            SetThemeCss(configService.getCSSPath());
-                                        }
-                                    }
-                                } else {
-                                    SetThemeCss(Settings.General['Theme Custom URL']);
-                                }
-
-                                if (Settings.General['Additional CSS URL']) {
-                                    SetAdditionalCss(Settings.General['Additional CSS URL']);
-                                }
-                            }
-                        }
-
-                        
-                        // Preview themes using &theme= or &themeurl=
-                        if ($stateParams.theme) {
-                            for (var y = 0; y < Themes.length; y++) {
-                                if (Themes[y].Name.toLowerCase() === $stateParams.theme.toLowerCase()) {
-                                    configService.setCSSPath(settingsService.path + 'Content/bootstrap/' + Themes[y].File);
-                                    SetThemeCss(configService.getCSSPath());
-                                }
-                            }
-                        }
-
-                        if ($stateParams.themeurl) {
-                            SetThemeCss($stateParams.themeurl);
-                        }
-
-                        if ($stateParams.cssurl) {
-                            SetAdditionalCss($stateParams.cssurl);
-                        }
-                    };
-
-                    return new Promise(function (resolve, reject) {
-                        loadTheme(configService, $stateParams, tmhDynamicLocale, settingsService);
-                        resolve();
-                    });
-                    
-                }
+                //setupThemePreview: themeServiceProvider.setupThemePreview,//!!todo
+                config: loadConfig
             }
         });
 
     });//ccApp.config
 
-    // Restriction
-    ccApp.run(function ($rootScope, userService, $state, googleAnalyticsService, apiConfig, configService, dataService, localStorageService, tmhDynamicLocale, settingsService, $stateParams, $ocLazyLoad) {
+    // ********************************************************************************************************************************************************************************
 
-        // enumerate routes that don't need authentication
-        var routesThatDontRequireAuth = ['/login', '/signup?refid&refkey', '/reminder/:key', '/confirmation?Status&Type&PickupDate&TransactionID&Comment', '/notifications?Id'];
 
-        // check if current location matches route
-        var routeClean = function (route) {
-            return $.inArray(route, routesThatDontRequireAuth);
-        };
 
-        $rootScope.$on('$stateChangeStart', function (ev, to, toParams, from, fromParams) {
-            console.log('route');
-            console.log(ev);
-            console.log(to);
+    function loadConfig(configService, dataService, googleAnalyticsService, $ocLazyLoad, tmhDynamicLocale, $stateParams, settingsService,
+        localStorageService, userService, $state, themeService, blindService, $urlRouter)
+        //CustomerConnect is global
+    {
+        console.log('loadConfig');
 
-            var initConfigService = function (apiConfig, CustomerConnect, localStorageService, configService, onResolve, dataService, tmhDynamicLocale, moment, $stateParams, configService, googleAnalyticsService, settingsService, $ocLazyLoad) {
-                apiConfig.ApplyConfig(CustomerConnect.Config);
+        return new Promise(function (resolve) {
 
+            var ls = loadSettings(configService, dataService,
+                          googleAnalyticsService, $ocLazyLoad, CustomerConnect);
+
+            ls.then(function () {
+                console.log('Settings loaded');
+                new Promise(function (resolve) {
+                    themeService.setupThemePreview(configService, settingsService, $stateParams);
+                    resolve();
+                }).then(function () {
+                    loadSettingsTheme(configService, tmhDynamicLocale, themeService, blindService, $stateParams, settingsService, $ocLazyLoad);//this is promise.
+                });
+
+                resolve();
+            });
+
+        });
+    }
+
+    function loadSettingsTheme(configService, tmhDynamicLocale, themeService, blindService, $stateParams, settingsService, $ocLazyLoad) {
+
+        console.log('loadSettingsTheme');
+
+        var loadTheme = function () {
+
+            var Settings = configService.getProfile();
+
+            var cssToLoad = [];
+
+            if (Settings && Settings.General) {
+                var themeCssUrl = '';
+                var additionalCssUrl = '';
+
+                var g = Settings.General;
+                // Put into setting dynamic language
+                tmhDynamicLocale.set(g['Data Formats']['Language Tag']);
+                moment.locale(g['Data Formats']['Language Tag']);
+
+                if (!g.Theme)
+                    g.Theme = "Default";
+
+                if (g.Theme !== 'Custom') {
+                    if (!themeService.Data.theme) {
+                        //themeService.setTheme(g.Theme, configService, settingsService);
+                        themeCssUrl = themeService.getThemeCssUrl(g.Theme, configService, settingsService);
+                    }
+                } else {
+                    if (!themeService.Data.themeurl) {
+                        //themeService.setThemeCss(g['Theme Custom URL']);
+                        themeCssUrl = g['Theme Custom URL'];
+                    }
+                }
+
+                //if (g['Additional CSS URL'] && !themeService.Data.cssurl) {
+                //    themeService.setAdditionalCss(g['Additional CSS URL']);
+                //}
+
+                additionalCssUrl = themeService.Data.cssurl ? themeService.Data.cssurl : g['Additional CSS URL'];
+
+                if (themeCssUrl && themeCssUrl.length) cssToLoad.push(themeCssUrl);
+                if (additionalCssUrl && additionalCssUrl.length) cssToLoad.push(additionalCssUrl);
+            }
+
+            $ocLazyLoad.load(cssToLoad)
+            .then(function () {
+                console.log('loadSettingsTheme: finished!');
+                blindService.show();
+            })
+            .catch(function (err) {
+                console.log('loadSettingsTheme: failed!', err);
+                blindService.show();
+            });
+        }
+
+        return new Promise(function (resolve, reject) {
+            loadTheme();
+            resolve();
+        });
+    }
+
+
+    function loadSettings(configService, dataService,
+                          googleAnalyticsService, $ocLazyLoad, CustomerConnect) {
+
+        console.log('loadSettings');
+
+        return new Promise(function (resolve, reject) {
+
+            if (configService.isInitialized()) {
+                resolve();
+                return;
+            }
+
+            var onResolve = function () {
+                console.groupEnd();
+                configService.init(true);
+                resolve();
+            }
+
+            var initConfigService = function (CustomerConnect, configService, dataService,
+                                          googleAnalyticsService, $ocLazyLoad, onResolve) {
                 dataService.settings.getSpecificSettings(true, true, true, true, true, true, true, true).then(function (data) {
 
+                    if (!data)
+                        return;
+
                     var Settings = null;
-                    if (!data.Failed)
+
+                    if (!data.Failed) {
                         Settings = data.ReturnObject.CustomerConnectSettings;
-                    else
-                        Settings = { Notifications: null, Preferences: null, Stores: null, States: null, General: null };
+                        if (data.Version)
+                            Settings.Version = data.Version;
+                    }
+                    else {
+                        console.log('load settings failed');
+
+                        if (data.Message == "Invalid or expired session") {
+                            console.log('expired session');
+                            window.location.reload();
+                            return;//have nothing to do;
+                        }
+
+                        Settings = { Notifications: null, Preferences: null, Stores: null, States: null, General: { 'Authentication Providers': null } };
+                        console.log('empty settings loaded');
+                        console.log(data);
+                    }
 
                     configService.setProfile(Settings);
-
 
                     var a = [];
                     var ap = Settings.General['Authentication Providers'];
@@ -596,104 +802,127 @@
                     }
                     var authLoad = Promise.all(a);
 
-                    var pAuth = new Promise(function (resolve, reject) {
-                        configService.authProviders.setup().then(function () {
-                            configService.init(true);
+                    var pAuth = configService.authProviders.setup();
+
+                    var localityPromise = new Promise(function (resolve, reject) {
+                        dataService.settings.getLocalitySettings(true, true, true, true, true, true, true, true).then(function (data) {
+                            if (!data.Failed) {
+                                Settings.LocalitySettings = data.ReturnObject;
+                                configService.setProfile(Settings);
+                            }
                             resolve();
                         });
                     });
 
                     Promise.all([
                                 authLoad.then(pAuth),
-                                googleAnalyticsService.load(Settings)
-                    ]).then(onResolve);
-                });
-            }
-
-
-
-            var loadSettings = function (apiConfig, configService, dataService, localStorageService, tmhDynamicLocale, settingsService, $stateParams, googleAnalyticsService, $ocLazyLoad) {
-                return new Promise(function (resolve, reject) {
-
-                    var onResolve = function () {
-                        console.groupEnd();
-                        resolve();
-                    }
-
-                    console.groupCollapsed('loadingSettings');
-
-                    if (!configService.isInitialized()) {
-                        console.log('loading settings');
-
-                        initConfigService(apiConfig, CustomerConnect, localStorageService, configService, onResolve, dataService, tmhDynamicLocale, moment, $stateParams, configService, googleAnalyticsService, settingsService, $ocLazyLoad);
-                    }
-                    else
+                                googleAnalyticsService.load(Settings),
+                                localityPromise
+                    ]).then(function () {
                         onResolve();
-
-                });
-            }
-
-            var InitCustomer = function (returnState) {
-                if (localStorageService.get(CustomerConnect.Config.Tenant + '_token') == null) {
-                    $state.go('login', { returnState: returnState });
-                    return;
-                }
-
-                CustomerConnect.Config.SessionId = localStorageService.get(CustomerConnect.Config.Tenant + '_token');
-                apiConfig.setSessionId(CustomerConnect.Config.SessionId);
-
-
-
-                var promiseC = dataService.customer.getCustomer();
-                var promiseM = dataService.user.getMessages();
-
-                Promise.all([promiseC, promiseM]).then(function (values) {
-                    var vc = values[0];
-
-                    if (vc.Failed) {
-                        localStorageService.remove(CustomerConnect.Config.Tenant + '_token');
-                        $state.go('login');
-                        return;
-                    }
-                    userService.setCustomer(vc.ReturnObject);
-
-                    var vm = values[1];
-                    if (vm.Failed)
-                        dialogs.error('Messages Error', 'Unable to load messages.');
-                    else
-                        userService.setMessages(vm.ReturnObject);
-
-                    if (returnState)
-                        $state.go(returnState);
-                    else
-                        $state.go('account');
+                    });
                 });
             };
 
-            var isNeedInitCustomer = routeClean(to.url) === -1 && !userService.getCustomer();
+            console.groupCollapsed('loadingSettings');
+            console.log('loading settings');
+            initConfigService(CustomerConnect, configService, dataService,
+                              googleAnalyticsService, $ocLazyLoad, onResolve);
+        });
+    };
 
-            // if route requires auth and user is not logged in
-            if (isNeedInitCustomer) {
-                ev.preventDefault();//customer missing, stop load state.
+
+    var initCustomer = function (returnState, localStorageService, CustomerConnect, apiConfig, dataService, userService) {
+        console.log('initCustomer');
+
+        return new Promise(function (resolve) {
+            if (localStorageService.get(CustomerConnect.Config.Tenant + '_token') == null) {
+                console.log('login with return');
+                resolve({ state: 'login', params: { returnState: returnState } });
+                return;
             }
 
-            return new Promise(function (resolve, reject) {
+            CustomerConnect.Config.SessionId = localStorageService.get(CustomerConnect.Config.Tenant + '_token');
+            apiConfig.setSessionId(CustomerConnect.Config.SessionId);
 
-                var ls = loadSettings(apiConfig, configService, dataService, localStorageService, tmhDynamicLocale, settingsService, $stateParams, googleAnalyticsService, $ocLazyLoad);
+            var promiseC = dataService.customer.getCustomer();
+            var promiseM = dataService.user.getMessages();
 
-                ls.then(function () {
-                    if (isNeedInitCustomer) {
-                        InitCustomer(to.name);
-                    }
+            Promise.all([promiseC, promiseM]).then(function (values) {
+                var vc = values[0];
+
+                if (vc.Failed) {
+                    localStorageService.remove(CustomerConnect.Config.Tenant + '_token');
+                    console.log('login');
+                    resolve({ state: 'login', params: {} });
+                    return;
+                }
+                userService.setCustomer(vc.ReturnObject);
+
+                var vm = values[1];
+                if (vm.Failed)
+                    dialogs.error('Messages Error', 'Unable to load messages.');
+                else
+                    userService.setMessages(vm.ReturnObject);
+
+                if (returnState) {
+                    console.log('Continue');
                     resolve();
-                });
+                }
+                else {
+                    console.log('account');
+                    resolve({ state: 'account', params: {} });
+                }
+            });
+        });
+    };
 
+
+    // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+    // Restriction
+    ccApp.run(function ($rootScope, userService, $state, googleAnalyticsService, apiConfig, configService, dataService, localStorageService, tmhDynamicLocale, settingsService, $stateParams, $ocLazyLoad, themeService, blindService
+    ) {
+        blindService.hide(3);
+
+        $rootScope.$on('$stateChangeStart', function (ev, toState, toParams, from, fromParams) {
+            console.log('route');
+            //console.log(ev);
+            console.log(toState);
+
+            //if (fromParams.skipSomeAsyncGlobal) {
+            //    fromParams.skipSomeAsyncGlobal = false;
+            //    return;
+            //}
+
+            if (!apiConfig.url)
+                apiConfig.ApplyConfig(CustomerConnect.Config);
+
+            var isAnonymousParent = function (route) {
+                return $.inArray(route, ['globaldependenciesanonymous', 'globaldependenciesLogin']);
+            };
+
+            var isNeedCustomer = isAnonymousParent(toState.parent) === -1 && !userService.getCustomer();
+            if (!isNeedCustomer)
+                return;
+
+            ev.preventDefault();
+
+            function continueNavigation(data) {
+                //fromParams.skipSomeAsyncGlobal = true;
+                if (data)
+                    $state.go(data.state, data.params);
+                else
+                    $state.go(toState.name, toParams);
+            }
+
+            initCustomer(toState.name, localStorageService, CustomerConnect, apiConfig, dataService, userService).then(function (data) {
+                continueNavigation(data);
             });
         });
 
-        $rootScope.$on('$stateChangeSuccess', function (event, to) {
-            console.log(to);
-            googleAnalyticsService.pageview(to.url);
+        $rootScope.$on('$stateChangeSuccess', function (event, toState) {
+            googleAnalyticsService.pageview(toState.url);
         });
 
         $rootScope.$on('$routeChangeSuccess', function () {
@@ -702,17 +931,24 @@
         });
     });
 
-    ccApp.directive('currencyformatter', function ($filter) {
-        var precision = 2;
+    ccApp.directive('currencyformatter', function ($filter, configService) {
+
+        var Settings = configService.getProfile();
+
+        var symbol = Settings.LocalitySettings.CurrencySymbol;
+        var precision = Settings.LocalitySettings.DigitsAfterDecimal;
+
         return {
             require: 'ngModel',
             link: function (scope, element, attrs, ctrl) {
                 ctrl.$formatters.push(function (data) {
-                    var formatted = $filter('currency')(data);
+
+                    var formatted = $filter('currency')(data, symbol, precision);
                     //convert data from model format to view format
                     return formatted; //converted
                 });
                 ctrl.$parsers.push(function (data) {
+
                     var plainNumber = data.replace(/[^\d|\-+|\+]/g, '');
                     var length = plainNumber.length;
                     var intValue = plainNumber.substring(0, length - precision);
@@ -724,7 +960,7 @@
 
                     var plainNumberWithDecimal = intValue + '.' + decimalValue;
                     //convert data from view format to model format
-                    var formatted = $filter('currency')(plainNumberWithDecimal);
+                    var formatted = $filter('currency')(plainNumberWithDecimal, symbol, precision);
                     element.val(formatted);
 
                     return Number(plainNumberWithDecimal);
@@ -732,4 +968,52 @@
             }
         };
     });
+
+    ccApp.filter('localizedCurrency', function ($filter, configService) {
+
+        var Settings = configService.getProfile();
+
+        var symbolDefault = Settings.LocalitySettings.CurrencySymbol;
+        var precisionDefault = Settings.LocalitySettings.DigitsAfterDecimal;
+
+
+        return function (input, symbol, precision) {
+
+            // Ensure that we are working with a number
+            if (isNaN(input)) {
+                return input;
+            } else {
+
+                // Check if optional parameters are passed, if not, use the defaults
+                var symbol = symbol || symbolDefault;
+                var precision = precision === precision ? precisionDefault : precision;
+
+                return $filter('currency')(input, symbol, precision);
+            }
+        }
+
+    });
+
+    ccApp.filter('localizedDate', function ($filter, configService) {
+
+        var ls = configService.getProfile().LocalitySettings;
+
+        var formats = {
+            shortDate: ls.ShortDateFormat,
+            fullDate: ls.LongDateFormat,
+
+            short: ls.ShortDateFormat + ' ' + ls.TimeFormat
+        };
+        
+        return function (input, format) {
+
+            if (formats[format] != undefined)
+                return $filter('date')(input, formats[format]);
+
+            return $filter('date')(input, format);
+        }
+    });
+
+
+
 })();

@@ -1,4 +1,4 @@
-<div ng-controller="StatementsController" id="statementsForm" class="fullPage">
+﻿<div ng-controller="StatementsController" id="statementsForm" class="fullPage">
     <div class="text-center">
         <h2>View Statements</h2>
         <br />
@@ -19,13 +19,13 @@
             <tbody>
                 <tr ng-if="Statements.length == 0"><td colspan="4">No statements found</td></tr>
                 <tr ng-repeat="statement in Statements">
-                    <td><a href="" ng-click="ShowStatement(statement.StatementID)">{{statement.StatementDate | date:'shortDate'}}</a></td>
-                    <td class="hidden-xs hidden-sm">{{statement.ClosingDate | date:'shortDate'}}</td>
-                    <td>{{statement.DueDate | date:'shortDate'}}</td>
-                    <td class="hidden-xs">{{statement.BalancePrevious | currency}}</td>
-                    <td class="hidden-xs">{{statement.TotalCharges | currency}}</td>
-                    <td class="hidden-xs">{{statement.TotalPayments | currency}}</td>
-                    <td>{{statement.Balance | currency}}</td>
+                    <td><a href="" ng-click="ShowStatement(statement.StatementID)">{{statement.StatementDate | localizedDate:'shortDate'}}</a></td>
+                    <td class="hidden-xs hidden-sm">{{statement.ClosingDate | localizedDate:'shortDate'}}</td>
+                    <td>{{statement.DueDate | localizedDate:'shortDate'}}</td>
+                    <td class="hidden-xs">{{statement.BalancePrevious | localizedCurrency}}</td>
+                    <td class="hidden-xs">{{statement.TotalCharges | localizedCurrency}}</td>
+                    <td class="hidden-xs">{{statement.TotalPayments | localizedCurrency}}</td>
+                    <td>{{statement.Balance | localizedCurrency}}</td>
                 </tr>
             </tbody>
             <tfoot>

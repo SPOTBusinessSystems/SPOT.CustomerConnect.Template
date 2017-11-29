@@ -1,4 +1,4 @@
-<div class="modal-header">
+﻿<div class="modal-header">
     <h4 class="modal-title">Pending Suspensions</h4>
 </div>
 <div class="modal-body">
@@ -14,8 +14,8 @@
                 </thead>
                 <tbody>
                     <tr ng-repeat="cancellation in filteredCancellations | orderBy: 'FromDate'">
-                        <td width="135px;">{{cancellation.FromDate | date:'shortDate'}}</td>
-                        <td width="135px;">{{cancellation.ToDate | date:'shortDate'}}</td>
+                        <td width="135px;">{{cancellation.FromDate | localizedDate:'shortDate'}}</td>
+                        <td width="135px;">{{cancellation.ToDate | localizedDate:'shortDate'}}</td>
                         <td class="hidden-xs">{{cancellation.Comments}}</td>
                     </tr>
                 </tbody>
