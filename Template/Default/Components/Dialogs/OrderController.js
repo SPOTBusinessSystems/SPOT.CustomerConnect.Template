@@ -19,6 +19,7 @@
             $scope.Orders = data.orders;
             $scope.currentPage = 1;
             $scope.hidePricing = configService.getProfile().General['Hide Prices On Order View'] == 1;
+            $scope.enableMessages = configService.getProfile().General['Enable Messages'] != 0;
 
             for (var x = 0; x < data.orders.length; x++) {
                 if (data.orders[x].InvoiceID == data.key) {

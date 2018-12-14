@@ -32,10 +32,10 @@
 
             <div class="row">
                 <div class="col-sm-6" style="padding: 3px;">
-                    <label class="btn btn-info btn-block" ng-click="pendingSuspensions()">Show Pending Suspensions</label>
+                    <button class="btn btn-info btn-block" ng-click="pendingSuspensions()">Show Pending Suspensions</button>
                 </div>
                 <div class="col-sm-6" style="padding: 3px;">
-                    <label class="btn btn-success btn-block" ng-click="scheduleCancellation()" ng-disabled="!cancellationForm.$valid">Suspend Service</label>
+                    <button class="btn btn-success btn-block" ng-click="scheduleCancellation(cancellationForm)" ng-disabled="!isActive || !cancellationForm.$valid">Suspend Service</button>
                 </div>
             </div>
         </form>

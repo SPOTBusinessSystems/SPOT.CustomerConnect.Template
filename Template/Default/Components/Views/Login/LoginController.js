@@ -41,8 +41,6 @@
                 $scope.returnState = null;
             }
 
-
-
             $scope.getCustomer = function () {
                 dataService.customer.getCustomer().then(function (data) {
                     if (!data.Failed) {
@@ -102,6 +100,25 @@
                 })
             };
 
+            $scope.loginByToken = function (authToken) {
+
+                dataService.user.loginByToken(authToken).then(function (data) {
+                    if (!data.Failed) {
+                        apiConfig.setSessionId(data.ReturnObject.SessionID);
+                        CustomerConnect.Config.SessionId = data.ReturnObject.SessionID;
+
+                        if (data.ReturnObject.PasswordComment != null) {
+                            $scope.requiresPasswordChange = true;
+                        }
+
+                        localStorageService.set(CustomerConnect.Config.Tenant + '_token', data.ReturnObject.SessionID);
+                        $scope.getCustomer();
+                    } else {
+                        dialogs.error('Login Failed', data.Message);
+                    }
+                })
+            };
+
             $scope.createAccount = function () {
                 userService.setEmail($scope.Login.emailAddress);
                 userService.setPassword($scope.Login.password);
@@ -109,12 +126,11 @@
             };
 
             $scope.sendPasswordEmail = function (templateData) {
-                dataService.customer.sendEmail({ ToAddress: $scope.Login.emailAddress, Template: 7, Data: JSON.stringify(templateData) })
-                    .done(function () {
-                        dialogs.notify('Email Sent', 'A password change email has been sent to your email address.');
-                    }).fail(function (emailData) {
-                        dialogs.error('Error Sending Email', emailData.Message);
-                    });
+                dataService.customer.sendEmail({ ToAddress: $scope.Login.emailAddress, Template: 7, Data: JSON.stringify(templateData) }).then(function () {
+                    dialogs.notify('Email Sent', 'A password change email has been sent to your email address.');
+                }).catch(function (emailData) {
+                    dialogs.error('Error Sending Email', emailData.Message);
+                });
             };
 
             $scope.forgotPassword = function () {
@@ -216,6 +232,11 @@
                     }
                 });
             }
+
+            if ($stateParams.authtoken) {
+                $scope.loginByToken($stateParams.authtoken);
+            }
+
         })();
     };
 })();

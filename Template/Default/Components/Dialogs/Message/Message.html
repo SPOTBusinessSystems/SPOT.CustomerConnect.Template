@@ -8,7 +8,7 @@
     <div class="form-group" ng-class="{'has-error':messageManagerForm.messageManagerBody.$invalid && messageManagerForm.messageManagerBody.$dirty, 'has-success':messageManagerForm.messageManagerBody.$valid && messageManagerForm.messageManagerBody.$dirty}" ng-show="Reply">
         <br />
         <label for="messageManagerBody" class="control-label">Message</label>
-        <textarea name="messageManagerBody" class="form-control" ng-model="messageBody" placeholder="Enter message (Required)" title="Please enter a message. (Required)" maxlength="255" rows="6" required></textarea>
+        <textarea name="messageManagerBody" class="form-control" ng-model="messageBody" placeholder="Enter message (Required)" title="Please enter a message. (Required)" maxlength="10000" rows="6" required></textarea>
         <span class="glyphicon glyphicon-remove form-control-feedback" aria-hidden="true" ng-if="messageManagerForm.messageManagerBody.$invalid && messageManagerForm.messageManagerBody.$dirty"></span>
         <span class="glyphicon glyphicon-ok form-control-feedback" aria-hidden="true" ng-if="messageManagerForm.messageManagerBody.$valid && messageManagerForm.messageManagerBody.$dirty"></span>
         <br />

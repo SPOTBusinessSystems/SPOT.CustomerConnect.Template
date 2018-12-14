@@ -1,12 +1,14 @@
 <div ng-controller="NotificationsController" class="fullPage" ng-cloak>
     <div ng-if="Customer.loaded">
         <form name="accountForm" novalidate>
-            <h3>Modify Notifications for {{EmailAddress}}</h3>
-            <notifications ng-model="Customer" />
+            <h3>Modify Notifications for {{Customer.EmailAddress}}</h3>
+            <div class="form-group" style="text-align: left;">
+                <input type="submit" class="btn btn-success" value="Disable All" ng-click="DisableAll();" />
+            </div>
+            <notifications ng-model="Customer" options="notifyOptions"/>
 
             <div class="form-group" style="text-align: center; margin-top: 10px;">
-                <input type="button" class="btn btn-danger" value="Undo Changes" ng-click="UndoChanges(); accountForm.$setPristine();" ng-disabled="!accountForm.$dirty" />
-                <input type="submit" class="btn btn-success" value="Save" ng-click="SaveAccount();" ng-disabled="!accountForm.$dirty" />
+                <input type="submit" class="btn btn-success" value="Save" ng-click="SaveNotification();" ng-disabled="!accountForm.$dirty" />
             </div>
         </form>
     </div>

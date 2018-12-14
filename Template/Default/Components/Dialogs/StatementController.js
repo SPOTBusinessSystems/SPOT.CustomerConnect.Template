@@ -15,12 +15,15 @@
         activate();
 
         function activate() {
+
             $scope.StatementID = data;
             $scope.Orders = [];
 
             $scope.filteredItems = [];
             $scope.itemsPerPage = 10;
             $scope.currentPage = 1;
+            
+            $scope.enableMessages = configService.getProfile().General['Enable Messages'] != 0;
 
             $scope.numPages = function () {
                 return Math.ceil($scope.Statement.StatementItems.length / $scope.numPerPage);

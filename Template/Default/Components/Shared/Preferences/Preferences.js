@@ -41,7 +41,7 @@
                             model.push({
                                 Description: scope.preferences[x].description,
                                 Name: scope.preferences[x].name,
-                                value: scope.preferences[x].selectedValue
+                                Value: scope.preferences[x].selectedValue
                             });
                         }
                     }

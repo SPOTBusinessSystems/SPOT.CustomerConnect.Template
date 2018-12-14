@@ -1,4 +1,4 @@
-<div ng-controller="accountcontroller" id="accountForm" class="smallPage container">
+<div ng-controller="accountcontroller" id="accountFormContainer" class="smallPage container">
     <div class="text-center">
         <h2>Account Information</h2>
         <br />
@@ -9,6 +9,10 @@
             <label class="btn btn-default" ng-click="customerReferral()" ng-show="Settings.General['Customer Referral']['Enable Customer Referral'] == 1 && Customer.ShowReferral">Refer a friend</label>
             <label class="btn btn-default" ng-click="convertToRoute()" ng-if="isEnableDeliveryVisible()">Enable delivery</label>
         </div>
+        <div class="form-group">
+            <label class="btn btn-default" ng-click="printBagTag()" ng-show="Settings['Account Update']['Show Print Bag Tag'] == 1">Print Bag Tag</label>
+        </div>
+
         <h3>Basic</h3>
         <div class="form-group">
             <div class="input-group" ng-class="{'has-error':!validEmail() && accountForm.email.$dirty, 'has-success':validEmail() && accountForm.email.$dirty}">
@@ -66,17 +70,11 @@
 
         <div style="max-width: 350px;">
             <h3>Phones</h3>
-            <div class="form-group" ng-repeat="phone in Customer.Phones" style="display:table-row;">
-                <span class="input-group-addon" style="display:table-cell"><label class="glyphicon glyphicon-phone"></label></span>
-                <input id="phoneNumber" name="phonenumber" ng-model="phone.Number" class="form-control" placeholder="{{ Settings.LocalitySettings.PhoneMask[0] }}" tooltip="{{ Settings.LocalitySettings.PhoneMask[0] }}" tooltip-trigger="focus" required type="tel" />
-                <select ng-model="phone.PhoneType" class="form-control">
-                    <option>Home</option>
-                    <option value="Cell/Mobile">Mobile</option>
-                    <option>Work</option>
-                    <option>Other</option>
-                    <option>Principal</option>
-                </select>
-                <div class="input-group-addon" ng-click="RemovePhone($index); accountForm.$setDirty();"><label class="glyphicon glyphicon-trash"></label></div>
+            <div class="form-group" ng-repeat="phone in Customer.Phones" layout="row">
+                <phone-number value="phone" masks="Settings.LocalitySettings.PhoneMask" options="{hasPhoneType:true}" on-update="accountForm.$setDirty();"></phone-number>
+                <md-input-container>
+                    <md-icon md-font-library="material-icons" ng-click="RemovePhone($index); accountForm.$setDirty();">delete</md-icon>
+                </md-input-container>
             </div>
         </div>
 
@@ -101,13 +99,29 @@
                     <input id="address2" ng-model="Customer.PrimaryAddress.Address2" class="form-control" placeholder="Address 2" />
                 </div>
 
-                <div class="input-group">
-                    <span class="input-group-addon"><i class="glyphicon glyphicon-pencil"></i></span>
-                    <input id="city" ng-model="Customer.PrimaryAddress.City" class="form-control" placeholder="City" />
-                    <span class="glyphicon form-control-feedback" aria-hidden="true"></span>
-                </div>
+                <ng-container ng-if="Settings.LocalitySettings.LocalityNameShort === 'NZ'">
+                    <div class="input-group">
+                        <span class="input-group-addon"><i class="glyphicon glyphicon-pencil"></i></span>
+                        <input id="city" ng-model="Customer.PrimaryAddress.City" class="form-control" placeholder="Suburb" />
+                        <span class="glyphicon form-control-feedback" aria-hidden="true"></span>
+                    </div>
 
-                <states ng-model="Customer.PrimaryAddress.State" />
+                    <div class="input-group">
+                        <span class="input-group-addon"><i class="glyphicon glyphicon-pencil"></i></span>
+                        <input id="city" ng-model="Customer.PrimaryAddress.State" class="form-control" placeholder="City" />
+                        <span class="glyphicon form-control-feedback" aria-hidden="true"></span>
+                    </div>
+                </ng-container>
+
+                <ng-container ng-if="Settings.LocalitySettings.LocalityNameShort !== 'NZ'">
+                    <div class="input-group">
+                        <span class="input-group-addon"><i class="glyphicon glyphicon-pencil"></i></span>
+                        <input id="city" ng-model="Customer.PrimaryAddress.City" class="form-control" placeholder="City" />
+                        <span class="glyphicon form-control-feedback" aria-hidden="true"></span>
+                    </div>
+
+                    <states ng-model="Customer.PrimaryAddress.State" />
+                </ng-container>
 
                 <div class="input-group">
                     <span class="input-group-addon"><i class="glyphicon glyphicon-pencil"></i></span>
@@ -127,13 +141,37 @@
                     <input id="address2" ng-model="Customer.DeliveryAddress.Address2" class="form-control" placeholder="Address 2" />
                 </div>
 
-                <div class="input-group">
+                <!--<div class="input-group">
                     <span class="input-group-addon"><i class="glyphicon glyphicon-pencil"></i></span>
-                    <input id="city" ng-model="Customer.DeliveryAddress.City" class="form-control" placeholder="City" />
+                    <input id="city" ng-model="Customer.DeliveryAddress.City" class="form-control" placeholder="{{Settings.LocalitySettings.Level3Name}}" />
                     <span class="glyphicon form-control-feedback" aria-hidden="true"></span>
                 </div>
 
-                <states ng-model="Customer.DeliveryAddress.State" />
+                <states ng-model="Customer.DeliveryAddress.State" />-->
+
+                <ng-container ng-if="Settings.LocalitySettings.LocalityNameShort === 'NZ'">
+                    <div class="input-group">
+                        <span class="input-group-addon"><i class="glyphicon glyphicon-pencil"></i></span>
+                        <input id="city" ng-model="Customer.DeliveryAddress.City" class="form-control" placeholder="Suburb" />
+                        <span class="glyphicon form-control-feedback" aria-hidden="true"></span>
+                    </div>
+
+                    <div class="input-group">
+                        <span class="input-group-addon"><i class="glyphicon glyphicon-pencil"></i></span>
+                        <input id="city" ng-model="Customer.DeliveryAddress.State" class="form-control" placeholder="City" />
+                        <span class="glyphicon form-control-feedback" aria-hidden="true"></span>
+                    </div>
+                </ng-container>
+
+                <ng-container ng-if="Settings.LocalitySettings.LocalityNameShort !== 'NZ'">
+                    <div class="input-group">
+                        <span class="input-group-addon"><i class="glyphicon glyphicon-pencil"></i></span>
+                        <input id="city" ng-model="Customer.DeliveryAddress.City" class="form-control" placeholder="City" />
+                        <span class="glyphicon form-control-feedback" aria-hidden="true"></span>
+                    </div>
+
+                    <states ng-model="Customer.DeliveryAddress.State" />
+                </ng-container>
 
                 <div class="input-group">
                     <span class="input-group-addon"><i class="glyphicon glyphicon-pencil"></i></span>
@@ -153,13 +191,37 @@
                     <input id="address2" ng-model="Customer.BillingAddress.Address2" class="form-control" placeholder="Address 2" />
                 </div>
 
-                <div class="input-group">
+                <!--<div class="input-group">
                     <span class="input-group-addon"><i class="glyphicon glyphicon-pencil"></i></span>
-                    <input id="city" ng-model="Customer.BillingAddress.City" class="form-control" placeholder="City" />
+                    <input id="city" ng-model="Customer.BillingAddress.City" class="form-control" placeholder="{{Settings.LocalitySettings.Level3Name}}" />
                     <span class="glyphicon form-control-feedback" aria-hidden="true"></span>
                 </div>
 
-                <states ng-model="Customer.BillingAddress.State" />
+                <states ng-model="Customer.BillingAddress.State" />-->
+
+                <ng-container ng-if="Settings.LocalitySettings.LocalityNameShort === 'NZ'">
+                    <div class="input-group">
+                        <span class="input-group-addon"><i class="glyphicon glyphicon-pencil"></i></span>
+                        <input id="city" ng-model="Customer.BillingAddress.City" class="form-control" placeholder="Suburb" />
+                        <span class="glyphicon form-control-feedback" aria-hidden="true"></span>
+                    </div>
+
+                    <div class="input-group">
+                        <span class="input-group-addon"><i class="glyphicon glyphicon-pencil"></i></span>
+                        <input id="city" ng-model="Customer.BillingAddress.State" class="form-control" placeholder="City" />
+                        <span class="glyphicon form-control-feedback" aria-hidden="true"></span>
+                    </div>
+                </ng-container>
+
+                <ng-container ng-if="Settings.LocalitySettings.LocalityNameShort !== 'NZ'">
+                    <div class="input-group">
+                        <span class="input-group-addon"><i class="glyphicon glyphicon-pencil"></i></span>
+                        <input id="city" ng-model="Customer.BillingAddress.City" class="form-control" placeholder="City" />
+                        <span class="glyphicon form-control-feedback" aria-hidden="true"></span>
+                    </div>
+
+                    <states ng-model="Customer.BillingAddress.State" />
+                </ng-container>
 
                 <div class="input-group">
                     <span class="input-group-addon"><i class="glyphicon glyphicon-pencil"></i></span>
@@ -174,7 +236,10 @@
 
         <div ng-if="Settings.Notifications">
             <h3>Notifications</h3>
-            <notifications ng-model="Customer" />
+            <div class="form-group" style="text-align: left;">
+                <input type="submit" class="btn btn-success" value="Disable All" ng-click="DisableAll();" />
+            </div>
+            <notifications ng-model="Customer" options="notifyOptions" />
         </div>
 
         <div ng-if="Settings.Preferences">
@@ -199,3 +264,4 @@
         </div>
     </form>
 </div>
+

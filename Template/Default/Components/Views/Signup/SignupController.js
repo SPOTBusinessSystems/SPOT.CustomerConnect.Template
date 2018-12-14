@@ -5,9 +5,9 @@
     .module('app')
     .controller('SignupController', SignupController);
 
-    SignupController.$inject = ['$scope', 'dialogs', 'blockUI', '$state', 'userService', '$stateParams', '$rootScope', 'vcRecaptchaService', 'dataService', 'configService', '$window', 'WizardHandler'];
+    SignupController.$inject = ['$scope', 'dialogs', 'blockUI', '$state', 'userService', '$stateParams', '$rootScope', 'vcRecaptchaService', 'dataService', 'configService', '$window', 'WizardHandler', 'facebookPixelTrackingService', 'googleAnalyticsService'];
 
-    function SignupController($scope, dialogs, blockUI, $state, userService, $stateParams, $rootScope, vcRecaptchaService, dataService, configService, $window, WizardHandler) {
+    function SignupController($scope, dialogs, blockUI, $state, userService, $stateParams, $rootScope, vcRecaptchaService, dataService, configService, $window, WizardHandler, facebookPixelTrackingService, googleAnalyticsService) {
         /* jshint validthis:true */
         var vm = this;
         vm.title = 'SignupController';
@@ -20,15 +20,14 @@
                 $state.go('login');
             }
 
-            ////Stub in case Recaptcha Site Key is not specified
-            //if (!$scope.Settings.General.Recaptcha) {
-            //    $scope.Settings.General.Recaptcha = { 'Site Key': '6Lcyri4UAAAAAK6q_INYjvBlZZQkISIpren9LNgX' };
-            //}
-
             $scope.Customer = {
                 Type: "DELIVERY",
                 Email: userService.getEmail(),
-                PhoneType: 'Cell/Mobile',// 'Choose Type',
+                Phone: {
+                    Number: null,
+                    PhoneMask: $scope.Settings.LocalitySettings.PhoneMask[0],
+                    PhoneType: 'Cell/Mobile',// 'Choose Type',
+                },
                 ReferringCustomerKey: $stateParams.refkey,
                 CaptchaValid: userService.getCaptchaValid(),
                 ReferralSource: "",
@@ -87,7 +86,7 @@
                 // If using credit card, check to make sure it is valid.
                 if ($scope.Customer.CreditCardsToSave) {
                     if ($scope.Customer.CreditCardsToSave[0]) {
-                        return (CustomerConnect.Util.Validate.CCExpiration($scope.Customer.CreditCardsToSave[0].CardExpiration) && CustomerConnect.Util.Validate.CCNumber($scope.Customer.CreditCardsToSave[0].CardInfo));
+                        return (CustomerConnect.Util.Validate.CCExpiration($scope.Customer.CreditCardsToSave[0].CardExpiration) && CustomerConnect.Util.Validate.CCNumber($scope.Customer.CreditCardsToSave[0].CardInfo, $scope.Settings['CreditCardSettings']));
                     }
                 }
 
@@ -163,9 +162,9 @@
                     awardId: $scope.Customer.AwardId,
                     phones: [
                         {
-                            number: $scope.Customer.PhoneNumber,
+                            number: $scope.Customer.Phone.Number,
                             phoneType: $scope.Customer.PhoneType,
-                            phoneMask: $scope.Settings.LocalitySettings.PhoneMask[0]
+                            phoneMask: $scope.Customer.PhoneMask,//$scope.Settings.LocalitySettings.PhoneMask[0]
                         }],
 
                     primaryAddress: {
@@ -210,6 +209,10 @@
                                 });
                             }
                         }
+
+                        facebookPixelTrackingService.trackEvent("SignupComplete");
+                        googleAnalyticsService.pageview('/SignupComplete');
+
 
                         dialogs.notify('Signup submitted', $scope.Settings.Signup['Submitted Message']);
                         userService.setEmail($scope.Customer.Email);
@@ -292,24 +295,67 @@
                     $scope.Params.HasPickupType = $scope.Settings.Signup['Allow Choose Route Pickup Type'] == 1;
                     $scope.Params.HasDeliveryType = $scope.Settings.Signup['Allow Choose Route Delivery Type'] == 1;
 
-                    console.log('delivery');
-                    console.log($scope.Params);
+                    //console.log('delivery');
+                    //console.log($scope.Params);
 
                     return;
                 }
                 else {
-                    $scope.Customer.Type = customerType;
-                    $scope.setPin();
-
-                    $scope.Params.HasPickupType = false;
-                    $scope.Params.HasDeliveryType = false;
-
-                    $scope.Customer.CustomerRouteInfo.PickupType = null;
-                    $scope.Customer.CustomerRouteInfo.DeliveryType = null;
-
+                    $scope.updateCustomerType(customerType);
                     WizardHandler.wizard('SignupWizard').next();
                 }
             };
+
+            $scope.updateCustomerType = function (customerType) {
+                $scope.Customer.Type = customerType;
+                $scope.setPin();
+
+                $scope.Params.HasPickupType = false;
+                $scope.Params.HasDeliveryType = false;
+
+                $scope.Customer.CustomerRouteInfo.PickupType = null;
+                $scope.Customer.CustomerRouteInfo.DeliveryType = null;
+            }
+
+            facebookPixelTrackingService.load($scope.Settings,
+                function () {
+                    //console.log("StartSignup");
+                    facebookPixelTrackingService.trackEvent("StartSignup");
+                    googleAnalyticsService.pageview('/StartSignup');
+                });
+
+            $scope.$on('wizard:stepChanged', function (event, args) {
+
+                switch (args.step.wzTitle) {
+                    case "Type":
+
+                        facebookPixelTrackingService.trackEvent("ServicePreference");
+                        googleAnalyticsService.pageview('/ServicePreference');
+                        //console.log('ServicePreference');
+                        break;
+                    case "Address":
+
+                        if ($scope.Settings.Signup["Disable Delivery"] == 1) {
+                            $scope.updateCustomerType('RETAIL');
+                        }
+
+                        facebookPixelTrackingService.trackEvent("ContactDetails");
+                        googleAnalyticsService.pageview('/ContactDetails');
+                        //console.log('ContactDetails');
+                        break;
+                    case "Credit Card":
+                        googleAnalyticsService.pageview('/SignupCreditCard');
+                        break;
+                    case "Note":
+                        googleAnalyticsService.pageview('/SignupNote');
+                        break;
+                    case "Confirm":
+                        facebookPixelTrackingService.trackEvent("ConfirmDetails");
+                        googleAnalyticsService.pageview('/ConfirmDetails');
+                        //console.log('ConfirmDetails');
+                        break;
+                }
+            });
 
         })();
     }

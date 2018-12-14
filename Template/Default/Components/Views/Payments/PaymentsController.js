@@ -5,8 +5,8 @@
     .module('app')
     .controller('PaymentsController', PaymentsController);
 
-    PaymentsController.$inject = ['$scope', 'dialogs', 'dataService', 'userService', '$state'];
-    function PaymentsController($scope, dialogs, dataService, userService, $state) {
+    PaymentsController.$inject = ['$scope', 'dialogs', 'dataService', 'userService', '$state', 'configService'];
+    function PaymentsController($scope, dialogs, dataService, userService, $state, configService) {
         /* jshint validthis:true */
         var vm = this;
         vm.title = 'PaymentsController';
@@ -15,6 +15,7 @@
 
         function activate() {
             $scope.Customer = userService.getCustomer();
+            $scope.Settings = configService.getProfile();
 
             $scope.filteredPayments = [];
             $scope.itemsPerPage = 5;
@@ -39,7 +40,7 @@
 
             $scope.init = function () {
                 $scope.AR = { Balance: "0.00", Payments: [] };
-                $scope.AR.Payment = { Amount: '0.00', CardInformation: null };
+                $scope.AR.Payment = { Amount: '0.00', CardInformation: null, OtherCard: { CardInfo: null, CardExpiration: null } };
 
                 dataService.ar.getPayments().then(function (data) {
                     if (!data.Failed) {
@@ -62,15 +63,26 @@
 
             $scope.init();
 
+            $scope.isValidCard = function (cc) {
 
-            $scope.CCValid = false;
+                if (!cc.CardInfo)
+                    return false;
 
-            $scope.ValidateCard = function () {
-                $scope.CCValid = CustomerConnect.Util.Validate.CCNumber($scope.AR.Payment.CardInformation.CardInfo);
+                return CustomerConnect.Util.Validate.CCNumber(cc.CardInfo, $scope.Settings['CreditCardSettings']);
             };
 
+            $scope.getCard = function () {
+                var res = $scope.AR.Payment.CardInformation;
+                if (!res)//Other
+                    res = angular.copy($scope.AR.Payment.OtherCard);
+
+                return res;
+            }
+
             $scope.submitPayment = function (saveCard) {
-                var cc = $scope.AR.Payment.CardInformation;
+
+                var cc = $scope.getCard();
+                console.log(cc);
 
                 if (Number($scope.AR.Payment.Amount) <= 0) {
                     dialogs.error('Payment invalid', 'Payment amount cannot be less than 0.01.');
@@ -85,6 +97,13 @@
                 if (cc.CardInfo == null && cc.CardExpiration == null) {
                     dialogs.error('Payment invalid', 'Card expiration not provided.');
                     return;
+                }
+
+                if (!cc.CardId) {//New card, validate number
+                    if (!$scope.isValidCard(cc)) {
+                        dialogs.error('Payment invalid', 'Invalid Credit Card Number');
+                        return;
+                    }
                 }
 
                 dataService.ar.savePayment(cc.CardId, cc.CardInfo, cc.CardExpiration, saveCard, $scope.AR.Payment.Amount + '').then(function (data) {

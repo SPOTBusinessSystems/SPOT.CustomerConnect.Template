@@ -1,0 +1,156 @@
+﻿<div ng-controller="LockerController" class="smallPage">
+    <div class="text-center">
+        <h2>Locker Drop Off</h2>
+        <br />
+    </div>
+
+    <wizard name="LockerWizard" on-finish="finishedWizard()" hide-indicators="true">
+        <wz-step wz-title="Step1">
+            <ng-form name="form" novalidate>
+
+                <ng-container ng-if="Content.RecentLockerBanks && Content.RecentLockerBanks.length>0">
+                    <h2>Select Locker Bank</h2>
+                    <div class="form-group">
+                        <md-input-container style="width:100%">
+                            <label>Locker Bank</label>
+                            <md-select ng-model="Data.SelectedRecentLockerBank" style="width: 100%;">
+                                <md-option ng-repeat="bank in Content.RecentLockerBanks" ng-value="bank">
+                                    {{bank.LocalNodeKey}}
+                                </md-option>
+                            </md-select>
+                        </md-input-container>
+                    </div>
+
+                    <div class="form-group center">
+                        <input type="submit" class="btn btn-success btn-block" ng-disabled="!Data.SelectedRecentLockerBank" value="Continue" ng-click="selectRecentLockers()" />
+                    </div>
+
+                    <div class="form-group" style="margin:50px 0px;">
+                        <span>OR</span>
+                    </div>
+                </ng-container>
+
+                <h2>Enter Address</h2>
+
+                <div class="form-group">
+                    <span>
+                        Please provide your current address. We will locate nearby lockers.
+                    </span>
+                </div>
+                <div class="form-group">
+                    <div class="form-group" ng-if="1">
+                        <label class="cotnrol-label">Enter address</label>
+                        <input class="form-control" type="text" id="LockerAddressAutocomplete" placeholder="Address" ng-model="Data.Place" details="Data.PlaceDetails" googleplace />
+                    </div>
+                </div>
+
+                <div class="form-group center">
+                    <input type="submit" class="btn btn-success btn-block" ng-disabled="!Data.PlaceDetails || !Data.PlaceDetails.geometry.location.lat() ||!Data.PlaceDetails.geometry.location.lng()" value="Continue" ng-click="selectBanks()" />
+                </div>
+            </ng-form>
+        </wz-step>
+
+        <wz-step wz-title="Step2">
+            <h2>Select Locker Bank</h2>
+            <ng-form name="form" novalidate>
+                <div class="form-group">
+                    <md-input-container style="width:100%">
+                        <label>Locker Bank</label>
+                        <md-select ng-model="Data.SelectedLockerBank" style="width: 100%;">
+                            <md-option ng-repeat="bank in Content.LockerBanks" ng-value="bank">
+                                {{bank.LocalNodeKey}}
+                            </md-option>
+                        </md-select>
+                    </md-input-container>
+                </div>
+
+                <div class="form-group center">
+                    <input type="submit" class="btn btn-default btn-block" value="Back" wz-previous />
+                    <input type="submit" class="btn btn-success btn-block" ng-disabled="!Data.SelectedLockerBank" value="Continue" ng-click="selectLockers()" />
+                </div>
+            </ng-form>
+        </wz-step>
+
+        <wz-step wz-title="StepLocker">
+            <h2>Select Locker</h2>
+            <ng-form name="form" novalidate>
+                <div class="form-group">
+                    <span>
+                        Please confirm that your garment bag was placed in an available locker and indicate the number on the front door.
+                    </span>
+                </div>
+                <div class="form-group">
+                    <md-input-container style="width:100%">
+                        <label>Locker Number</label>
+                        <md-select ng-model="Data.SelectedLocker" style="width: 100%;">
+                            <md-option ng-repeat="bank in Content.Lockers" ng-value="bank">
+                                {{bank.LocalNodeKey}}
+                            </md-option>
+                        </md-select>
+                    </md-input-container>
+                </div>
+
+                <div class="form-group center">
+                    <input type="submit" class="btn btn-default btn-block" value="Back" ng-click="backtoStart()" />
+                    <input type="submit" class="btn btn-success btn-block" wz-next ng-disabled="!Data.SelectedLocker" value="Continue" />
+                </div>
+            </ng-form>
+        </wz-step>
+
+        <wz-step wz-title="StepInstructions">
+            <h2>Confirmation</h2>
+            <ng-form name="form" novalidate>
+                <div class="form-group">
+                    <span>
+                        You are requesting a pickup from the following locker
+                    </span>
+                </div>
+                <div class="text-center">
+                    <div class="form-group">
+                        <span>
+                            {{Data.SelectedLockerBank.LocalNodeKey}}
+                        </span>
+                        <br />
+                        <span>
+                            {{Data.SelectedLockerBank.Address.Address1}} {{Data.SelectedLockerBank.Address.Address2}}
+                            <br />
+                            {{Data.SelectedLockerBank.Address.City}} {{Data.SelectedLockerBank.Address.State}} {{Data.SelectedLockerBank.Address.Zip}}
+                        </span>
+                        <br />
+                        <br />
+                        <span>
+                            Locker: {{Data.SelectedLocker.LocalNodeKey}}
+                        </span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="form-group" ng-if="1">
+                        <label class="control-label">Special Instructions</label>
+                        <textarea name="comments" class="form-control" ng-model="Data.Comments" title="Please enter a message." rows="6"></textarea>
+                    </div>
+                </div>
+
+                <div class="form-group center">
+                    <input type="submit" class="btn btn-default btn-block" value="Back" wz-previous />
+                    <input type="submit" class="btn btn-success btn-block" ng-disabled="0" value="Continue" ng-click="submit()" />
+                </div>
+            </ng-form>
+        </wz-step>
+
+        <wz-step wz-title="StepDoneSuccess">
+            <h2>Congratulations!</h2>
+            <ng-form name="form" novalidate>
+                <div class="form-group" style="margin:40px 0;">
+                    <span>
+                        Confirm that the door was locked using any 4-digit code. <br />Your locker pickup request is completed. You will be notified via text or email when your orders have been picked up by our driver.
+                    </span>
+                </div>
+
+                <div class="form-group center">
+                    <input type="submit" class="btn btn-success btn-block" wz-finish value="OK" />
+                </div>
+            </ng-form>
+        </wz-step>
+
+    </wizard>
+</div>

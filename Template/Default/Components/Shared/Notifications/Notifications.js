@@ -5,19 +5,22 @@
     notificationsDirective.$inject = ['settingsService', 'configService', '$filter'];
 
     function notificationsDirective(settingsService, configService, $filter) {
+
+        var options = null;
+        var notificationsOld;
+
         var directive = {
             controller: controller,
             link: link,
             restrict: 'E',
             templateUrl: settingsService.path + 'Components/Shared/Notifications/Notifications.html',
-            require: 'ngModel',
+            require: { ngModel: 'ngModel', form: '^form' },
             scope: {
-                ngModel: '='
+                ngModel: '=',
+                options: '='
             }
         };
         return directive;
-
-
 
 
 
@@ -99,15 +102,14 @@
                 var methodName = value[i].NotificationMethodName;
 
                 var j = findInArray(notifications, typeName, 'Name');
-                var k = findInArray(methods, methodName, 'Name');
-
                 if (j != -1) {
                     var z = notifications[j];
-
+                    var k = findInArray(z.methods, methodName, 'Name');
                     if (k != -1)
-                        z.selectedMethod.push(methods[k]);
+                        z.selectedMethod.push(z.methods[k]);
                 }
                 else {
+                    var k = findInArray(methods, methodName, 'Name');
                     if (k != -1)
                         outer.push(value[i]);
                 }
@@ -125,9 +127,9 @@
                     res.push({
                         NotificationTypeDescription: z.Description,
                         NotificationTypeName: z.Name,
-                        NotificationMethodDescription:  z.selectedMethod[d].Description,
+                        NotificationMethodDescription: z.selectedMethod[d].Description,
                         NotificationMethodName: z.selectedMethod[d].Name,
-                        
+
                         NotificationValue: true
                     });
                     continue;
@@ -145,6 +147,8 @@
                 }
             }
 
+
+
             return res;
         }
 
@@ -155,13 +159,15 @@
                 options = configService.getProfile().NotificationsV2;
 
             $scope.notifications = loadOptions(options);
-
+            
             $scope.notificationsOuter = []
 
             if (options != null) {
                 var model = $scope.ngModel.Notifications;
                 loadSelected(model, $scope.notifications, options.NotificationMethods, $scope.notificationsOuter);
             }
+
+            notificationsOld = angular.copy($scope.notifications);
 
             $scope.getPhone = function (name) {
                 var pL = $scope.ngModel.Phones;
@@ -210,8 +216,8 @@
 
                         var name = item[i].Name;
 
-                        if (name == "Disabled")
-                            return "Disabled";
+                        if (name == 'Disabled' || name == 'Disable')
+                            return "Unsubscribe";
 
                         var x = $scope.getNotificationValue(name);
                         if (x)
@@ -225,31 +231,102 @@
                 }
             };
 
-            $scope.getOptionText = function (name) {
+            $scope.getOptionText = function (item) {
+
+                var name = item.Name;
+
                 if (name !== undefined) {
+
+                    if (name == 'Disabled' || name == 'Disable')
+                        return "Unsubscribe";
+
                     var x = $scope.getNotificationValue(name);
                     if (x)
                         x = " - " + x;
 
-                    return name + x;
+                    var title = name;
+                    if (item.Description)
+                        title = item.Description;
+
+                    return title + x;
                 } else {
                     return "";
                 }
             };
         }
 
+        function setDisabledAll(notifications) {
 
-        function link(scope, iElement, iAttrs, ngModel) {
+            for (var i = 0; i < notifications.length; i++) {
+                var z = notifications[i];
 
-            if (!ngModel) {
+                while (z.selectedMethod.length > 0)
+                    z.selectedMethod.pop();
+
+                var k = findInArray(z.methods, 'Disabled', 'Name');
+
+                if (k != -1)
+                    z.selectedMethod.push(z.methods[k]);
+            }
+        }
+
+        function handleChanges(a, aOld) {
+
+            for (var i = 0; i < a.length; i++) {
+                var x = a[i].selectedMethod;
+                var xOld = aOld[i].selectedMethod;
+                if (x.length == xOld.length)
+                    continue;
+                //console.log('difference found');
+
+                var d = findInArray(x, 'Disabled', 'Name');
+                var dOld = findInArray(xOld, 'Disabled', 'Name');
+
+                if (d != -1 && dOld != -1)//set common item, remove disabled
+                {
+                    //console.log('removing disabled');
+                    x.splice(d, 1);
+                    a[i].selectedMethod = angular.copy(x);
+                }
+
+                return true;
+            }
+            return false;
+        }
+
+        function link(scope, iElement, iAttrs, controllers) {
+
+            if (!controllers.ngModel) {
                 return;
             }
 
+            options = scope.options;
+
             scope.updateModel = function () {
+
                 var nn = scope.notifications;
-                ngModel.$viewValue.Notifications = saveSelected(nn, scope.notificationsOuter);
-                ngModel.$setViewValue(ngModel.$viewValue);
+                var f = handleChanges(nn, notificationsOld);
+                notificationsOld = angular.copy(nn);
+
+                controllers.ngModel.$viewValue.Notifications = saveSelected(nn, scope.notificationsOuter);
+                controllers.ngModel.$setViewValue(controllers.ngModel.$viewValue);
+                controllers.form.$setDirty();
+
+                if (f && options.onNotificationMethodChanged)
+                    options.onNotificationMethodChanged();
             }
+
+            scope.disableAll = function () {
+
+                setDisabledAll(scope.notifications);
+                scope.updateModel();
+            }
+
+            angular.extend(scope.options, {
+                disableAll: function () {
+                    scope.disableAll();
+                }
+            });
         }
     }
 })();

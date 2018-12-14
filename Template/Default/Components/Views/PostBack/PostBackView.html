@@ -1,0 +1,14 @@
+<div ng-controller="postBackController" class="medPage">
+
+    <div ng-if="Content.error" class="form-group text-center">
+        <h2>{{Content.error}}</h2>
+        <br />
+        <div >
+            {{Content.errorDetails}}
+        </div>
+    </div>
+
+    <div ng-if="Content.html" class="form-group">
+        <div ng-bind-html="Content.html | trust"></div>
+    </div>
+</div>

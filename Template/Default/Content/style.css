@@ -75,3 +75,89 @@ html, body {
     margin-bottom: 30px;
     display: block;
 }
+
+
+
+.pickupGrid .md-label {
+    display: block;
+}
+
+    .pickupGrid .md-label i {
+        vertical-align: bottom;
+    }
+
+    .pickupGrid .md-label .pickupRight {
+        float: right;
+        display: inline-block;
+        min-width: 200px;
+    }
+
+    .pickupGrid .md-label .pickupComment {
+        margin-top: 5px;
+        font-size: 12px;
+        color: #6f6f6f;
+        clear: both;
+    }
+
+    .pickupGrid .md-label .pickupRouteIcon {
+        min-width: 25px;
+        margin-left: 5px;
+        float: right;
+    }
+
+.pickupGrid md-radio-button {
+    margin-bottom: 0;
+    padding-top: 15px;
+}
+
+    .pickupGrid md-radio-button:not(.ng-hide):not(:last-child) .pickupBottomLine {
+        margin: 15px 40px 0 0;
+        border-bottom: 1px solid #eee;
+    }
+
+@media (max-width: 400px) {
+    .pickupGrid .md-label .pickupRight {
+        float: none;
+        clear: both;
+        display: block;
+    }
+}
+
+.pickupGrid md-radio-button.md-checked {
+    font-weight: bold;
+}
+
+
+
+credit-card.has-success md-input-container.md-icon-float > md-icon {
+    color: #43ac6a;
+}
+
+credit-card.has-success md-input-container input.md-input {
+    border-color: #43ac6a !important;
+    padding-bottom: 0;
+    border-width: 0 0 2px;
+}
+
+credit-card.has-success md-input-container label {
+    color: #43ac6a !important;
+}
+
+credit-card.has-success md-input-container md-select-value.md-select-value {
+    border-color: #43ac6a !important;
+    border-bottom-width: 2px;
+    border-bottom-style: solid;
+    padding-bottom: 0;
+}
+
+.creditCardIconContainer {
+    padding-top: 25px;
+}
+
+    .creditCardIconContainer md-icon {
+        color: black;
+    }
+
+md-input-container.creditCardNumberContainer md-icon, md-input-container.md-input-focused.creditCardNumberContainer md-icon {
+    color: #52df6d;
+}

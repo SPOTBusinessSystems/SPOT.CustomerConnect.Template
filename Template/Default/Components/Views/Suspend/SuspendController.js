@@ -26,9 +26,27 @@
                 maxDate: moment().add(3, 'months')
             };
 
+            $scope.isActive = true;
+
+            validateRoute();
+
+            function validateRoute() {
+
+                if ($scope.Customer["RequestState"] && $scope.Customer["RequestState"] == 'RP') {
+                    $scope.isActive = false;
+                    dialogs.notify('Unavailable', 'You have not yet been assigned a delivery route');
+                }
+            }
+
+
             $scope.dateFormat = $scope.Settings.General["Data Formats"]["Date Format"].toLowerCase().split("m").join("M"); // Lowercase, then replace all m to M.
 
-            $scope.scheduleCancellation = function () {
+            $scope.scheduleCancellation = function (cancellationForm) {
+
+                if (!$scope.isActive || !cancellationForm.$valid) {
+                    return;
+                }
+
                 dataService.route.saveCancellation($scope.getCancellationAdjusted()).then(function (data) {
                     if (!data.Failed) {
                         dialogs.notify('Success', 'Your temporary suspension of service has been scheduled from ' + moment($scope.Cancellation.FromDate).format('MM-DD-YYYY') + ' to ' + moment($scope.Cancellation.ToDate).format('MM-DD-YYYY') + '.');

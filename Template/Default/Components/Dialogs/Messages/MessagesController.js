@@ -5,9 +5,9 @@
     .module('app')
     .controller('MessagesController', MessagesController);
 
-    MessagesController.$inject = ['$rootScope', '$scope', 'dialogs', 'blockUI', 'vcRecaptchaService', 'userService', 'settingsService', 'dataService', '$uibModalInstance', '$ocLazyLoad'];
+    MessagesController.$inject = ['$rootScope', '$scope', 'dialogs', 'blockUI', 'vcRecaptchaService', 'userService', 'settingsService', 'dataService', '$uibModalInstance', '$ocLazyLoad', 'configService'];
 
-    function MessagesController($rootScope, $scope, dialogs, blockUI, vcRecaptchaService, userService, settingsService, dataService, $uibModalInstance, $ocLazyLoad) {
+    function MessagesController($rootScope, $scope, dialogs, blockUI, vcRecaptchaService, userService, settingsService, dataService, $uibModalInstance, $ocLazyLoad, configService) {
         /* jshint validthis:true */
         var vm = this;
         vm.title = 'MessagesController';
@@ -15,10 +15,13 @@
         activate();
 
         function activate() {
+
             $scope.unreadMessages = "";
             $scope.filteredMessages = [];
             $scope.itemsPerPage = 10;
             $scope.currentPage = 1;
+
+            $scope.enableMessages = configService.getProfile().General['Enable Messages'] != 0;
 
             $scope.numPages = function () {
                 return Math.ceil($scope.Messages.length / $scope.numPerPage);

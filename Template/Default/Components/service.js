@@ -63,6 +63,8 @@
 
     function configService(dataService, $q, $window) {
         var parent = this;
+        var profile = null;
+        var onProfileHandler = null;
 
         this.authProviders = {
             // Setup
@@ -373,6 +375,11 @@
 
         this.setProfile = function (profile) {
             this.profile = profile;
+
+            if (this.profile && this.onProfileHandler) {
+                this.onProfileHandler();
+                this.onProfileHandler = null;
+            }
         };
 
         this.getProfile = function () {
@@ -382,6 +389,13 @@
 
             return this.profile;
         };
+
+        this.onProfile = function (postback) {
+            if (this.profile)
+                postback();
+
+            this.onProfileHandler = postback;
+        }
 
         this.setCSSPath = function (path) {
             this.CSSPath = path;
@@ -426,8 +440,30 @@
         };
 
         this.setCustomer = function (customer) {
+            cleanPreferences(customer);
             this.customer = customer;
         };
+
+        function cleanPreferences(customer) {
+            if (!customer)
+                return;
+
+            var p = customer.Preferences;
+            if (!p)
+                return;
+
+            var a = {};
+
+            for (var i = p.length - 1; i >= 0; i--) {
+                var x = p[i];
+                var y = a[x.Name];
+                if (y) {
+                    p.splice(i, 1);
+                }
+                else
+                    a[x.Name] = x;
+            }
+        }
 
         this.getCustomer = function () {
             return this.customer;
@@ -491,8 +527,8 @@
 
         // Customer
         var customer = {
-            convertToDelivery: function () {
-                return createRequest('ConvertToDelivery', null).then(handleSuccess, handleError);
+            convertToDelivery: function (p) {
+                return createRequest('ConvertToDelivery', p).then(handleSuccess, handleError);
             },
 
             getCustomer: function () {
@@ -554,6 +590,10 @@
             checkAddress: function (customer) {
                 var p = { Address1: customer.Address1, Address2: customer.Address2, City: customer.City, State: customer.State, Zip: customer.Zip };
                 return createRequest('CheckAddress', p).then(handleSuccess, handleError);
+            },
+
+            sendEmail: function (email) {
+                return createRequest('SendEmail', email).then(handleSuccess, handleError);
             }
         };
 
@@ -592,12 +632,48 @@
 
             savePickup: function (pickup) {
                 return createRequest('PickupRequest', pickup).then(handleSuccess, handleError);
+            },
+
+            getPickupVisits: function () {
+                return createRequest('RequestVisits', { 'AddressTypeID': 304 }).then(handleSuccess, handleError);
+            },
+
+            deletePickup: function (scheduledVisitID, pickupDate) {
+                if (!scheduledVisitID)
+                    scheduledVisitID = '00000000-0000-0000-0000-000000000000';
+
+                return createRequest('DeletePickup', { PickupID: scheduledVisitID, PickupDate: pickupDate }).then(handleSuccess, handleError);
+            },
+
+            getHolidays: function () {
+                return createRequest('GetHolidays', null).then(handleSuccess, handleError);
+            },
+
+            getTransactionConfirmationContent: function (query) {
+                return createRequest('GetTransactionConfirmationContent', { query: query }).then(handleSuccess, handleError);
+            },
+
+
+            getLockerBanksRecent: function (lat, lon) {
+                return createRequest('RetrieveLockerBanks', { RequestType: 'R', Latitude: lat, Longitude: lon, MaximumDistance: 2500 }).then(handleSuccess, handleError);
+            },
+
+            getLockerBanks: function (lat, lon) {
+                return createRequest('RetrieveLockerBanks', { RequestType: 'D', Latitude: lat, Longitude: lon, MaximumDistance: 2500 }).then(handleSuccess, handleError);
+            },
+
+            getLockerBank: function (lockerID) {
+                return createRequest('RetrieveLockerBank', { LockerID: lockerID }).then(handleSuccess, handleError);
+            },
+
+            postLockerEvent: function (lockerID, comments) {
+                return createRequest('PostLockerEvent', { LockerID: lockerID, EventType: 'D', Comments: comments }).then(handleSuccess, handleError);
             }
         };
 
         // Settings
         var settings = {
-            getSpecificSettings: function (customerConnectSettings, notifications, preferences, referralSources, states, timeSlots, stores, routes) {
+            getSpecificSettings: function (customerConnectSettings, notifications, preferences, referralSources, states, timeSlots, stores, routes, creditCardSettings) {
                 return createRequest('GetSpecificSettings',
                     {
                         CustomerConnectSettings: customerConnectSettings,
@@ -607,7 +683,8 @@
                         States: states,
                         TimeSlots: timeSlots,
                         Stores: stores,
-                        Routes: routes
+                        Routes: routes,
+                        CreditCardSettings: creditCardSettings
                     }).then(handleSuccess, handleError);
             },
 
@@ -673,6 +750,10 @@
                 return createRequest('Login', { user: emailAddress, password: password }).then(handleSuccess, handleError);
             },
 
+            loginByToken: function (authToken) {
+                return createRequest('Login', { CustomerConnectAuthToken: authToken }).then(handleSuccess, handleError);
+            },
+
             logout: function () {
                 return createRequest('Logoff', null).then(handleSuccess, handleError);
             },
@@ -731,10 +812,17 @@
         };
 
         function createRequest(requestType, body) {
+
+            var bodyText = '';
+            if (body)
+                bodyText = ',"Body":"' + CustomerConnect.Util.base64._encode(JSON.stringify(body)) + '"';
+
+            var data = '{"RequestType":"' + requestType + '","AccountKey":"' + apiConfig.getAccountKey() + '","SessionID":"' + apiConfig.getSessionId() + '"' + bodyText + ',"UserAgent":"' + navigator.userAgent.toString() + '"}';
+
             return $http({
                 method: 'post',
                 url: apiConfig.getURL(),
-                data: '{"RequestType":"' + requestType + '","AccountKey":"' + apiConfig.getAccountKey() + '","SessionID":"' + apiConfig.getSessionId() + '","Body":"' + CustomerConnect.Util.base64._encode(JSON.stringify(body)) + '","UserAgent":"' + navigator.userAgent.toString() + '"}',
+                data: data,
                 async: true,
                 contentType: "application/json",
                 dataType: "json"

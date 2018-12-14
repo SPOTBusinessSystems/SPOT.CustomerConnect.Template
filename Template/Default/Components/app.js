@@ -272,12 +272,94 @@
         }
     }]);
 
+    ccApp.factory('facebookPixelTrackingService', [function () {
+        var isLoaded = false;
+        return {
+            load: function (Settings, onCompleted) {
+
+                if (!isLoaded && Settings && Settings.General && Settings.General["Facebook Pixel"]
+                    && Settings.General["Facebook Pixel"]["Facebook Pixel ID"]) {
+
+                    var key = Settings.General["Facebook Pixel"]["Facebook Pixel ID"];
+
+                    !function (f, b, e, v, n, t, s) {
+                        if (f.fbq) return; n = f.fbq = function () {
+                            n.callMethod ?
+                            n.callMethod.apply(n, arguments) : n.queue.push(arguments)
+                        };
+                        if (!f._fbq) f._fbq = n; n.push = n; n.loaded = !0; n.version = '2.0';
+                        n.queue = []; t = b.createElement(e); t.async = !0;
+                        t.src = v; s = b.getElementsByTagName(e)[0];
+                        s.parentNode.insertBefore(t, s)
+                    }(window, document, 'script', 'https://connect.facebook.net/en_US/fbevents.js');
+
+                    fbq('init', key);
+
+                    isLoaded = true;
+                    if (onCompleted)
+                        onCompleted();
+                }
+                else
+                    if (onCompleted)
+                        onCompleted();
+            },
+
+            trackEvent: function (eventName) {
+
+                if (!isLoaded || !fbq)
+                    return;
+
+                fbq('trackCustom', eventName);
+            }
+        }
+    }]);
+
+    ccApp.factory('printService', ['$rootScope', '$compile', '$http', '$timeout', '$q',
+        function ($rootScope, $compile, $http, $timeout, $q) {
+
+            var openNewWindow = function (html) {
+                var popupWin = window.open('', '_blank', '');
+                popupWin.document.open();
+                popupWin.document.write('<html><head></head><body onload="window.print(); window.close();">' + html + '</html>');
+                popupWin.document.close();
+            };
+
+            var print = function (templateUrl, data) {
+                $http.get(templateUrl).then(function (templateResponse) {
+                    var template = templateResponse.data;
+                    var printScope = $rootScope.$new();
+                    angular.extend(printScope, data);
+                    var element = $compile($(template))(printScope);
+                    var renderAndPrintPromise = $q.defer();
+
+                    return new Promise(function (resolve, reject) {
+                        var waitForRenderAndPrint = function () {
+                            if (printScope.$$phase || $http.pendingRequests.length) {
+                                $timeout(waitForRenderAndPrint, 1000);
+                            } else {
+                                openNewWindow(element.html());
+                                resolve();
+                                printScope.$destroy();
+                            }
+                        };
+                        waitForRenderAndPrint();
+                    });
+                });
+            };
+
+            return {
+                print: print
+            };
+        }]);
+
 
     ccApp.config(function ($stateProvider, $urlRouterProvider, $urlMatcherFactoryProvider,
         $httpProvider, dialogsProvider, localStorageServiceProvider, tmhDynamicLocaleProvider,
         settingsServiceProvider
-        , $controllerProvider, $compileProvider, $filterProvider, $provide, $ocLazyLoadProvider, themeServiceProvider
+        , $controllerProvider, $compileProvider, $filterProvider, $provide, $ocLazyLoadProvider, themeServiceProvider, $locationProvider
         ) {
+
+        $locationProvider.hashPrefix('');
 
         $urlMatcherFactoryProvider.caseInsensitive(true); // Allow any case.
         $urlMatcherFactoryProvider.strictMode(false); // Allows trailing slash.
@@ -299,6 +381,43 @@
 
         tmhDynamicLocaleProvider.localeLocationPattern(settingsServiceProvider.getPath() + 'Scripts/angular/i18n/angular-locale_{{locale}}.js');
 
+
+        function loadMap($window, configService) {
+            return new Promise(function (resolve, reject) {
+
+                //console.log('loadMap');
+
+                configService.onProfile(function () {
+
+                    //console.log('got settings');
+
+                    if (typeof google === 'object' && typeof google.maps === 'object') {
+                        console.log('Map already loaded');
+                        resolve();
+                    } else {
+                        $window.GoogleMapLoaded = function () {
+                            console.log('Map loaded');
+                            resolve();
+                        }
+
+                        var script = document.createElement("script");
+                        script.type = "text/javascript";
+                        script.src = "https://maps.googleapis.com/maps/api/js?libraries=places&callback=GoogleMapLoaded";
+
+                        var s = configService.getProfile();
+
+                        //Next 2 lines in case "Google API Key" is missing. Should be removed.
+                        if (!s.General.Geocoding["Google API Key"])
+                            s.General.Geocoding["Google API Key"] = 'AIzaSyAAFnu36gyziL9GvKd-e_VmvY-CqFvftjY';
+
+                        if (s.General.Geocoding && s.General.Geocoding["Google API Key"])
+                            script.src += '&key=' + s.General.Geocoding["Google API Key"];
+
+                        document.body.appendChild(script);
+                    }
+                });
+            });
+        }
 
         function loadFiles(stateName) {
             return ['$ocLazyLoad', function ($ocLazyLoad) {
@@ -327,12 +446,19 @@
         }
 
 
+        var isRecaptchaLoaded = false;
+
         function loadRecaptcha($ocLazyLoad, $window) {
             return new Promise(function (resolve, reject) {
                 resolve();//don't block load process
+
+                if (isRecaptchaLoaded)
+                    return;
+
                 var f = function () {
                     if ($window.vcRecaptchaApiLoaded) { //is vcRecaptcha loaded?
-                        $ocLazyLoad.load('recaptcha');
+                        console.log("loading recaptcha");
+                        $ocLazyLoad.load('recaptcha').then(function () { isRecaptchaLoaded = true; });
                     }
                     else {
                         setTimeout(f, 1000);
@@ -375,6 +501,7 @@
                     files: [cssPath('styles-material-bundle.min.css'),
                             scriptPath('angular-material-bundle.min.js?v=1.0.0'),
 
+                            componentPath('Base/PhoneNumber.js'),
                             componentPath('Base/CreditCard.js'),
                             componentPath('Controls/CreditCards.js'),
                             componentPath('Controls/ChangePassword.js'),
@@ -395,6 +522,7 @@
                             scriptPath('angular-material-bundle.min.js?v=1.0.0'),
                             cssPath('styles-material-bundle.min.css'),
 
+                            componentPath('Base/PhoneNumber.js'),
                             componentPath('Base/CreditCard.js'),
                             componentPath('Controls/ReferralSources.js'),
                             componentPath('Shared/PasswordIndicator/PasswordIndicatorDirective.js'),
@@ -414,7 +542,12 @@
                 },
                 {
                     name: 'payment',
-                    files: [componentPath('Shared/CCExp/CCExp.js'), controllerPath('Payments')
+                    files: [
+                        cssPath('styles-material-bundle.min.css'),
+                        scriptPath('angular-material-bundle.min.js?v=1.0.0'),
+
+                        componentPath('Base/CreditCard.js'),
+                        controllerPath('Payments')
                     ]
                 },
                 {
@@ -430,7 +563,16 @@
                 },
                  {
                      name: 'pickup',
-                     files: [controllerPath('Pickup')
+                     files: [cssPath('styles-material-bundle.min.css'),
+                             scriptPath('angular-material-bundle.min.js?v=1.0.0'),
+                             controllerPath('Pickup')
+                     ]
+                 },
+                 {
+                     name: 'pickupCalendar',
+                     files: [cssPath('styles-material-bundle.min.css'),
+                             scriptPath('angular-material-bundle.min.js?v=1.0.0'),
+                             controllerPath('PickupCalendar')
                      ]
                  },
                  {
@@ -472,6 +614,25 @@
                      name: 'googleAnalytics',
                      files: ['https://www.google-analytics.com/analytics.js'
                      ]
+                 },
+                 {
+                     name: 'postback',
+                     files: [controllerPath('postBack')
+                     ]
+                 },
+                 {
+                     name: 'coupon',
+                     files: [controllerPath('coupon')
+                     ]
+                 },
+                 {
+                     name: 'locker',
+                     files: [
+                         cssPath('styles-material-bundle.min.css'),
+                         scriptPath('angular-material-bundle.min.js?v=1.0.0'),
+
+                         controllerPath('Locker')
+                     ]
                  }
             ]
         });
@@ -505,11 +666,12 @@
 
         // Views
         $stateProvider.state('login', {
-            url: '/login',
+            url: '/login?sid&authtoken',
             parent: 'globaldependenciesLogin',
             templateUrl: viewPath('Login'),
             params: { forgotPasswordEmail: null, returnState: null },
             resolve: {
+                loginBySid: loginBySid,
                 load: loadFiles('login')
             }
         })
@@ -572,6 +734,12 @@
             templateUrl: viewPath('Pickup'),
             resolve: { load: loadFiles('pickup') }
         })
+        .state('pickupcalendar', {
+            url: '/pickupcalendar',
+            parent: 'globaldependencies',
+            templateUrl: viewPath('PickupCalendar'),
+            resolve: { load: loadFiles('pickupCalendar') }
+        })
         .state('suspend', {
             url: '/suspend',
             parent: 'globaldependencies',
@@ -614,6 +782,26 @@
             templateUrl: viewPath('Notifications'),
             resolve: { load: loadFiles('notifications') }
         })
+        .state('postback', {
+            url: '/postback',
+            parent: 'globaldependenciesanonymous',
+            templateUrl: viewPath('PostBack'),
+            resolve: { load: loadFiles('postback') }
+        })
+        .state('coupon', {
+            url: '/coupon?barcode&qrcode&text&w&h',
+            parent: 'globaldependenciesanonymous',
+            templateUrl: viewPath('Coupon'),
+            resolve: { load: loadFiles('coupon') }
+        })
+        .state('locker', {
+            url: '/locker',
+            parent: 'globaldependencies',
+            templateUrl: viewPath('Locker'),
+            resolve: { load: loadFiles('locker'), loadMap: loadMap }
+        })
+
+
         .state('globaldependenciesLogin', {
             abstract: true,
             url: '?theme&themeurl&cssurl', // for previewing themes.
@@ -646,6 +834,29 @@
 
     // ********************************************************************************************************************************************************************************
 
+    function loginBySid($stateParams, localStorageService, apiConfig, dataService, userService) {
+
+        return new Promise(function (resolve, reject) {
+
+            var sessionId = $stateParams.sid;
+            if (!sessionId) {
+                resolve();
+                return;
+            }
+
+            apiConfig.setSessionId(sessionId);
+            CustomerConnect.Config.SessionId = sessionId;
+            localStorageService.set(CustomerConnect.Config.Tenant + '_token', sessionId);
+
+            //suppose that server works OK and settings are being loaded using common functionality
+
+            //load Customer
+            initCustomer(null, localStorageService, CustomerConnect, apiConfig, dataService, userService).then(function () {
+                console.log("loginBySid redirect");
+                reject({ redirectTo: 'account' });
+            })
+        });
+    }
 
 
     function loadConfig(configService, dataService, googleAnalyticsService, $ocLazyLoad, tmhDynamicLocale, $stateParams, settingsService,
@@ -756,7 +967,7 @@
 
             var initConfigService = function (CustomerConnect, configService, dataService,
                                           googleAnalyticsService, $ocLazyLoad, onResolve) {
-                dataService.settings.getSpecificSettings(true, true, true, true, true, true, true, true).then(function (data) {
+                dataService.settings.getSpecificSettings(true, true, true, true, true, true, true, true, true).then(function (data) {
 
                     if (!data)
                         return;
@@ -808,6 +1019,23 @@
                         dataService.settings.getLocalitySettings(true, true, true, true, true, true, true, true).then(function (data) {
                             if (!data.Failed) {
                                 Settings.LocalitySettings = data.ReturnObject;
+                                if (!Settings.LocalitySettings.Level2Name)
+                                    Settings.LocalitySettings.Level2Name = "State";
+
+                                //if (!Settings.LocalitySettings.Level3Name)
+                                //{
+                                //    var x = "City";//default
+
+                                //    //Patch for RosesAltNZ, should be removed when Level3Name implemented and set up.
+                                //    if (Settings.General.Workstation == 'ROSNZ_API') {
+                                //        x = 'Suburb';
+                                //        Settings.LocalitySettings.Level2Name = "City";
+                                //    }
+
+                                //    Settings.LocalitySettings.Level3Name = x;
+                                //}
+
+
                                 configService.setProfile(Settings);
                             }
                             resolve();
@@ -929,6 +1157,16 @@
             // fix recaptcha bug
             $('.pls-container').remove();
         });
+
+        $rootScope.$on('$stateChangeError', function (evt, to, toParams, from, fromParams, error) {
+            if (error.redirectTo) {
+                $state.go(error.redirectTo, {}, { reload: true });
+            }
+            else {
+                console.log("stateChangeError");
+                console.log(error);
+            }
+        })
     });
 
     ccApp.directive('currencyformatter', function ($filter, configService) {
@@ -999,12 +1237,13 @@
         var ls = configService.getProfile().LocalitySettings;
 
         var formats = {
-            shortDate: ls.ShortDateFormat,
-            fullDate: ls.LongDateFormat,
+            shortDate: ls.ShortDateFormat_Angular,
+            fullDate: ls.LongDateFormat_Angular,
 
-            short: ls.ShortDateFormat + ' ' + ls.TimeFormat
+            short: ls.ShortDateFormat_Angular + ' ' + ls.TimeFormat_Angular,
+            pickupDate: "EEE MMM dd"
         };
-        
+
         return function (input, format) {
 
             if (formats[format] != undefined)
@@ -1014,6 +1253,11 @@
         }
     });
 
+    ccApp.filter("trust", ['$sce', function ($sce) {
+        return function (htmlCode) {
+            return $sce.trustAsHtml(htmlCode);
+        }
+    }]);
 
 
 })();

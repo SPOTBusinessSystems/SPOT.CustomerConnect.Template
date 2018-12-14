@@ -1,0 +1,111 @@
+<div ng-controller="PickupCalendarController" class="medPage">
+    <div class="text-center">
+        <h2>Schedule Your Pickup</h2>
+        <br />
+    </div>
+    <div class="form-group text-center">
+        <h4>Available days:</h4>
+        <div ng-if="Customer.RouteDays.charAt(0) == 'M'">
+            <label class="control-label">&nbsp;&nbsp;&nbsp;Monday</label>
+            <br />
+        </div>
+        <div ng-if="Customer.RouteDays.charAt(1) == 'T'">
+            <label class="control-label">&nbsp;&nbsp;&nbsp;Tuesday</label>
+            <br />
+        </div>
+        <div ng-if="Customer.RouteDays.charAt(2) == 'W'">
+            <label class="control-label">&nbsp;&nbsp;&nbsp;Wednesday</label>
+            <br />
+        </div>
+        <div ng-if="Customer.RouteDays.charAt(3) == 'T'">
+            <label class="control-label">&nbsp;&nbsp;&nbsp;Thursday</label>
+            <br />
+        </div>
+        <div ng-if="Customer.RouteDays.charAt(4) == 'F'">
+            <label class="control-label">&nbsp;&nbsp;&nbsp;Friday</label>
+            <br />
+        </div>
+        <div ng-if="Customer.RouteDays.charAt(5) == 'S'">
+            <label class="control-label">&nbsp;&nbsp;&nbsp;Saturday</label>
+            <br />
+        </div>
+        <div ng-if="Customer.RouteDays.charAt(6) == 'S'">
+            <label class="control-label">&nbsp;&nbsp;&nbsp;Sunday</label>
+            <br />
+        </div>
+
+        <div ng-show="Route.SameDayCutoffTime != ''">
+            <span>Standard pickups must be scheduled by {{cutoffTime}}</span>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <form name="pickupForm" novalidate>
+            <div class="row form-group">
+                <div ng-class="{'col-sm-6':Settings.Pickup['Allow Delivery Date Selection'] == '1', 'col-sm-12':Settings.Pickup['Allow Delivery Date Selection'] == '0'}">
+                    <div class="input-group center">
+                        <label class="control-label">Pickup Date</label><br />
+                        {{Pickup.Date | localizedDate:'fullDate' }}
+                        <uib-datepicker ng-model="Pickup.Date" class="well well-sm" datepicker-options="pickupDateOptions" ng-required="true" ng-change="pickupDateChange()" required></uib-datepicker>
+
+                        <div ng-if="Settings.Pickup['Allow Time Selection'] == '1'">
+                            <label for="pickupTimeSlot" class="control-label">Time</label>
+                            <select id="pickupTimeSlot" class="form-control" ng-change="pickupTimeChange(pickupTimeSlot)" ng-model="pickupTimeSlot" ng-options="ts as ts.TimeRange + ' (' + ts.StartTime + '-' + ts.EndTime + ')' for ts in Settings.TimeSlots[Customer.AccountNodeID] | filter:isPickupTime(ts) track by ts.TimeRange" ng-required="true"></select>
+                        </div>
+                    </div>
+                </div>
+
+                <div ng-if="Settings.Pickup['Allow Delivery Date Selection'] == '1'" class="col-sm-6">
+                    <div class="input-group center">
+                        <label class="control-label">Delivery Date</label><br />
+                        {{Pickup.DeliveryDate | localizedDate:'fullDate' }}
+                        <uib-datepicker ng-model="Pickup.DeliveryDate" class="well well-sm" datepicker-options="deliveryDateOptions" ng-required="true" required></uib-datepicker>
+
+                        <div ng-if="Settings.Pickup['Allow Time Selection'] == '1' && Settings.Pickup['Allow Delivery Date Selection'] == '1'">
+                            <label for="deliveryTimeSlot" class="control-label">Time</label>
+                            <select id="deliveryTimeSlot" class="form-control" ng-change="deliveryTimeChange(deliveryTimeSlot)" ng-model="deliveryTimeSlot" ng-options="ts.TimeRange + ' (' + ts.StartTime + '-' + ts.EndTime + ')' for ts in Settings.TimeSlots[Customer.AccountNodeID] | filter:isDeliveryTime(ts) track by ts.TimeRange" ng-required="true"></select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="comments" class="control-label">Pickup Comments</label>
+                <textarea name="comments" class="form-control" ng-model="Pickup.Comments" title="Please enter a message." maxlength="255" rows="6"></textarea>
+                <span>{{Pickup.Comments.length}} / 255</span>
+            </div>
+
+            <div class="form-group" ng-if="Settings.Pickup['Allow Delivery Date Selection'] == '1'">
+                <label for="comments" class="control-label">Delivery Comments</label>
+                <textarea name="comments" class="form-control" ng-model="Pickup.DeliveryComments" title="Please enter a message." maxlength="255" rows="6"></textarea>
+                <span>{{Pickup.DeliveryComments.length}} / 255</span>
+            </div>
+
+            <div class="form-group">
+                <label for="instructions" class="control-label">Cleaning Instructions/Requests</label>
+                <textarea name="instructions" class="form-control" ng-model="Pickup.Instructions" title="Please enter a message." maxlength="1000" rows="6"></textarea>
+                <span>{{Pickup.Instructions.length}} / 1000</span>
+            </div>
+
+            <div class="form-group" ng-if="Settings.Pickup['Terms and Conditions Acceptance Required']==1">
+                <div class="input-group terms-input">
+                    <label for="cbAcceptTerms">
+                        <input type="checkbox" id="cbAcceptTerms" ng-model="Pickup.AcceptTerms" required />
+                        <span>
+                            I have read and accept the company's standard <a target="_blank" href="{{Settings.Pickup['Terms and Conditions URL']}}">Terms & Conditions</a> relating to Home/Office collection and delivery services.
+                        </span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-sm-6" style="padding: 3px;">
+                    <label class="btn btn-info btn-block" ng-click="pendingPickups()">Show Pending Pickups</label>
+                </div>
+                <div class="col-sm-6" style="padding: 3px;">
+                    <label class="btn btn-success btn-block" ng-click="pickupForm.$valid && schedulePickup()" ng-disabled="!pickupForm.$valid">Schedule Your Pickup</label>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

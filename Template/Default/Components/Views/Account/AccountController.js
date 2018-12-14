@@ -7,9 +7,9 @@ var authProvider;
     .module('app')
     .controller('accountcontroller', accountcontroller);
 
-    accountcontroller.$inject = ['$scope', 'dialogs', '$rootScope', '$filter', 'settingsService', '$state', 'dataService', 'userService', 'configService', '$compile', '$stateParams', '$ocLazyLoad', 'CheckStateChangeService'];
+    accountcontroller.$inject = ['$scope', 'dialogs', '$rootScope', '$filter', 'settingsService', '$state', 'dataService', 'userService', 'configService', '$compile', '$stateParams', '$ocLazyLoad', 'CheckStateChangeService', 'printService'];
 
-    function accountcontroller($scope, dialogs, $rootScope, $filter, settingsService, $state, dataService, userService, configService, $compile, $stateParams, $ocLazyLoad, CheckStateChangeService) {
+    function accountcontroller($scope, dialogs, $rootScope, $filter, settingsService, $state, dataService, userService, configService, $compile, $stateParams, $ocLazyLoad, CheckStateChangeService, printService) {
         /* jshint validthis:true */
         var vm = this;
         vm.title = 'accountcontroller';
@@ -17,20 +17,23 @@ var authProvider;
         activate();
 
         function activate() {
-
+            $scope.notifyOptions = { onNotificationMethodChanged: function () { $scope.NotificationMethodChanged(); } };
             $scope.Customer = angular.copy(userService.getCustomer());
             $scope.Settings = configService.getProfile();
             $scope.configService = configService;
+            $scope.disableSave = false;
 
             // Password change
             if ($stateParams.requirePasswordChange) {
                 $scope.requirePasswordChange = $stateParams.requirePasswordChange;
+                $stateParams.requirePasswordChange = false;
             } else {
                 $scope.requirePasswordChange = false;
             }
 
             $scope.Customer.Notifications = $filter('orderBy')($scope.Customer.Notifications, 'NotificationTypeDescription', false);
             $scope.Settings.Notifications = $filter('orderBy')($scope.Settings.Notifications, ['Description', 'MethodName'], false);
+
 
             $scope.$watch('birthMonth', function () {
                 $scope.setBirthDays();
@@ -88,10 +91,13 @@ var authProvider;
             $scope.SaveAccount = function () {
                 var ci = angular.copy($scope.Customer);
 
+                ci.NotificationSaveMode = 2;
+
                 if ($scope.birthMonth)
                     ci.Birthdate = new Date(Date.UTC(2012, $scope.birthMonth - 1, $scope.birthDate));
 
                 var ccArray = ci.CreditCards;
+                var ccChanged = false;
 
                 if (ccArray.length > 0) {
 
@@ -113,6 +119,8 @@ var authProvider;
                         if (cc.CardId.startsWith('New_')) {
                             // New credit card, move to new credit cards save.
 
+                            ccChanged = true;
+
                             // Empty card added but removed
                             if (cc.MarkDeleted) {
                                 ccArray.remove(cc);
@@ -124,7 +132,16 @@ var authProvider;
                                 swal({
                                     type: 'error',
                                     title: 'Unable to add new credit card',
-                                    text: "A valid credit card number is required."
+                                    text: " A valid credit card number is required."
+                                });
+
+                                return;
+                            }
+                            if (!CustomerConnect.Util.Validate.CCType(cc.CardInfo, $scope.Settings['CreditCardSettings'])) {
+                                swal({
+                                    type: 'error',
+                                    title: 'Unable to add new credit card',
+                                    text: "Your credit card type is not supported."
                                 });
 
                                 return;
@@ -150,6 +167,7 @@ var authProvider;
                             var cL = userService.getCustomer().CreditCards;
                             //index >= cL.length ||
                             if (cc.CardInfo != cL[index].CardInfo || cc.CardExpiration != moment(cL[index].CardExpiration).format("MM/YY")) {
+                                ccChanged = true;
                                 if (!CustomerConnect.Util.Validate.CCNumber(cc.CardInfo)) {
                                     swal({
                                         type: 'error',
@@ -158,11 +176,21 @@ var authProvider;
                                     });
 
                                     return;
-                                } else {
-                                    // Card Updated. Mark deleted, re-add with new CC Info and expiration
-                                    ccSave.push(GetCard(cc));
-                                    cc.MarkDeleted = true;
                                 }
+                                if (!CustomerConnect.Util.Validate.CCType(cc.CardInfo, $scope.Settings['CreditCardSettings'])) {
+                                    swal({
+                                        type: 'error',
+                                        title: 'Unable to add new credit card',
+                                        text: "Your credit card type is not supported."
+                                    });
+
+                                    return;
+                                }
+
+
+                                // Card Updated. Mark deleted, re-add with new CC Info and expiration
+                                ccSave.push(GetCard(cc));
+                                cc.MarkDeleted = true;
                             }
                         }
                     }
@@ -176,22 +204,17 @@ var authProvider;
                             text: $scope.Settings['Account Update']['Submitted Message']
                         }).then(function () {
 
-                            dataService.customer.getCustomer().then(function (data) {
-                                if (!data.Failed) {
-                                    userService.setCustomer(data.ReturnObject);
-                                    //$scope.Customer = angular.copy(userService.getCustomer());
+
+                            $scope.reloadCustomerInternal().then(function () {
+
+                                if (ccChanged && $scope.Customer.IsAR && $scope.Customer.ARBalance) {
+                                    $state.go('payment');
+                                    return;
                                 }
 
-                                $scope.accountForm.$setPristine();
-                                $scope.accountForm.$setUntouched();
-                                //$state.reload();
-                                $state.reload($state.current.name);
-
-                                $stateParams.reload = !$stateParams.reload;
-                                $state.transitionTo($state.current, $stateParams, {
-                                    reload: true, inherit: false, notify: true
-                                });
+                                $scope.reloadForm();
                             });
+
                         });
                     } else {
                         swal({
@@ -205,9 +228,43 @@ var authProvider;
                 });
             };
 
+            $scope.reloadCustomer = function () {
+
+                $scope.reloadCustomerInternal().then(function () {
+                    $scope.reloadForm();
+                });
+            }
+
+            $scope.reloadCustomerInternal = function () {
+                return new Promise(function (resolve, reject) {
+                    dataService.customer.getCustomer().then(function (data) {
+                        if (!data.Failed) {
+                            userService.setCustomer(data.ReturnObject);
+                            //$scope.Customer = angular.copy(userService.getCustomer());
+                        }
+
+                        console.log($scope);
+                        $scope.accountForm.$setPristine();
+                        $scope.accountForm.$setUntouched();
+
+                        resolve();
+                    });
+                });
+            }
+
+            $scope.reloadForm = function () {
+                //$state.reload();
+                $state.reload($state.current.name);
+
+                $stateParams.reload = !$stateParams.reload;
+                $state.transitionTo($state.current, $stateParams, {
+                    reload: true, inherit: false, notify: true
+                });
+            }
+
             // Undo Form
             $scope.UndoChanges = function () {
-                $state.reload();
+                $scope.reloadForm();
             };
 
             // Date Control
@@ -260,15 +317,102 @@ var authProvider;
                     return;
                 }
 
-                dataService.customer.convertToDelivery().then(function (data) {
+                if (!isCreditCardValid()) {
+                    dialogs.error('Delivery Signup', 'Credit card validation failed. Please add valid credit card and save it.');
+                    return;
+                }
+
+                var p = validateAddress();
+                p.then(function (isAddressValid) {
+                    if (isAddressValid)
+                        convertToRouteRequest();
+                });
+            };
+
+            function isCreditCardValid() {
+                if ($scope.Settings.Signup.Route['Require Credit Card'] != 1)
+                    return true;
+
+                // If using credit card, check to make sure it is valid.
+                var cc = $scope.Customer.CreditCards;
+                if (cc) {
+                    for (var i = 0; i < cc.length; i++)
+                        if (cc[i] && CustomerConnect.Util.Validate.CCExpiration(cc[0].CardExpiration))
+                            return true;
+                    //CustomerConnect.Util.Validate.CCNumber(cc[0].CardInfo, $scope.Settings['CreditCardSettings'])); // Card is already saved, no need to validate number
+                }
+
+                // Implicit false.
+                return false;
+            }
+
+            function validateAddress() {
+
+                return new Promise(function (resolve, reject) {
+
+                    if ($scope.Settings.General && $scope.Settings.General["Geocoding"]) {
+                        var geocodingEnabled = $scope.Settings.General && $scope.Settings.General["Geocoding"]["Enabled"];
+                        if (geocodingEnabled != "1")
+                            resolve(true);
+                    }
+                    else
+                        resolve(true);
+
+                    //Send address to server for Route validation
+                    dataService.customer.checkAddress($scope.Customer.PrimaryAddress).then(function (data) {
+                        if (data.Failed) {
+                            dialogs.error('Address validation failed.', data.Message);
+                            resolve(false);
+                        } else {
+                            resolve(true);
+                        }
+                    });
+                });
+            }
+
+            function getCustomerLatLon() {
+
+                var c = $scope.Customer;
+                var s = $scope.Settings;
+
+                if (s['Account Update'] && s['Account Update']['Show Delivery Address'] == '1' && c.DeliveryGeoLocation.Latitude != 0 && c.DeliveryGeoLocation.Longitude != 0)
+                    return { Latitude: c.DeliveryGeoLocation.Latitude, Longitude: c.DeliveryGeoLocation.Longitude };
+
+
+                if (c.PrimaryGeoLocation.Latitude == 0 && c.PrimaryGeoLocation.Longitude == 0)
+                    return null;
+
+                return { Latitude: c.PrimaryGeoLocation.Latitude, Longitude: c.PrimaryGeoLocation.Longitude };
+            }
+
+            function convertToRouteRequest() {
+
+                var p = getCustomerLatLon();
+
+                var isAddressValid = p;
+
+                if (!isAddressValid) {
+                    p = { Latitude: 0, Longitude: 0 };
+                }
+
+                dataService.customer.convertToDelivery(p).then(function (data) {
                     if (!data.Failed) {
-                        dialogs.notify('Delivery Signup', 'You have been converted to a delivery account.')
+
+                        var m = 'You have been converted to a delivery account.';
+                        if ($scope.Settings["Account Update"] && $scope.Settings["Account Update"]["Delivery Enabled Message"])
+                            m = $scope.Settings["Account Update"]["Delivery Enabled Message"];
+
+                        //if (!isAddressValid) {
+                        //    dialogs.notify("Delivery Signup Warning", "Unable to geocode your Primary address. Please make sure your primary address is valid.");
+                        //}
+
+                        dialogs.notify('Delivery Signup', m);
 
                         dataService.customer.getCustomer().then(function (cdata) {
                             if (!cdata.Failed) {
                                 userService.setCustomer(cdata.ReturnObject);
                                 $scope.Customer = angular.copy(userService.getCustomer());
-                                $state.reload();
+                                $scope.reloadForm();
                             } else {
                                 dialogs.error('Retrieval failed.', cdata.Message);
                             }
@@ -277,7 +421,7 @@ var authProvider;
                         dialogs.error('Update failed.', data.Message);
                     }
                 });
-            };
+            }
 
             $scope.isEnableDeliveryVisible = function () {
 
@@ -314,10 +458,97 @@ var authProvider;
 
             };
 
+
+            $scope.printBagTag = function () {
+                var data = { Customer: angular.copy($scope.Customer), Settings: $scope.Settings };
+
+                if (!(data.Customer.DeliveryGeoLocation && data.Customer.DeliveryGeoLocation.Latitude && data.Customer.DeliveryGeoLocation.Longitude)) {
+                    data.Customer.DeliveryAddress = angular.copy(data.Customer.PrimaryAddress);
+                }
+
+                printService.print(settingsService.path + 'Components/Dialogs/BagTagPrint.html', data);
+            };
+
+            $scope.DisableAll = function () {
+
+                //confirm
+                swal({
+                    title: 'Are you sure?',
+                    text: "All notification subscriptions will be disabled. Continue?",
+                    type: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#008cba',
+                    cancelButtonColor: '#5cb85c',
+                    confirmButtonText: 'Yes, Unsubscribe',
+                    cancelButtonText: 'Cancel'
+                }).then(function () {
+                    //Set all to disabled
+                    $scope.disableSave = true;
+                    $scope.notifyOptions.disableAll();
+                    //!!todo:save notifications only
+                    $scope.SaveNotification();
+                    $scope.disableSave = false;
+
+                }).catch(function () { });
+            };
+
+            $scope.SaveNotification = function () {
+
+                var p = $scope.SaveNotificationInternal();
+
+                p.then(function (data) {
+                    if (!data.Failed) {
+                        var dlg = dialogs.notify('Update submitted', 'Your notification settings have been changed.');
+                        dlg.result.then(function () {
+                            $scope.reloadCustomer();
+                        })
+                    } else {
+                        dialogs.error('Update failed.', data.Message);
+                    }
+                });
+            };
+
+            $scope.SaveNotificationInternal = function () {//Returns promise
+
+                var x = {
+                    ClientAccountID: $scope.Customer.ClientAccountID,
+                    Notifications: $scope.Customer.Notifications,
+
+                    EmailAddress: $scope.Customer.EmailAddress,
+                    EmailAddress2: "",
+                    EmailAddress3: "",
+                    EmailAddress4: "",
+                    Phones: [],
+
+                    loaded: true
+                };
+
+                return dataService.customer.saveCustomerNotificationsById(x);
+            };
+
+            $scope.NotificationMethodChanged = function () {
+
+                if ($scope.disableSave)
+                    return;
+
+                var p = $scope.SaveNotificationInternal();
+
+                p.then(function (data) {
+                    if (!data.Failed) {
+                        //console.log('$scope.NotificationMethodChanged succeed');
+                    } else {
+                        console.log('$scope.NotificationMethodChanged failed');
+                    }
+                });
+            }
+
+
             CheckStateChangeService.checkFormOnStateChange($scope, validateStateChange);
 
             // Initialize Customer
             $scope.initCustomer();
         };
+
+
     }
 })();

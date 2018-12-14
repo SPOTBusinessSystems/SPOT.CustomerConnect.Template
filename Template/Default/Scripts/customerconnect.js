@@ -132,7 +132,8 @@ var CustomerConnect = {
                 return false;
             },
 
-            CCNumber: function (s) {
+            CCNumber: function (s, creditCardSettings) {
+
                 var ca, sum = 0, mul = 1;
                 var len = s.length;
                 while (len--) {
@@ -140,23 +141,45 @@ var CustomerConnect = {
                     sum += ca - (ca > 9) * 9;
                     mul ^= 3;
                 }
-                return (sum % 10 === 0) && (sum > 0);
+
+                if (!((sum % 10 === 0) && (sum > 0)))
+                    return false;
+
+                return CustomerConnect.Util.Validate.CCType(s, creditCardSettings);
             },
 
-            CCType: function (s) {
-                if (typeof CustomerConnect.Config.Settings.CCTypesSupported == 'undefined') {
-                    return false;
-                }
+            CCType: function (s, creditCardSettings) {
 
-                if (CustomerConnect.Config.Settings.CCTypesSupported.search(CustomerConnect.Util.Validate.GetCCType(s)) == -1) {
-                    return false;
-                }
+                if (!creditCardSettings || !creditCardSettings.CardTypesAllowed || !creditCardSettings.CardTypesAllowed.length)
+                    return true;
 
-                return CustomerConnect.Util.Validate.CCNumber(s);
+                var t = CustomerConnect.Util.Validate.GetCCType(s);
+                var name = CustomerConnect.Util.Validate.GetCCTypeName(t).toUpperCase();
+
+                return creditCardSettings.CardTypesAllowed.includes(name);
             },
 
             EmailAddress: function (s) {
                 return /^[A-Za-z0-9\._%+-]+@[A-Za-z0-9\.-]+\.[A-Za-z]{2,}/.test(s);
+            },
+
+            GetCCTypeName: function (typeAbbr) {
+                switch (typeAbbr) {
+                    case 'AMEX': return 'American Express';
+                    case 'MC': return 'MasterCard';
+                    case 'VISA': return 'Visa';
+                    case 'DNRS': return 'Diners Club';
+                    case 'DISC': return 'Discover';
+
+                    case 'JCB': return 'JCB';
+                    case 'CART': return 'Carte Blanche';
+                    case 'SOLO': return 'Solo';
+                    case 'SWTC': return 'Switch';
+                    case 'MAES': return 'Maestro';
+                    case 'UNKN': return 'Unknown';
+
+                    default: return typeAbbr;
+                }
             },
 
             GetCCType: function (s) {

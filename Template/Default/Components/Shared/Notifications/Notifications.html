@@ -5,7 +5,7 @@
         </md-select-header>
         <md-select ng-model="notification.selectedMethod" md-selected-text="getSelectedText(notification.selectedMethod)" aria-label="{{notification.Description}}" ng-change="updateModel()" multiple>
             <md-optgroup>
-                <md-option ng-value="item" ng-repeat="item in notification.methods">{{getOptionText(item.Name)}}</md-option>
+                <md-option ng-value="item" ng-repeat="item in notification.methods">{{getOptionText(item)}}</md-option>
             </md-optgroup>
         </md-select>
     </md-input-container>

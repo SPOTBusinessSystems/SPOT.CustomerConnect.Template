@@ -22,12 +22,6 @@
                 return;
             }
 
-            var Settings = configService.getProfile();
-            if (Settings != null) {
-                var stateTitle = "Select " + Settings.LocalitySettings.Level2Name;
-                var a = iElement.find('option:first');
-                a.text(stateTitle);
-            }
 
             // Initial value
             scope.$watch(ngModel, function () {
@@ -47,8 +41,12 @@
         function controller($scope) {
             $scope.selectedState = {};
 
-            if (configService.getProfile() != null) {
-                $scope.states = configService.getProfile().States;
+            var Settings = configService.getProfile();
+            if (Settings != null) {
+                var a = Settings.States.slice();
+                var x = { NodeID: "", Key: "", Name: "Select " + Settings.LocalitySettings.Level2Name };
+                a.splice(0, 0, x);
+                $scope.states = a;
             }
         }
     }

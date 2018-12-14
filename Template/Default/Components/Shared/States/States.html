@@ -1,7 +1,6 @@
 ﻿<div class="input-group">
     <span class="input-group-addon"><i class="glyphicon glyphicon-pencil"></i></span>
-    <select ng-model="selectedState" ng-options="state.Name for state in states track by state.Key" class="form-control stateControl" required>
-        <option value='' disabled>Select State</option>
+    <select ng-model="selectedState" ng-options="state.Name for state in states track by state.Key" class="form-control stateControl" >
     </select>
     <span class="glyphicon form-control-feedback" aria-hidden="true"></span>
 </div>

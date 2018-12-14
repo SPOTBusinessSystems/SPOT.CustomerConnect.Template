@@ -28,7 +28,7 @@
         <uib-pagination boundary-links="true" max-size="3" items-per-page="itemsPerPage" total-items="AR.Payments.length" ng-model="currentPage" ng-change="pageChanged()" num-pages="numPages" previous-text="&lsaquo;" next-text="&rsaquo;" first-text="&laquo;" last-text="&raquo;"></uib-pagination>
     </div>
 
-    <div style="max-width: 300px; margin: 0 auto;">
+    <div style="max-width: 400px; margin: 0 auto;">
         <form name="paymentForm" novalidate>
             <h3>Current Balance:&nbsp;&nbsp;{{AR.Balance | localizedCurrency}}</h3>
             <div class="form-group">
@@ -42,17 +42,9 @@
                 <select id="makePaymentCCOFSel" class="form-control" ng-model="AR.Payment.CardInformation" ng-options="cc.CardInfo for cc in Customer.CreditCards track by cc.CardId">
                     <option value="" selected>Other Card</option>
                 </select>
-                <div ng-hide="AR.Payment.CardInformation.CardId">
+                <div ng-hide="AR.Payment.CardInformation.CardId" style="margin-top:29px;">
                     <div class="form-group">
-                        <div class="form-group">
-                            <div class="input-group has-feedback" ng-class="{'has-error':!CCValid && paymentForm.makePaymentNewCard.$dirty, 'has-success':CCValid && paymentForm.makePaymentNewCard.$dirty}">
-                                <label for="makePaymentNewCard" class="control-label">Other Card Number</label>
-                                <input name="makePaymentNewCard" class="form-control" ng-model="AR.Payment.CardInformation.CardInfo" ng-change="ValidateCard()" placeholder="Enter credit card number (Required)" ng-minlength="8" />
-                                <span class="glyphicon glyphicon-remove form-control-feedback" aria-hidden="true" ng-if="!CCValid && paymentForm.makePaymentNewCard.$dirty"></span>
-                                <span class="glyphicon glyphicon-ok form-control-feedback" aria-hidden="true" ng-if="CCValid && paymentForm.makePaymentNewCard.$dirty"></span>
-                            </div>
-                            <ccexp ng-model="AR.Payment.CardInformation.CardExpiration" />
-                        </div>
+                        <credit-card card-info="AR.Payment.OtherCard"></credit-card>
                     </div>
                 </div>
             </div>

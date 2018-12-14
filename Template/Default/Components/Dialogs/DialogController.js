@@ -66,11 +66,10 @@
 
                     dataService.customer.inviteFriend(body).then(function (data2) {
                         if (!data2.Failed) {
-                            dialogs.notify(data.firstName + ' has been Notified!',
+                            dialogs.notify(data.firstName + ' has been notified!',
+                                "Thank you! " +
                                 data.firstName +
-                                " has been sent a $10 coupon, and you will receive a $10 coupon when " +
-                                data.firstName +
-                                " uses us for the first time");
+                                " has been sent a referral.");
                         } else {
                             dialogs.error('Error', 'Unable to send notification.');
                         }
