@@ -759,7 +759,7 @@
             },
 
             passwordReminder: function (requestInfo) {
-                return createRequest('RememberPasswordRequest', requestInfo).then(handleSuccess, handleError);
+                return createRequest('RemindPassword', requestInfo).then(handleSuccess, handleError);
             },
 
             finishPasswordReminder: function (requestInfo) {

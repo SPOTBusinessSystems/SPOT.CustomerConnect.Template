@@ -22,6 +22,7 @@ var authProvider;
             $scope.Settings = configService.getProfile();
             $scope.configService = configService;
             $scope.disableSave = false;
+            $scope.Validation = { PrimaryAddress: true, DeliveryAddress: true, BillingAdress: true };
 
             // Password change
             if ($stateParams.requirePasswordChange) {
@@ -38,6 +39,7 @@ var authProvider;
             $scope.$watch('birthMonth', function () {
                 $scope.setBirthDays();
             });
+
 
             $scope.setBirthDays = function () {
                 $scope.birthDays = [];
@@ -68,15 +70,24 @@ var authProvider;
             }
 
             $scope.primaryAddressValid = function () {
-                if (!$scope.Customer.RouteName)//Required if relivery enabled only
-                    return true;
 
-                return $scope.primaryAddressValidInternal();
+                var res = $scope.Validation.PrimaryAddress && $scope.Validation.DeliveryAddress && $scope.Validation.BillingAddress;
+
+                if ($scope.Customer.RouteName)// Primary address required if delivery enabled only
+                    res = res && $scope.isFullAddress($scope.Customer.PrimaryAddress);
+
+                return res;
             };
 
             $scope.primaryAddressValidInternal = function () {
                 var a = $scope.Customer.PrimaryAddress;
-                return (a.Address1 && a.City && a.State && a.Zip);
+                return $scope.addressValidInternal(a);
+            };
+
+            $scope.addressValidInternal = function (a) {
+                if (!a)
+                    return false;
+                return $scope.isFullAddress(a);
             };
 
             $scope.isFirstLastName = function () {
@@ -196,37 +207,81 @@ var authProvider;
                     }
                 }
 
-                dataService.customer.saveCustomer(ci).then(function (data) {
-                    if (!data.Failed) {
-                        swal({
-                            type: 'success',
-                            title: 'Update submitted',
-                            text: $scope.Settings['Account Update']['Submitted Message']
-                        }).then(function () {
+                $scope.validateAddressFull().then(function () {
+                    dataService.customer.saveCustomer(ci).then(function (data) {
+                        if (!data.Failed) {
+                            swal({
+                                type: 'success',
+                                title: 'Update submitted',
+                                text: $scope.Settings['Account Update']['Submitted Message']
+                            }).then(function () {
 
 
-                            $scope.reloadCustomerInternal().then(function () {
+                                $scope.reloadCustomerInternal().then(function () {
 
-                                if (ccChanged && $scope.Customer.IsAR && $scope.Customer.ARBalance) {
-                                    $state.go('payment');
-                                    return;
-                                }
+                                    if (ccChanged && $scope.Customer.IsAR && $scope.Customer.ARBalance) {
+                                        $state.go('payment');
+                                        return;
+                                    }
 
-                                $scope.reloadForm();
+                                    $scope.reloadForm();
+                                });
+
+                            });
+                        } else {
+                            swal({
+                                type: 'error',
+                                title: 'Update Failed',
+                                text: data.Message
                             });
 
-                        });
-                    } else {
-                        swal({
-                            type: 'error',
-                            title: 'Update Failed',
-                            text: data.Message
-                        });
+                            return;
+                        }
+                    });
+                }).catch(function (error) {
 
-                        return;
-                    }
+                    dialogs.error('Save Customer', error);
                 });
+
+
             };
+
+            $scope.validateAddressFull = function () {
+
+                return new Promise(function (resolve, reject) {
+
+                    var a = [];
+                    var addressType = [];
+
+                    if (!$scope.isEmptyAddress($scope.Customer.PrimaryAddress)) {
+                        a.push($scope.validateAddressInternal($scope.Customer.PrimaryAddress));
+                        addressType.push("Primary Address");
+                    }
+
+                    if ($scope.Settings['Account Update']['Show Delivery Address'] == 1 && !$scope.isEmptyAddress($scope.Customer.DeliveryAddress)) {
+                        a.push($scope.validateAddressInternal($scope.Customer.DeliveryAddress));
+                        addressType.push("Delivery Address");
+                    }
+
+
+                    if ($scope.Settings['Account Update']['Show Billing Address'] == 1 && !$scope.isEmptyAddress($scope.Customer.BillingAddress)) {
+                        a.push($scope.validateAddressInternal($scope.Customer.BillingAddress));
+                        addressType.push("Billing Address");
+                    }
+
+
+                    Promise.all(a).then(function (values) {
+
+                        for (var i = 0; i < values.length; i++) {
+                            if (!values[i])
+                                reject("Unable to locate your " + addressType[i]);
+                        }
+
+                        resolve();
+                    });
+
+                });
+            }
 
             $scope.reloadCustomer = function () {
 
@@ -349,6 +404,18 @@ var authProvider;
             function validateAddress() {
 
                 return new Promise(function (resolve, reject) {
+                    $scope.validateAddressInternal($scope.Customer.PrimaryAddress).then(function (result) {
+                        if (!result)
+                            dialogs.error('Address validation failed.', data.Message);
+                        resolve(result);
+                    });
+                });
+
+            }
+
+            $scope.validateAddressInternal = function (a) {
+
+                return new Promise(function (resolve, reject) {
 
                     if ($scope.Settings.General && $scope.Settings.General["Geocoding"]) {
                         var geocodingEnabled = $scope.Settings.General && $scope.Settings.General["Geocoding"]["Enabled"];
@@ -359,9 +426,9 @@ var authProvider;
                         resolve(true);
 
                     //Send address to server for Route validation
-                    dataService.customer.checkAddress($scope.Customer.PrimaryAddress).then(function (data) {
+                    dataService.customer.checkAddress(a).then(function (data) {
                         if (data.Failed) {
-                            dialogs.error('Address validation failed.', data.Message);
+                            //dialogs.error('Address validation failed.', data.Message);
                             resolve(false);
                         } else {
                             resolve(true);
@@ -541,6 +608,70 @@ var authProvider;
                     }
                 });
             }
+
+
+            $scope.testAddress = function (addressType, field, value, a) {
+
+                console.log('testAddress');
+                console.log(addressType);
+                console.log(field);
+
+                switch (field) {
+                    case "Address1": a.Address1 = value;
+                        break;
+                    case "Address2": a.Address2 = value;
+                        break;
+                    case "City": a.City = value;
+                        break;
+                    case "State": a.State = value;
+                        break;
+                    case "Zip": a.Zip = value;
+                        break;
+                }
+
+                var res = $scope.testAddressInternal(a);
+
+                $scope.Validation[addressType] = res;
+
+                console.log(res);
+                return res;
+            }
+
+            $scope.testAddressInternal = function (a) {
+                if ($scope.isEmptyAddress(a))
+                    return true;
+
+                if ($scope.isFullAddress(a))
+                    return true;
+
+                return false;
+            }
+
+
+            $scope.isEmptyAddress = function (a) {
+                return !(a.Address1 || a.Address2 || a.City || a.State || a.Zip);
+            }
+
+            $scope.isFullAddress = function (a) {
+                return a.Address1 && a.City && a.State && a.Zip;
+            }
+
+
+            $scope.$watchGroup(['Customer.PrimaryAddress.Address1', 'Customer.PrimaryAddress.Address2', 'Customer.PrimaryAddress.City', 'Customer.PrimaryAddress.State', 'Customer.PrimaryAddress.Zip'], function () {
+                var res = $scope.testAddressInternal($scope.Customer.PrimaryAddress);
+                $scope.Validation.PrimaryAddress = res;
+            });
+
+            $scope.$watchGroup(['Customer.DeliveryAddress.Address1', 'Customer.DeliveryAddress.Address2', 'Customer.DeliveryAddress.City', 'Customer.DeliveryAddress.State', 'Customer.DeliveryAddress.Zip'], function () {
+                var res = $scope.testAddressInternal($scope.Customer.DeliveryAddress);
+                $scope.Validation.DeliveryAddress = res;
+            });
+
+            $scope.$watchGroup(['Customer.BillingAddress.Address1', 'Customer.BillingAddress.Address2', 'Customer.BillingAddress.City', 'Customer.BillingAddress.State', 'Customer.BillingAddress.Zip'], function () {
+                var res = $scope.testAddressInternal($scope.Customer.BillingAddress);
+                $scope.Validation.BillingAddress = res;
+            });
+
 
 
             CheckStateChangeService.checkFormOnStateChange($scope, validateStateChange);

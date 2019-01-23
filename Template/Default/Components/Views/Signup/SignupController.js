@@ -163,8 +163,8 @@
                     phones: [
                         {
                             number: $scope.Customer.Phone.Number,
-                            phoneType: $scope.Customer.PhoneType,
-                            phoneMask: $scope.Customer.PhoneMask,//$scope.Settings.LocalitySettings.PhoneMask[0]
+                            phoneType: $scope.Customer.Phone.PhoneType,
+                            phoneMask: $scope.Customer.Phone.PhoneMask,//$scope.Settings.LocalitySettings.PhoneMask[0]
                         }],
 
                     primaryAddress: {
@@ -175,7 +175,9 @@
                         Zip: $scope.Customer.Zip
                     },
                     referringCustomerKey: $scope.Customer.ReferringCustomerKey,
-                    comments: $scope.Customer.Comments
+                    comments: $scope.Customer.Comments,
+                    Locker: $scope.Customer.Locker,
+                    LockerPIN: $scope.Customer.LockerPIN
                 };
 
                 if ($scope.Settings.Signup['Terms and Conditions Acceptance Required'] == 1) {
@@ -271,8 +273,9 @@
 
             $scope.setPin = function () {
                 if ($scope.Customer.Type == 'LOCKER') {
+
                     $scope.Customer.Locker = "Y";
-                    var onlyNumbers = $scope.Customer.PhoneNumber.replace(/\D/g, '');
+                    var onlyNumbers = $scope.Customer.Phone.Number.replace(/\D/g, '');
                     $scope.Customer.LockerPIN = onlyNumbers.substring(onlyNumbers.length - 4);
                 }
                 else {

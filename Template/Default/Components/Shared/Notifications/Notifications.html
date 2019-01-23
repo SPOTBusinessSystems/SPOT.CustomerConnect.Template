@@ -3,7 +3,7 @@
         <md-select-header>
             <span> {{notification.Description}}</span>
         </md-select-header>
-        <md-select ng-model="notification.selectedMethod" md-selected-text="getSelectedText(notification.selectedMethod)" aria-label="{{notification.Description}}" ng-change="updateModel()" multiple>
+        <md-select ng-model="notification.selectedMethod" md-selected-html="getSelectedText(notification.selectedMethod)" aria-label="{{notification.Description}}" ng-change="updateModel()" multiple>
             <md-optgroup>
                 <md-option ng-value="item" ng-repeat="item in notification.methods">{{getOptionText(item)}}</md-option>
             </md-optgroup>

@@ -125,14 +125,6 @@
                 $state.go('signup');
             };
 
-            $scope.sendPasswordEmail = function (templateData) {
-                dataService.customer.sendEmail({ ToAddress: $scope.Login.emailAddress, Template: 7, Data: JSON.stringify(templateData) }).then(function () {
-                    dialogs.notify('Email Sent', 'A password change email has been sent to your email address.');
-                }).catch(function (emailData) {
-                    dialogs.error('Error Sending Email', emailData.Message);
-                });
-            };
-
             $scope.forgotPassword = function () {
                 if (!$scope.Login.emailAddress) {
                     return;
@@ -140,10 +132,9 @@
 
                 var ip = "1.1.1.1";
 
-                dataService.user.passwordReminder({ emailAddress: $scope.Login.emailAddress, ipAddress: ip }).then(function (data) {
+                dataService.user.passwordReminder({ emailAddress: $scope.Login.emailAddress, ipAddress: ip, sendEmail: true, resetFinishURL: $scope.getFinishUrl('%code%') }).then(function (data) {
                     if (!data.Failed) {
-                        var templateData = { IPAddress: ip, RememberKey: data.ReturnObject.RememberKey, FinishUrl: $scope.getFinishUrl(data.ReturnObject.RememberKey) };
-                        $scope.sendPasswordEmail(templateData);
+                        dialogs.notify('Email Sent', 'A password change email has been sent to your email address.');
                     } else {
                         dialogs.error('Password Reminder Error', data.Message);
                     }

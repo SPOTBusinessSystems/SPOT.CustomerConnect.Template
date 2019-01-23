@@ -12,13 +12,15 @@
             var ctrl = this;
             ctrl.configService = configService;
 
-            
-            
-
+            ctrl.phoneTypes = [
+                { "name": "Home", "value": "Home" },
+                { "name": "Mobile", "value": "Cell/Mobile" },
+                { "name": "Work", "value": "Work" },
+                { "name": "Other", "value": "Other" },
+                { "name": "Principal", "value": "Principal" }
+            ];
 
             this.$onInit = function () {
-
-                console.log(ctrl);
 
                 ctrl.phoneNumberTitle = "Phone Number";
 
@@ -43,6 +45,7 @@
                 $scope.$watch('$ctrl.value.PhoneMask', function () {
                     ctrl.applyMask();
                 });
+
             };
 
             function filterMasks() {
@@ -70,7 +73,7 @@
                 if (!str)
                     return 0;
 
-                var x = str.replace(/[^#]/g, ""); 
+                var x = str.replace(/[^#]/g, "");
 
                 return x.length;
             };
@@ -84,8 +87,7 @@
 
                 var mask = ctrl.value.PhoneMask;
 
-                if (getMaskLength(mask) == digits.length)
-                {
+                if (getMaskLength(mask) == digits.length) {
                     var i = 0;
 
                     var f = function () {
@@ -98,8 +100,7 @@
                 }
 
                 //mask length mismatch. Try to find better mask.
-                for (var i = 0; i < ctrl.masks.length; i++)
-                {
+                for (var i = 0; i < ctrl.masks.length; i++) {
                     var m = ctrl.masks[i];
                     if (m == mask)
                         continue;
@@ -124,8 +125,9 @@
             }
 
             this.applyMask = function () {
+
                 var n = ctrl.value.Number;
-                
+
                 var x = formatPhone(n);
 
                 if (x != n) {
@@ -133,6 +135,8 @@
                     ctrl.masksFilterted = filterMasks();
                 }
             }
+
+
 
         },
         template: [
@@ -154,14 +158,10 @@
                 '<md-input-container ng-if="$ctrl.options.hasPhoneType">',
                     '<label>Phone Type</label>',
                     '<md-select ng-model="$ctrl.value.PhoneType">',
-                        '<md-option ng-value="Home">Home</md-option>',
-                        '<md-option ng-value="Cell/Mobile">Mobile</md-option>',
-                        '<md-option ng-value="Work">Work</md-option>',
-                        '<md-option ng-value="Other">Other</md-option>',
-                        '<md-option ng-value="Principal">Principal</md-option>',
+                        '<md-option ng-value="opt.value" ng-repeat="opt in $ctrl.phoneTypes">{{ opt.name }}</md-option>',
                     '</md-select>',
                 '</md-input-container>',
-                
+
             '</div>'
         ].join('')
     });

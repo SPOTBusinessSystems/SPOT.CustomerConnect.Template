@@ -62,7 +62,7 @@
                 <label class="control-label">Available Cash Credit:&nbsp;&nbsp;</label>{{ Customer.CashCreditBalance | localizedCurrency}}
                 <br />
             </div>
-            <div ng-show="Customer.LockerPIN">
+            <div ng-show="Customer.LockerPIN &&!Settings['Account Update']['Edit Locker PIN']">
                 <label class="control-label">Locker PIN:&nbsp;&nbsp;</label>{{ Customer.LockerPIN }}
                 <br />
             </div>
@@ -89,147 +89,147 @@
         <div class="form-group">
             <div class="form-group">
                 <h4>Primary</h4>
-                <div class="input-group">
+                <div class="input-group has-feedback" ng-class="{'has-error':!Validation.PrimaryAddress, 'has-success':Validation.PrimaryAddress && accountForm.priAddress1.$dirty}">
                     <span class="input-group-addon"><i class="glyphicon glyphicon-pencil"></i></span>
-                    <input type="text" id="address1" ng-model="Customer.PrimaryAddress.Address1" class="form-control" placeholder="Address 1" aria-describedby="add1" />
+                    <input type="text" name="priAddress1" ng-model="Customer.PrimaryAddress.Address1" class="form-control" placeholder="Address 1" aria-describedby="add1" />
                 </div>
 
-                <div class="input-group">
+                <div class="input-group has-feedback" ng-class="{'has-error':!Validation.PrimaryAddress, 'has-success':Validation.PrimaryAddress && accountForm.priAddress2.$dirty}">
                     <span class="input-group-addon"><i class="glyphicon glyphicon-pencil"></i></span>
-                    <input id="address2" ng-model="Customer.PrimaryAddress.Address2" class="form-control" placeholder="Address 2" />
+                    <input type="text" name="priAddress2" ng-model="Customer.PrimaryAddress.Address2" class="form-control" placeholder="Address 2" />
                 </div>
 
                 <ng-container ng-if="Settings.LocalitySettings.LocalityNameShort === 'NZ'">
-                    <div class="input-group">
+                    <div class="input-group has-feedback" ng-class="{'has-error':!Validation.PrimaryAddress, 'has-success':Validation.PrimaryAddress && accountForm.priCity.$dirty}">
                         <span class="input-group-addon"><i class="glyphicon glyphicon-pencil"></i></span>
-                        <input id="city" ng-model="Customer.PrimaryAddress.City" class="form-control" placeholder="Suburb" />
+                        <input name="priCity" ng-model="Customer.PrimaryAddress.City" class="form-control" placeholder="Suburb" />
                         <span class="glyphicon form-control-feedback" aria-hidden="true"></span>
                     </div>
 
-                    <div class="input-group">
+                    <div class="input-group has-feedback" ng-class="{'has-error':!Validation.PrimaryAddress, 'has-success':Validation.PrimaryAddress && accountForm.priState.$dirty}">
                         <span class="input-group-addon"><i class="glyphicon glyphicon-pencil"></i></span>
-                        <input id="city" ng-model="Customer.PrimaryAddress.State" class="form-control" placeholder="City" />
+                        <input name="priState" ng-model="Customer.PrimaryAddress.State" class="form-control" placeholder="City" />
                         <span class="glyphicon form-control-feedback" aria-hidden="true"></span>
                     </div>
                 </ng-container>
 
                 <ng-container ng-if="Settings.LocalitySettings.LocalityNameShort !== 'NZ'">
-                    <div class="input-group">
+                    <div class="input-group has-feedback" ng-class="{'has-error':!Validation.PrimaryAddress, 'has-success':Validation.PrimaryAddress && accountForm.priCity.$dirty}">
                         <span class="input-group-addon"><i class="glyphicon glyphicon-pencil"></i></span>
-                        <input id="city" ng-model="Customer.PrimaryAddress.City" class="form-control" placeholder="City" />
+                        <input name="priCity" ng-model="Customer.PrimaryAddress.City" class="form-control" placeholder="City" />
                         <span class="glyphicon form-control-feedback" aria-hidden="true"></span>
                     </div>
 
-                    <states ng-model="Customer.PrimaryAddress.State" />
+                    <states ng-model="Customer.PrimaryAddress.State" ng-class="{'has-error':!Validation.PrimaryAddress, 'has-success':Validation.PrimaryAddress && accountForm.priAddress1.$dirty}" />
                 </ng-container>
 
-                <div class="input-group">
+                <div class="input-group has-feedback" ng-class="{'has-error':!Validation.PrimaryAddress, 'has-success':Validation.PrimaryAddress && accountForm.priZip.$dirty}">
                     <span class="input-group-addon"><i class="glyphicon glyphicon-pencil"></i></span>
-                    <input id="zip" ng-model="Customer.PrimaryAddress.Zip" class="form-control" placeholder="{{Settings.LocalitySettings.PostalCodeName}}" />
+                    <input name="priZip" ng-model="Customer.PrimaryAddress.Zip" class="form-control" placeholder="{{Settings.LocalitySettings.PostalCodeName}}" />
                     <span class="glyphicon form-control-feedback" aria-hidden="true"></span>
                 </div>
             </div>
+
+
             <div class="form-group" ng-if="Settings['Account Update']['Show Delivery Address'] == 1">
                 <h4>Delivery</h4>
-                <div class="input-group">
+                <div class="input-group has-feedback" ng-class="{'has-error':!Validation.DeliveryAddress, 'has-success':Validation.DeliveryAddress && accountForm.delAddress1.$dirty}">
                     <span class="input-group-addon"><i class="glyphicon glyphicon-pencil"></i></span>
-                    <input type="text" id="address1" ng-model="Customer.DeliveryAddress.Address1" class="form-control" placeholder="Address 1" aria-describedby="add1" />
+                    <input type="text" name="delAddress1" ng-model="Customer.DeliveryAddress.Address1" class="form-control" placeholder="Address 1" aria-describedby="add1" />
                 </div>
 
-                <div class="input-group">
+                <div class="input-group has-feedback" ng-class="{'has-error':!Validation.DeliveryAddress, 'has-success':Validation.DeliveryAddress && accountForm.delAddress2.$dirty}">
                     <span class="input-group-addon"><i class="glyphicon glyphicon-pencil"></i></span>
-                    <input id="address2" ng-model="Customer.DeliveryAddress.Address2" class="form-control" placeholder="Address 2" />
+                    <input name="delAddress2" ng-model="Customer.DeliveryAddress.Address2" class="form-control" placeholder="Address 2" />
                 </div>
-
-                <!--<div class="input-group">
-                    <span class="input-group-addon"><i class="glyphicon glyphicon-pencil"></i></span>
-                    <input id="city" ng-model="Customer.DeliveryAddress.City" class="form-control" placeholder="{{Settings.LocalitySettings.Level3Name}}" />
-                    <span class="glyphicon form-control-feedback" aria-hidden="true"></span>
-                </div>
-
-                <states ng-model="Customer.DeliveryAddress.State" />-->
 
                 <ng-container ng-if="Settings.LocalitySettings.LocalityNameShort === 'NZ'">
-                    <div class="input-group">
+                    <div class="input-group has-feedback" ng-class="{'has-error':!Validation.DeliveryAddress, 'has-success':Validation.DeliveryAddress && accountForm.delCity.$dirty}">
                         <span class="input-group-addon"><i class="glyphicon glyphicon-pencil"></i></span>
-                        <input id="city" ng-model="Customer.DeliveryAddress.City" class="form-control" placeholder="Suburb" />
+                        <input name="delCity" ng-model="Customer.DeliveryAddress.City" class="form-control" placeholder="Suburb" />
                         <span class="glyphicon form-control-feedback" aria-hidden="true"></span>
                     </div>
 
-                    <div class="input-group">
+                    <div class="input-group has-feedback" ng-class="{'has-error':!Validation.DeliveryAddress, 'has-success':Validation.DeliveryAddress && accountForm.delState.$dirty}">
                         <span class="input-group-addon"><i class="glyphicon glyphicon-pencil"></i></span>
-                        <input id="city" ng-model="Customer.DeliveryAddress.State" class="form-control" placeholder="City" />
+                        <input name="delState" ng-model="Customer.DeliveryAddress.State" class="form-control" placeholder="City" />
                         <span class="glyphicon form-control-feedback" aria-hidden="true"></span>
                     </div>
                 </ng-container>
 
                 <ng-container ng-if="Settings.LocalitySettings.LocalityNameShort !== 'NZ'">
-                    <div class="input-group">
+                    <div class="input-group has-feedback" ng-class="{'has-error':!Validation.DeliveryAddress, 'has-success':Validation.DeliveryAddress && accountForm.delCity.$dirty}">
                         <span class="input-group-addon"><i class="glyphicon glyphicon-pencil"></i></span>
-                        <input id="city" ng-model="Customer.DeliveryAddress.City" class="form-control" placeholder="City" />
+                        <input name="delCity" ng-model="Customer.DeliveryAddress.City" class="form-control" placeholder="City" />
                         <span class="glyphicon form-control-feedback" aria-hidden="true"></span>
                     </div>
 
-                    <states ng-model="Customer.DeliveryAddress.State" />
+                    <states ng-model="Customer.DeliveryAddress.State" ng-class="{'has-error':!Validation.DeliveryAddress, 'has-success':Validation.DeliveryAddress && accountForm.delAddress1.$dirty}" />
                 </ng-container>
 
-                <div class="input-group">
+                <div class="input-group has-feedback" ng-class="{'has-error':!Validation.DeliveryAddress, 'has-success':Validation.DeliveryAddress && accountForm.delZip.$dirty}">
                     <span class="input-group-addon"><i class="glyphicon glyphicon-pencil"></i></span>
-                    <input id="zip" ng-model="Customer.DeliveryAddress.Zip" class="form-control" placeholder="{{Settings.LocalitySettings.PostalCodeName}}" />
+                    <input name="delZip" ng-model="Customer.DeliveryAddress.Zip" class="form-control" placeholder="{{Settings.LocalitySettings.PostalCodeName}}" />
                     <span class="glyphicon form-control-feedback" aria-hidden="true"></span>
                 </div>
             </div>
             <div class="form-group" ng-if="Settings['Account Update']['Show Billing Address'] == 1">
                 <h4>Billing</h4>
-                <div class="input-group">
+                <div class="input-group has-feedback" ng-class="{'has-error':!Validation.BillingAddress, 'has-success':Validation.BillingAddress && accountForm.bilAddress1.$dirty}">
                     <span class="input-group-addon"><i class="glyphicon glyphicon-pencil"></i></span>
-                    <input type="text" id="address1" ng-model="Customer.BillingAddress.Address1" class="form-control" placeholder="Address 1" aria-describedby="add1" />
+                    <input type="text" name="bilAddress1" ng-model="Customer.BillingAddress.Address1" class="form-control" placeholder="Address 1" aria-describedby="add1" />
                 </div>
 
-                <div class="input-group">
+                <div class="input-group has-feedback" ng-class="{'has-error':!Validation.BillingAddress, 'has-success':Validation.BillingAddress && accountForm.bilAddress2.$dirty}">
                     <span class="input-group-addon"><i class="glyphicon glyphicon-pencil"></i></span>
-                    <input id="address2" ng-model="Customer.BillingAddress.Address2" class="form-control" placeholder="Address 2" />
+                    <input name="bilAddress2" ng-model="Customer.BillingAddress.Address2" class="form-control" placeholder="Address 2" />
                 </div>
-
-                <!--<div class="input-group">
-                    <span class="input-group-addon"><i class="glyphicon glyphicon-pencil"></i></span>
-                    <input id="city" ng-model="Customer.BillingAddress.City" class="form-control" placeholder="{{Settings.LocalitySettings.Level3Name}}" />
-                    <span class="glyphicon form-control-feedback" aria-hidden="true"></span>
-                </div>
-
-                <states ng-model="Customer.BillingAddress.State" />-->
 
                 <ng-container ng-if="Settings.LocalitySettings.LocalityNameShort === 'NZ'">
-                    <div class="input-group">
+                    <div class="input-group has-feedback" ng-class="{'has-error':!Validation.BillingAddress, 'has-success':Validation.BillingAddress && accountForm.bilCity.$dirty}">
                         <span class="input-group-addon"><i class="glyphicon glyphicon-pencil"></i></span>
-                        <input id="city" ng-model="Customer.BillingAddress.City" class="form-control" placeholder="Suburb" />
+                        <input name="bilCity" ng-model="Customer.BillingAddress.City" class="form-control" placeholder="Suburb" />
                         <span class="glyphicon form-control-feedback" aria-hidden="true"></span>
                     </div>
 
-                    <div class="input-group">
+                    <div class="input-group has-feedback" ng-class="{'has-error':!Validation.BillingAddress, 'has-success':Validation.BillingAddress && accountForm.bilState.$dirty}">
                         <span class="input-group-addon"><i class="glyphicon glyphicon-pencil"></i></span>
-                        <input id="city" ng-model="Customer.BillingAddress.State" class="form-control" placeholder="City" />
+                        <input name="bilState" ng-model="Customer.BillingAddress.State" class="form-control" placeholder="City" />
                         <span class="glyphicon form-control-feedback" aria-hidden="true"></span>
                     </div>
                 </ng-container>
 
                 <ng-container ng-if="Settings.LocalitySettings.LocalityNameShort !== 'NZ'">
-                    <div class="input-group">
+                    <div class="input-group has-feedback" ng-class="{'has-error':!Validation.BillingAddress, 'has-success':Validation.BillingAddress && accountForm.bilCity.$dirty}">
                         <span class="input-group-addon"><i class="glyphicon glyphicon-pencil"></i></span>
-                        <input id="city" ng-model="Customer.BillingAddress.City" class="form-control" placeholder="City" />
+                        <input name="bilCity" ng-model="Customer.BillingAddress.City" class="form-control" placeholder="City" />
                         <span class="glyphicon form-control-feedback" aria-hidden="true"></span>
                     </div>
 
-                    <states ng-model="Customer.BillingAddress.State" />
+                    <states ng-model="Customer.BillingAddress.State" ng-class="{'has-error':!Validation.BillingAddress, 'has-success':Validation.BillingAddress && accountForm.bilAddress1.$dirty}" />
                 </ng-container>
 
-                <div class="input-group">
+                <div class="input-group has-feedback" ng-class="{'has-error':!Validation.BillingAddress, 'has-success':Validation.BillingAddress && accountForm.bilZip.$dirty}">
                     <span class="input-group-addon"><i class="glyphicon glyphicon-pencil"></i></span>
-                    <input id="zip" ng-model="Customer.BillingAddress.Zip" class="form-control" placeholder="{{Settings.LocalitySettings.PostalCodeName}}" />
+                    <input name="bilZip" ng-model="Customer.BillingAddress.Zip" class="form-control" placeholder="{{Settings.LocalitySettings.PostalCodeName}}" />
                     <span class="glyphicon form-control-feedback" aria-hidden="true"></span>
                 </div>
             </div>
         </div>
+
+        <div class="form-group" ng-if="Customer.Locker == 'Y' && Settings['Account Update']['Edit Locker PIN'] == 1">
+            <h4>Locker Pin</h4>
+
+            <div class="input-group has-feedback" ng-class="{'has-error':accountForm.lockerPin.$invalid && accountForm.lockerPin.$dirty, 'has-success':accountForm.lockerPin.$valid && accountForm.lockerPin.$dirty}">
+                <span class="input-group-addon"><i class="glyphicon glyphicon-pencil"></i></span>
+                <input type="text" id="lockerPin" name="lockerPin" ng-model="Customer.LockerPIN" class="form-control" placeholder="Locker Pin" ng-pattern="/^\d{4}$/" />
+                <span class="glyphicon glyphicon-remove form-control-feedback" aria-hidden="true" ng-if="accountForm.lockerPin.$invalid && accountForm.lockerPin.$dirty"></span>
+                <span class="glyphicon glyphicon-ok form-control-feedback" aria-hidden="true" ng-if="accountForm.lockerPin.$valid && accountForm.lockerPin.$dirty"></span>
+            </div>
+            <span ng-if="accountForm.lockerPin.$invalid && accountForm.lockerPin.$dirty">Locker Pin should be 4 digits</span>
+        </div>
+
+
 
         <h3>Credit Cards</h3>
         <credit-cards cards="Customer.CreditCards" on-update="accountForm.$setDirty();"></credit-cards>

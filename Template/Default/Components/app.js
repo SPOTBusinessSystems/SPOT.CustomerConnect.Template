@@ -268,6 +268,16 @@
                     $('.block-ui-non-transparent').removeClass('block-ui-non-transparent');
                     //console.log('show time');
                 }
+            },
+            showAll: function () {
+                //console.log('show');
+                hideCounter = 0;
+
+                if (hideCounter <= 0) {
+                    blockUI.stop();
+                    $('.block-ui-non-transparent').removeClass('block-ui-non-transparent');
+                    //console.log('show time');
+                }
             }
         }
     }]);
@@ -510,6 +520,7 @@
                             componentPath('Shared/Notifications/Notifications.js'),
                             componentPath('Shared/States/States.js'),
                             componentPath('Shared/SpecialInstructions/SpecialInstructions.js'),
+                            componentPath('Base/CustomValidator.js'),
 
                             componentPath('Base/AuthProviders/GoogleAuth.js'),
                             componentPath('Base/AuthProviders/FacebookAuth.js'),
@@ -633,6 +644,11 @@
 
                          controllerPath('Locker')
                      ]
+                 },
+                 {
+                     name: 'error',
+                     files: [controllerPath('error')
+                     ]
                  }
             ]
         });
@@ -657,6 +673,17 @@
             [
                 '<site-header></site-header>',
                 '<main-menu></main-menu>',
+                '<ui-view></ui-view>',
+                '<site-footer></site-footer>'
+            ].join('');
+
+            return res;
+        }
+
+        function resolveTemplateError($stateParams, settingsService, configService) {
+            var res =
+            [
+                '<site-header></site-header>',
                 '<ui-view></ui-view>',
                 '<site-footer></site-footer>'
             ].join('');
@@ -801,6 +828,13 @@
             resolve: { load: loadFiles('locker'), loadMap: loadMap }
         })
 
+        .state('error', {
+            url: '/error',
+            parent: 'globaldependenciesError',
+            templateUrl: viewPath('Error'),
+            resolve: { show: function (blindService) { blindService.showAll(); }, load: loadFiles('error') }
+        })
+
 
         .state('globaldependenciesLogin', {
             abstract: true,
@@ -828,13 +862,21 @@
                 //setupThemePreview: themeServiceProvider.setupThemePreview,//!!todo
                 config: loadConfig
             }
-        });
-
+        })
+        .state('globaldependenciesError', {
+            abstract: true,
+            url: '?theme&themeurl&cssurl', // for previewing themes.
+            template: resolveTemplateError,
+            resolve: {
+                //setupThemePreview: themeServiceProvider.setupThemePreview,//!!todo
+                //config: loadConfig
+            }
+        })
     });//ccApp.config
 
     // ********************************************************************************************************************************************************************************
 
-    function loginBySid($stateParams, localStorageService, apiConfig, dataService, userService) {
+    function loginBySid($stateParams, localStorageService, apiConfig, dataService, userService, $state) {
 
         return new Promise(function (resolve, reject) {
 
@@ -844,16 +886,36 @@
                 return;
             }
 
+            if (!CustomerConnect.Config.SessionIdOld)
+                CustomerConnect.Config.SessionIdOld = CustomerConnect.Config.SessionId;
             apiConfig.setSessionId(sessionId);
             CustomerConnect.Config.SessionId = sessionId;
             localStorageService.set(CustomerConnect.Config.Tenant + '_token', sessionId);
 
+
             //suppose that server works OK and settings are being loaded using common functionality
 
             //load Customer
-            initCustomer(null, localStorageService, CustomerConnect, apiConfig, dataService, userService).then(function () {
+            initCustomer(null, localStorageService, CustomerConnect, apiConfig, dataService, userService).then(function (data) {
                 console.log("loginBySid redirect");
-                reject({ redirectTo: 'account' });
+
+                if (data && data.state == 'error') {
+
+                    //restore sessionID
+                    if (CustomerConnect.Config.SessionIdOld) {
+                        sessionId = CustomerConnect.Config.SessionIdOld;
+                        apiConfig.setSessionId(sessionId);
+                        CustomerConnect.Config.SessionId = sessionId;
+                        localStorageService.set(CustomerConnect.Config.Tenant + '_token', sessionId);
+                    }
+
+                    console.log("to error page");
+                    window.location.hash = '#/error';
+                    return;
+                }
+
+                window.location.hash = '#/account';
+                //reject({ redirectTo: 'account' });
             })
         });
     }
@@ -1022,20 +1084,6 @@
                                 if (!Settings.LocalitySettings.Level2Name)
                                     Settings.LocalitySettings.Level2Name = "State";
 
-                                //if (!Settings.LocalitySettings.Level3Name)
-                                //{
-                                //    var x = "City";//default
-
-                                //    //Patch for RosesAltNZ, should be removed when Level3Name implemented and set up.
-                                //    if (Settings.General.Workstation == 'ROSNZ_API') {
-                                //        x = 'Suburb';
-                                //        Settings.LocalitySettings.Level2Name = "City";
-                                //    }
-
-                                //    Settings.LocalitySettings.Level3Name = x;
-                                //}
-
-
                                 configService.setProfile(Settings);
                             }
                             resolve();
@@ -1064,6 +1112,16 @@
         console.log('initCustomer');
 
         return new Promise(function (resolve) {
+
+            if (returnState == 'error')//Error page, don't load customer
+            {
+                console.log('initCustomer error page: delayed resolve pending');
+                setTimeout(function () { console.log('delayed resolve'); resolve(); }, 5000);
+                //resolve();
+                return;
+            }
+
+
             if (localStorageService.get(CustomerConnect.Config.Tenant + '_token') == null) {
                 console.log('login with return');
                 resolve({ state: 'login', params: { returnState: returnState } });
@@ -1077,6 +1135,14 @@
             var promiseM = dataService.user.getMessages();
 
             Promise.all([promiseC, promiseM]).then(function (values) {
+
+                if (!values[0].HostName || !values[1].HostName) //result is not XML, failure
+                {
+                    console.log('getCustomer error');
+                    resolve({ state: 'error', params: {} });
+                    return;
+                }
+
                 var vc = values[0];
 
                 if (vc.Failed) {
@@ -1127,7 +1193,7 @@
                 apiConfig.ApplyConfig(CustomerConnect.Config);
 
             var isAnonymousParent = function (route) {
-                return $.inArray(route, ['globaldependenciesanonymous', 'globaldependenciesLogin']);
+                return $.inArray(route, ['globaldependenciesanonymous', 'globaldependenciesLogin', 'globaldependenciesError']);
             };
 
             var isNeedCustomer = isAnonymousParent(toState.parent) === -1 && !userService.getCustomer();
@@ -1137,6 +1203,8 @@
             ev.preventDefault();
 
             function continueNavigation(data) {
+                //console.log('continueNavigation');
+
                 //fromParams.skipSomeAsyncGlobal = true;
                 if (data)
                     $state.go(data.state, data.params);
@@ -1159,6 +1227,7 @@
         });
 
         $rootScope.$on('$stateChangeError', function (evt, to, toParams, from, fromParams, error) {
+            console.log('$stateChangeError');
             if (error.redirectTo) {
                 $state.go(error.redirectTo, {}, { reload: true });
             }

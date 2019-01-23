@@ -79,8 +79,11 @@
                     <input type="button" class="btn btn-success" style="width:100%;" value="Our Stores" ng-click="setCustomerType('RETAIL');" />
                     <br /><br />
                     <input type="submit" class="btn btn-success" style="width:100%;" value="Pickup & Delivery" ng-click="setCustomerType('DELIVERY');" />
-                    <!--<br /><br />
-                    <input type="button" class="btn btn-success" style="width:100%;" value="Lockers" ng-click="setCustomerType('LOCKER');" />-->
+
+                    <ng-container ng-if="Settings['Signup']['Allow Locker Delivery'] == 1">
+                        <br />
+                        <input type="button" class="btn btn-success" style="width:100%;" value="Lockers" ng-click="setCustomerType('LOCKER');" />
+                    </ng-container>
                 </div>
                 <div ng-show="Params.HasPickupType">
                     <label class="control-label" style="margin-top:15px;">Pickup Type</label>
@@ -123,7 +126,7 @@
                         <span class="glyphicon glyphicon-remove form-control-feedback" aria-hidden="true" ng-if="addressForm.address2.$invalid && addressForm.address2.$dirty"></span>
                         <span class="glyphicon glyphicon-ok form-control-feedback" aria-hidden="true" ng-if="addressForm.address2.$valid && addressForm.address2.$dirty"></span>
                     </div>
-                                        
+
                     <ng-container ng-if="Settings.LocalitySettings.LocalityNameShort === 'NZ'">
                         <div class="input-group" ng-class="{'has-error':addressForm.city.$invalid && addressForm.city.$dirty, 'has-success':addressForm.city.$valid && addressForm.city.$dirty}">
                             <span class="input-group-addon"><i class="glyphicon glyphicon-pencil"></i></span>
@@ -159,9 +162,21 @@
                     </div>
                 </div>
 
+                <div class="form-group" ng-if="Customer.Locker == 'Y' && Settings['Signup']['Allow Locker Delivery'] == 1">
+                    <h4>Locker Pin</h4>
+
+                    <div class="input-group has-feedback" ng-class="{'has-error':addressForm.lockerPin.$invalid && addressForm.lockerPin.$dirty, 'has-success':addressForm.lockerPin.$valid && addressForm.lockerPin.$dirty}">
+                        <span class="input-group-addon"><i class="glyphicon glyphicon-pencil"></i></span>
+                        <input type="text" id="lockerPin" name="lockerPin" ng-model="Customer.LockerPIN" class="form-control" placeholder="Locker Pin" ng-pattern="/^\d{4}$/" />
+                        <span class="glyphicon glyphicon-remove form-control-feedback" aria-hidden="true" ng-if="addressForm.lockerPin.$invalid && addressForm.lockerPin.$dirty"></span>
+                        <span class="glyphicon glyphicon-ok form-control-feedback" aria-hidden="true" ng-if="addressForm.lockerPin.$valid && addressForm.lockerPin.$dirty"></span>
+                    </div>
+                    <span ng-if="addressForm.lockerPin.$invalid && addressForm.lockerPin.$dirty">Locker Pin should be 4 digits</span>
+                </div>
+
                 <div class="form-group">
                     <input type="button" class="btn btn-danger" wz-previous value="Go Back" />
-                    <input type="submit" class="btn btn-success" ng-disabled="Customer.Type == 'DELIVERY' && !addressValid()" wz-next value="Continue" />
+                    <input type="submit" class="btn btn-success" ng-disabled="(Customer.Type == 'DELIVERY' && !addressValid()) || addressForm.lockerPin.$invalid" wz-next value="Continue" />
                 </div>
             </ng-form>
         </wz-step>
